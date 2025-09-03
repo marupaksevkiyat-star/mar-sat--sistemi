@@ -184,6 +184,81 @@ export default function Admin() {
     },
   });
 
+  // Add product mutation
+  const addProductMutation = useMutation({
+    mutationFn: async (productData: any) => {
+      return await apiRequest("/api/products", {
+        method: "POST",
+        body: JSON.stringify(productData),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Yeni ürün eklendi",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      setActiveModal('products');
+      setNewProduct({ name: '', description: '', code: '', price: '', category: '' });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Hata",
+        description: "Ürün eklenirken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Edit product mutation
+  const editProductMutation = useMutation({
+    mutationFn: async (productData: any) => {
+      return await apiRequest(`/api/products/${productData.id}`, {
+        method: "PUT",
+        body: JSON.stringify(productData),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Ürün güncellendi",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      setActiveModal('products');
+      setEditingProduct(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Hata",
+        description: "Ürün güncellenirken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete product mutation
+  const deleteProductMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      return await apiRequest(`/api/products/${productId}`, {
+        method: "DELETE",
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Ürün silindi",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Hata",
+        description: "Ürün silinirken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -1290,14 +1365,15 @@ export default function Admin() {
               </Button>
               <Button 
                 onClick={() => {
-                  toast({
-                    title: "Başarılı",
-                    description: "Yeni ürün eklendi",
+                  addProductMutation.mutate({
+                    name: newProduct.name,
+                    description: newProduct.description,
+                    code: newProduct.code,
+                    price: parseFloat(newProduct.price || '0'),
+                    category: newProduct.category || 'Genel',
                   });
-                  setActiveModal('products');
-                  setNewProduct({ name: '', description: '', code: '', price: '', category: '' });
                 }}
-                disabled={!newProduct.name || !newProduct.code}
+                disabled={!newProduct.name || !newProduct.code || addProductMutation.isPending}
                 className="flex-1"
               >
                 <i className="fas fa-save mr-2"></i>
@@ -1469,14 +1545,16 @@ export default function Admin() {
                 </Button>
                 <Button 
                   onClick={() => {
-                    toast({
-                      title: "Başarılı",
-                      description: "Ürün bilgileri güncellendi",
+                    editProductMutation.mutate({
+                      id: editingProduct.id,
+                      name: editingProduct.name,
+                      description: editingProduct.description,
+                      code: editingProduct.code,
+                      price: editingProduct.price,
+                      category: editingProduct.category || 'Genel',
                     });
-                    setActiveModal('products');
-                    setEditingProduct(null);
                   }}
-                  disabled={!editingProduct.name || !editingProduct.code}
+                  disabled={!editingProduct.name || !editingProduct.code || editProductMutation.isPending}
                   className="flex-1"
                 >
                   <i className="fas fa-save mr-2"></i>
