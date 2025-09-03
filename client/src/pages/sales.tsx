@@ -24,7 +24,6 @@ export default function Sales() {
   const [showCustomerForm, setShowCustomerForm] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [showSalesForm, setShowSalesForm] = useState(false);
   const [selectedCustomerForSale, setSelectedCustomerForSale] = useState<any>(null);
 
   useEffect(() => {
@@ -209,7 +208,6 @@ export default function Sales() {
 
   const handleNewSale = (customer: any) => {
     setSelectedCustomerForSale(customer);
-    setShowSalesForm(true);
   };
 
   const handleCompleteVisit = (outcome: string, customerData?: any, orderData?: any, appointmentData?: any) => {
@@ -400,6 +398,52 @@ export default function Sales() {
                   </p>
                 </div>
               )}
+
+              {/* Sipariş Formu */}
+              {selectedCustomerForSale && (
+                <div className="mt-6 pt-6 border-t border-border">
+                  <div className="mb-4">
+                    <h4 className="font-medium text-foreground">
+                      Sipariş Oluştur: {selectedCustomerForSale.companyName}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedCustomerForSale.contactPerson}
+                    </p>
+                  </div>
+                  <OrderForm
+                    customer={selectedCustomerForSale}
+                    onSubmit={(orderData) => {
+                      // Sipariş verilerini düzelt
+                      const orderItemsData = orderData.items.map((item: any) => ({
+                        productId: item.productId,
+                        quantity: item.quantity,
+                        price: item.price.toString(),
+                      }));
+                      
+                      const orderPayload = {
+                        customerId: selectedCustomerForSale.id,
+                        totalAmount: orderData.totalAmount.toString(),
+                        status: 'pending',
+                        notes: orderData.notes || '',
+                        items: orderItemsData
+                      };
+                      
+                      createOrderMutation.mutate(orderPayload, {
+                        onSuccess: () => {
+                          setSelectedCustomerForSale(null);
+                          toast({
+                            title: "Başarılı",
+                            description: "Sipariş başarıyla oluşturuldu!",
+                          });
+                        }
+                      });
+                    }}
+                    onCancel={() => {
+                      setSelectedCustomerForSale(null);
+                    }}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -419,40 +463,6 @@ export default function Sales() {
           </div>
         )}
 
-        {showSalesForm && selectedCustomerForSale && (
-          <div className="mb-8">
-            <OrderForm
-              customer={selectedCustomerForSale}
-              onSubmit={(orderData) => {
-                // Direkt sipariş oluştur
-                const orderItemsData = orderData.items.map((item: any) => ({
-                  productId: item.productId,
-                  quantity: item.quantity,
-                  price: item.price.toString(),
-                }));
-                
-                const orderPayload = {
-                  customerId: selectedCustomerForSale.id,
-                  totalAmount: orderData.totalAmount.toString(),
-                  status: 'pending',
-                  notes: orderData.notes || '',
-                  items: orderItemsData
-                };
-                
-                createOrderMutation.mutate(orderPayload, {
-                  onSuccess: () => {
-                    setShowSalesForm(false);
-                    setSelectedCustomerForSale(null);
-                  }
-                });
-              }}
-              onCancel={() => {
-                setShowSalesForm(false);
-                setSelectedCustomerForSale(null);
-              }}
-            />
-          </div>
-        )}
 
         {/* Diğer Özellikler - Alt Kısım */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
