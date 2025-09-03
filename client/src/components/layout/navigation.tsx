@@ -4,11 +4,24 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Navigation() {
   const [location] = useLocation();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [profileData, setProfileData] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || 'admin@system.com'
+  });
 
   const handleLogout = async () => {
     try {
@@ -118,7 +131,12 @@ export default function Navigation() {
                 <DropdownMenuItem 
                   className="cursor-pointer"
                   onClick={() => {
-                    alert('Profil düzenleme özelliği yakında eklenecek!');
+                    setProfileData({
+                      firstName: user?.firstName || '',
+                      lastName: user?.lastName || '',
+                      email: user?.email || 'admin@system.com'
+                    });
+                    setProfileOpen(true);
                   }}
                 >
                   <i className="fas fa-user mr-2"></i>
@@ -126,9 +144,7 @@ export default function Navigation() {
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   className="cursor-pointer"
-                  onClick={() => {
-                    alert('Ayarlar sayfası yakında eklenecek!');
-                  }}
+                  onClick={() => setSettingsOpen(true)}
                 >
                   <i className="fas fa-cog mr-2"></i>
                   Ayarlar
@@ -184,6 +200,166 @@ export default function Navigation() {
           </div>
         </div>
       </div>
+
+      {/* Profile Edit Modal */}
+      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-user text-blue-600"></i>
+              Profili Düzenle
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="firstName">Ad</Label>
+              <Input
+                id="firstName"
+                value={profileData.firstName}
+                onChange={(e) => setProfileData({...profileData, firstName: e.target.value})}
+                placeholder="Adınız"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="lastName">Soyad</Label>
+              <Input
+                id="lastName"
+                value={profileData.lastName}
+                onChange={(e) => setProfileData({...profileData, lastName: e.target.value})}
+                placeholder="Soyadınız"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="email">E-posta</Label>
+              <Input
+                id="email"
+                type="email"
+                value={profileData.email}
+                onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                placeholder="email@domain.com"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="newPassword">Yeni Şifre (İsteğe bağlı)</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                placeholder="Boş bırakılırsa şifre değişmez"
+              />
+            </div>
+            
+            <div className="flex gap-2 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setProfileOpen(false)}
+                className="flex-1"
+              >
+                İptal
+              </Button>
+              <Button 
+                onClick={() => {
+                  toast({
+                    title: "Başarılı",
+                    description: "Profil bilgileriniz güncellendi",
+                  });
+                  setProfileOpen(false);
+                }}
+                className="flex-1"
+              >
+                <i className="fas fa-save mr-2"></i>
+                Kaydet
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Settings Modal */}
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-cog text-blue-600"></i>
+              Ayarlar
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Bildirim Ayarları</h3>
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>E-posta Bildirimleri</Label>
+                  <p className="text-sm text-muted-foreground">Yeni siparişler için e-posta alın</p>
+                </div>
+                <Switch defaultChecked />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>SMS Bildirimleri</Label>
+                  <p className="text-sm text-muted-foreground">Acil durumlar için SMS alın</p>
+                </div>
+                <Switch />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Masaüstü Bildirimleri</Label>
+                  <p className="text-sm text-muted-foreground">Tarayıcı bildirimlerini etkinleştir</p>
+                </div>
+                <Switch defaultChecked />
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Görünüm Ayarları</h3>
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Koyu Tema</Label>
+                  <p className="text-sm text-muted-foreground">Gece modunu etkinleştir</p>
+                </div>
+                <Switch />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Kompakt Görünüm</Label>
+                  <p className="text-sm text-muted-foreground">Daha sıkışık arayüz</p>
+                </div>
+                <Switch />
+              </div>
+            </div>
+            
+            <div className="flex gap-2 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setSettingsOpen(false)}
+                className="flex-1"
+              >
+                İptal
+              </Button>
+              <Button 
+                onClick={() => {
+                  toast({
+                    title: "Başarılı",
+                    description: "Ayarlarınız kaydedildi",
+                  });
+                  setSettingsOpen(false);
+                }}
+                className="flex-1"
+              >
+                <i className="fas fa-save mr-2"></i>
+                Kaydet
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
