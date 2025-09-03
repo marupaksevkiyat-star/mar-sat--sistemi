@@ -30,17 +30,20 @@ export default function Production() {
   }, [isAuthenticated, isLoading, toast]);
 
   const { data: pendingOrders, isLoading: pendingLoading } = useQuery({
-    queryKey: ["/api/orders?status=pending"],
+    queryKey: ["/api/orders", "status", "pending"],
+    queryFn: () => fetch("/api/orders?status=pending", { credentials: "include" }).then(res => res.json()),
     retry: false,
   });
 
   const { data: activeOrders, isLoading: activeLoading } = useQuery({
-    queryKey: ["/api/orders?status=production"],
+    queryKey: ["/api/orders", "status", "production"],
+    queryFn: () => fetch("/api/orders?status=production", { credentials: "include" }).then(res => res.json()),
     retry: false,
   });
 
   const { data: completedOrders, isLoading: completedLoading } = useQuery({
-    queryKey: ["/api/orders?status=production_ready"],
+    queryKey: ["/api/orders", "status", "production_ready"],
+    queryFn: () => fetch("/api/orders?status=production_ready", { credentials: "include" }).then(res => res.json()),
     retry: false,
   });
 
@@ -54,9 +57,9 @@ export default function Production() {
         description: "Üretim başlatıldı",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/orders?status=pending"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/orders?status=production"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/orders?status=production_ready"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "pending"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production_ready"] });
     },
     onError: (error: Error) => {
       if (isUnauthorizedError(error)) {
@@ -94,9 +97,9 @@ export default function Production() {
         description: "Üretim güncellendi",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/orders?status=pending"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/orders?status=production"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/orders?status=production_ready"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "pending"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production_ready"] });
     },
     onError: (error: Error) => {
       if (isUnauthorizedError(error)) {
@@ -128,9 +131,9 @@ export default function Production() {
         description: "Üretim tamamlandı, sevkiyata hazır",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/orders?status=pending"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/orders?status=production"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/orders?status=production_ready"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "pending"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production_ready"] });
     },
     onError: (error: Error) => {
       if (isUnauthorizedError(error)) {
