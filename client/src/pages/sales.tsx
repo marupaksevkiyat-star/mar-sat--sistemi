@@ -413,6 +413,9 @@ export default function Sales() {
                   <OrderForm
                     customer={selectedCustomerForSale}
                     onSubmit={(orderData) => {
+                      console.log('OrderForm verisi:', orderData);
+                      console.log('Seçilen müşteri:', selectedCustomerForSale);
+                      
                       // Sipariş verilerini düzelt
                       const orderItemsData = orderData.items.map((item: any) => ({
                         productId: item.productId,
@@ -421,12 +424,14 @@ export default function Sales() {
                       }));
                       
                       const orderPayload = {
-                        customerId: selectedCustomerForSale.id,
+                        customerId: orderData.customerId || selectedCustomerForSale.id,
                         totalAmount: orderData.totalAmount.toString(),
                         status: 'pending',
                         notes: orderData.notes || '',
                         items: orderItemsData
                       };
+                      
+                      console.log('Gönderilen sipariş:', orderPayload);
                       
                       createOrderMutation.mutate(orderPayload, {
                         onSuccess: () => {
@@ -434,6 +439,14 @@ export default function Sales() {
                           toast({
                             title: "Başarılı",
                             description: "Sipariş başarıyla oluşturuldu!",
+                          });
+                        },
+                        onError: (error) => {
+                          console.error('Sipariş hatası:', error);
+                          toast({
+                            title: "Hata",
+                            description: "Sipariş oluşturulurken bir hata oluştu",
+                            variant: "destructive",
                           });
                         }
                       });
