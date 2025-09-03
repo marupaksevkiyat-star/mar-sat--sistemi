@@ -610,16 +610,11 @@ export default function Admin() {
                     </div>
                     <div className="text-right">
                       <Badge variant={
-                        user.role === 'admin' ? 'default' : 
-                        user.role === 'sales' ? 'secondary' : 
-                        user.role === 'production' ? 'outline' : 
-                        'destructive'
+                        user.role === 'Admin' ? 'default' : 
+                        user.role.includes('Müdürü') ? 'secondary' : 
+                        'outline'
                       }>
-                        {user.role === 'admin' ? 'Yönetici' :
-                         user.role === 'sales' ? 'Satış' :
-                         user.role === 'production' ? 'Üretim' :
-                         user.role === 'shipping' ? 'Sevkiyat' :
-                         user.role}
+                        {user.role}
                       </Badge>
                       <div className="mt-2">
                         <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
@@ -722,10 +717,15 @@ export default function Admin() {
                   <SelectValue placeholder="Kullanıcı rolü seçin" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="sales">Satış</SelectItem>
-                  <SelectItem value="production">Üretim</SelectItem>
-                  <SelectItem value="shipping">Sevkiyat</SelectItem>
-                  <SelectItem value="admin">Yönetici</SelectItem>
+                  <SelectItem value="Satış Müdürü">Satış Müdürü</SelectItem>
+                  <SelectItem value="Satış Personeli">Satış Personeli</SelectItem>
+                  <SelectItem value="Üretim Müdürü">Üretim Müdürü</SelectItem>
+                  <SelectItem value="Üretim Personeli">Üretim Personeli</SelectItem>
+                  <SelectItem value="Muhasebe Müdürü">Muhasebe Müdürü</SelectItem>
+                  <SelectItem value="Muhasebe Personeli">Muhasebe Personeli</SelectItem>
+                  <SelectItem value="Sevkiyat Müdürü">Sevkiyat Müdürü</SelectItem>
+                  <SelectItem value="Sevkiyat Personeli">Sevkiyat Personeli</SelectItem>
+                  <SelectItem value="Admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
