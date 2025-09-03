@@ -81,7 +81,24 @@ export default function Landing() {
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <p>Satış • Üretim • Sevkiyat • Yönetim</p>
-            <p className="mt-2 text-xs">Demo: admin / 1234</p>
+            <div className="mt-4 p-3 bg-muted/50 rounded-lg text-xs">
+              <p className="font-medium mb-2">Kullanılabilir Hesaplar:</p>
+              <div className="grid grid-cols-2 gap-1 text-left">
+                <div>
+                  <p><strong>Admin:</strong> admin / 1234</p>
+                  <p><strong>Satış Müdürü:</strong> ahmet / 1234</p>
+                  <p><strong>Satış Personeli:</strong> ayse / 1234</p>
+                  <p><strong>Üretim Müdürü:</strong> mehmet / 1234</p>
+                  <p><strong>Üretim Personeli:</strong> zeynep / 1234</p>
+                </div>
+                <div>
+                  <p><strong>Muhasebe Müdürü:</strong> ali / 1234</p>
+                  <p><strong>Muhasebe Personeli:</strong> elif / 1234</p>
+                  <p><strong>Sevkiyat Müdürü:</strong> fatma / 1234</p>
+                  <p><strong>Sevkiyat Personeli:</strong> murat / 1234</p>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
