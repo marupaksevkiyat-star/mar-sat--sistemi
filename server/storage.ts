@@ -599,6 +599,55 @@ export class DatabaseStorage implements IStorage {
     const today = new Date();
     return await this.getAppointments(salesPersonId, today);
   }
+
+  // Invoice operations
+  async createInvoice(invoiceData: InsertInvoice): Promise<Invoice> {
+    // Generate invoice number
+    const timestamp = Date.now().toString();
+    const invoiceNumber = `INV-${timestamp.slice(-6)}`;
+    
+    const [invoice] = await db
+      .insert(invoices)
+      .values({
+        ...invoiceData,
+        invoiceNumber,
+      })
+      .returning();
+    return invoice;
+  }
+
+  async getInvoices(filters?: { status?: string }): Promise<InvoiceWithDetails[]> {
+    let query = db
+      .select()
+      .from(invoices)
+      .leftJoin(orders, eq(invoices.orderId, orders.id))
+      .leftJoin(customers, eq(invoices.customerId, customers.id));
+
+    if (filters?.status) {
+      query = query.where(eq(invoices.status, filters.status as any)) as any;
+    }
+
+    query = query.orderBy(desc(invoices.createdAt)) as any;
+
+    const invoicesData = await query;
+    
+    return invoicesData.map((row: any) => ({
+      ...row.invoices,
+      order: row.orders!,
+      customer: row.customers!,
+    }));
+  }
+
+  async updateInvoiceStatus(id: string, status: string, updates?: Partial<InsertInvoice>): Promise<Invoice> {
+    const updateData: any = { status, updatedAt: new Date(), ...updates };
+    
+    const [invoice] = await db
+      .update(invoices)
+      .set(updateData)
+      .where(eq(invoices.id, id))
+      .returning();
+    return invoice;
+  }
 }
 
 export const storage = new DatabaseStorage();
