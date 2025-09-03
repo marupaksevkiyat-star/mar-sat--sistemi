@@ -139,12 +139,29 @@ export const appointments = pgTable("appointments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Invoices table for shipping management
+export const invoices = pgTable("invoices", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceNumber: varchar("invoice_number").notNull().unique(),
+  orderId: varchar("order_id").notNull().references(() => orders.id),
+  customerId: varchar("customer_id").notNull().references(() => customers.id),
+  status: varchar("status").notNull().default("draft"), // draft, pending, shipped, delivered, cancelled
+  shippingAddress: text("shipping_address").notNull(),
+  trackingNumber: varchar("tracking_number"),
+  notes: text("notes"),
+  shippedAt: timestamp("shipped_at"),
+  deliveredAt: timestamp("delivered_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   customers: many(customers),
   orders: many(orders),
   visits: many(visits),
   appointments: many(appointments),
+  invoices: many(invoices),
 }));
 
 export const customersRelations = relations(customers, ({ one, many }) => ({
@@ -155,6 +172,7 @@ export const customersRelations = relations(customers, ({ one, many }) => ({
   orders: many(orders),
   visits: many(visits),
   appointments: many(appointments),
+  invoices: many(invoices),
 }));
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
@@ -168,6 +186,7 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
   }),
   items: many(orderItems),
   visit: one(visits),
+  invoice: one(invoices),
 }));
 
 export const orderItemsRelations = relations(orderItems, ({ one }) => ({
@@ -207,6 +226,17 @@ export const appointmentsRelations = relations(appointments, ({ one }) => ({
   }),
   customer: one(customers, {
     fields: [appointments.customerId],
+    references: [customers.id],
+  }),
+}));
+
+export const invoicesRelations = relations(invoices, ({ one }) => ({
+  order: one(orders, {
+    fields: [invoices.orderId],
+    references: [orders.id],
+  }),
+  customer: one(customers, {
+    fields: [invoices.customerId],
     references: [customers.id],
   }),
 }));
@@ -254,6 +284,13 @@ export const insertAppointmentSchema = createInsertSchema(appointments).omit({
   createdAt: true,
 });
 
+export const insertInvoiceSchema = createInsertSchema(invoices).omit({
+  id: true,
+  invoiceNumber: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -269,6 +306,8 @@ export type InsertVisit = z.infer<typeof insertVisitSchema>;
 export type Visit = typeof visits.$inferSelect;
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
 export type Appointment = typeof appointments.$inferSelect;
+export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
+export type Invoice = typeof invoices.$inferSelect;
 
 // Extended types for API responses
 export type OrderWithDetails = Order & {
@@ -290,4 +329,9 @@ export type VisitWithDetails = Visit & {
 export type AppointmentWithDetails = Appointment & {
   customer: Customer;
   salesPerson: User;
+};
+
+export type InvoiceWithDetails = Invoice & {
+  order: Order;
+  customer: Customer;
 };

@@ -6,6 +6,7 @@ import {
   orderItems,
   visits,
   appointments,
+  invoices,
   type User,
   type UpsertUser,
   type InsertCustomer,
@@ -24,6 +25,9 @@ import {
   type InsertAppointment,
   type Appointment,
   type AppointmentWithDetails,
+  type InsertInvoice,
+  type Invoice,
+  type InvoiceWithDetails,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, sum, gte, lte } from "drizzle-orm";
@@ -70,6 +74,11 @@ export interface IStorage {
     monthlySales: number;
     deliveryRate: number;
   }>;
+  
+  // Invoice operations
+  createInvoice(invoice: InsertInvoice): Promise<Invoice>;
+  getInvoices(filters?: { status?: string }): Promise<InvoiceWithDetails[]>;
+  updateInvoiceStatus(id: string, status: string, updates?: Partial<InsertInvoice>): Promise<Invoice>;
   
   // Recent activities
   getRecentOrders(limit?: number): Promise<OrderWithDetails[]>;
