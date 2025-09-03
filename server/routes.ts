@@ -63,6 +63,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User routes (admin only)
+  app.get('/api/users', isAuthenticated, async (req: any, res) => {
+    try {
+      const userRole = req.session.user.role;
+      if (userRole !== 'admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      
+      // For now, return mock users since we don't have a full user management system
+      const mockUsers = [
+        { id: 'admin', firstName: 'Admin', lastName: 'User', email: 'admin@system.com', role: 'admin', status: 'active' },
+        { id: 'sales1', firstName: 'Ahmet', lastName: 'Yılmaz', email: 'ahmet@company.com', role: 'sales', status: 'active' },
+        { id: 'sales2', firstName: 'Ayşe', lastName: 'Demir', email: 'ayse@company.com', role: 'sales', status: 'active' },
+        { id: 'production1', firstName: 'Mehmet', lastName: 'Kaya', email: 'mehmet@company.com', role: 'production', status: 'active' },
+        { id: 'shipping1', firstName: 'Fatma', lastName: 'Özkan', email: 'fatma@company.com', role: 'shipping', status: 'active' },
+      ];
+      res.json(mockUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
   // Dashboard routes
   app.get('/api/dashboard/stats', isAuthenticated, async (req: any, res) => {
     try {
