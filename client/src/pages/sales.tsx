@@ -238,6 +238,8 @@ export default function Sales() {
               },
               items: orderItemsData
             };
+            console.log("Creating order with payload:", orderPayload);
+            console.log("New customer:", newCustomer);
             createOrderMutation.mutate(orderPayload);
           }
         });
