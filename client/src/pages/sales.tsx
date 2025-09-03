@@ -1,0 +1,260 @@
+import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
+import { apiRequest } from "@/lib/queryClient";
+import Navigation from "@/components/layout/navigation";
+import LocationTracker from "@/components/sales/location-tracker";
+import VisitForm from "@/components/sales/visit-form";
+import CustomerForm from "@/components/sales/customer-form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+
+export default function Sales() {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [showCustomerForm, setShowCustomerForm] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+      return;
+    }
+  }, [isAuthenticated, isLoading, toast]);
+
+  const { data: nearbyCustomers, isLoading: nearbyLoading } = useQuery({
+    queryKey: ["/api/customers/nearby", currentLocation?.lat, currentLocation?.lng],
+    enabled: !!currentLocation,
+    retry: false,
+  });
+
+  const { data: dailyStats } = useQuery({
+    queryKey: ["/api/visits", new Date().toISOString().split('T')[0]],
+    retry: false,
+  });
+
+  const createCustomerMutation = useMutation({
+    mutationFn: async (customerData: any) => {
+      return await apiRequest("POST", "/api/customers", customerData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Müşteri başarıyla oluşturuldu",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
+      setShowCustomerForm(false);
+    },
+    onError: (error: Error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Hata",
+        description: "Müşteri oluşturulurken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createVisitMutation = useMutation({
+    mutationFn: async (visitData: any) => {
+      return await apiRequest("POST", "/api/visits", visitData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Ziyaret kaydedildi",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/visits"] });
+    },
+    onError: (error: Error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Hata",
+        description: "Ziyaret kaydedilirken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  const handleSelectCustomer = (customer: any) => {
+    setSelectedCustomer(customer);
+    setShowCustomerForm(true);
+  };
+
+  const handleNewCustomer = () => {
+    setSelectedCustomer(null);
+    setShowCustomerForm(true);
+  };
+
+  const handleCompleteVisit = (outcome: string, customerData?: any, orderData?: any) => {
+    // Create visit record
+    const visitData = {
+      customerId: selectedCustomer?.id,
+      visitType: selectedCustomer ? 'existing_customer' : 'new_customer',
+      outcome,
+      latitude: currentLocation?.lat?.toString(),
+      longitude: currentLocation?.lng?.toString(),
+      notes: `Ziyaret sonucu: ${outcome}`,
+    };
+
+    createVisitMutation.mutate(visitData);
+
+    // If creating new customer
+    if (!selectedCustomer && customerData) {
+      createCustomerMutation.mutate({
+        ...customerData,
+        latitude: currentLocation?.lat?.toString(),
+        longitude: currentLocation?.lng?.toString(),
+        status: outcome === 'not_interested' ? 'not_interested' : 'active',
+      });
+    }
+
+    setShowCustomerForm(false);
+    setSelectedCustomer(null);
+  };
+
+  const calculateTodayStats = () => {
+    if (!dailyStats || !Array.isArray(dailyStats)) return { totalVisits: 0, successfulSales: 0, followUps: 0 };
+    
+    return {
+      totalVisits: dailyStats.length,
+      successfulSales: dailyStats.filter((v: any) => v.outcome === 'sale').length,
+      followUps: dailyStats.filter((v: any) => v.outcome === 'follow_up').length,
+    };
+  };
+
+  const todayStats = calculateTodayStats();
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-foreground">Satış Yönetimi</h2>
+          <p className="text-muted-foreground mt-1">Saha ziyaretleri ve müşteri yönetimi</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Visit Panel */}
+          <div className="lg:col-span-2 space-y-6">
+            <LocationTracker 
+              onLocationUpdate={setCurrentLocation}
+              nearbyCustomers={nearbyCustomers}
+              onSelectCustomer={handleSelectCustomer}
+              onNewCustomer={handleNewCustomer}
+              isLoading={nearbyLoading}
+            />
+
+            {showCustomerForm && (
+              <CustomerForm
+                customer={selectedCustomer}
+                onComplete={handleCompleteVisit}
+                onCancel={() => {
+                  setShowCustomerForm(false);
+                  setSelectedCustomer(null);
+                }}
+                currentLocation={currentLocation}
+              />
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Daily Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Bugünkü Aktivite</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Toplam Ziyaret</span>
+                    <span className="font-medium text-foreground" data-testid="text-total-visits">
+                      {todayStats.totalVisits}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Başarılı Satış</span>
+                    <span className="font-medium text-green-600" data-testid="text-successful-sales">
+                      {todayStats.successfulSales}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Takip Gerekli</span>
+                    <span className="font-medium text-orange-600" data-testid="text-follow-ups">
+                      {todayStats.followUps}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Map Placeholder */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Konum Haritası</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="aspect-square bg-muted rounded-lg border-2 border-dashed border-border flex items-center justify-center">
+                  <div className="text-center">
+                    <i className="fas fa-map text-4xl text-muted-foreground mb-2"></i>
+                    <p className="text-sm text-muted-foreground">Harita Entegrasyonu</p>
+                    <p className="text-xs text-muted-foreground mt-1">GPS konumu ve müşteri konumları</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
