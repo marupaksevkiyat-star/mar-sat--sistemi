@@ -398,7 +398,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const filters: any = {};
       if (status) filters.status = status;
-      if (userRole !== 'admin') filters.salesPersonId = userId;
+      
+      // Admin tüm siparileri görebilir, diğerleri sadece kendi siparislerini
+      if (userRole !== 'admin' && userRole !== 'Admin') {
+        filters.salesPersonId = userId;
+      }
       
       const orders = await storage.getOrders(filters);
       res.json(orders);
