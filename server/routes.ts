@@ -229,7 +229,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/dashboard/stats', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.session.user.id;
-      const stats = await storage.getDashboardStats(userId);
+      const userRole = req.session.user.role;
+      
+      // Admin tüm verileri görebilir, diğerleri sadece kendi verilerini
+      const filterUserId = (userRole === 'admin' || userRole === 'Admin') ? null : userId;
+      const stats = await storage.getDashboardStats(filterUserId);
       res.json(stats);
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
