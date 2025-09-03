@@ -222,9 +222,19 @@ export default function Sales() {
       if (orderData) {
         createCustomerMutation.mutate(newCustomerData, {
           onSuccess: (newCustomer) => {
+            // Create order items first
+            const orderItemsData = orderData.items.map((item: any) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              unitPrice: item.price
+            }));
+            
             const orderWithCustomer = {
-              ...orderData,
               customerId: newCustomer.id,
+              notes: orderData.notes || '',
+              totalAmount: orderData.totalAmount.toString(),
+              status: orderData.status || 'pending',
+              items: orderItemsData
             };
             createOrderMutation.mutate(orderWithCustomer);
           }
@@ -245,9 +255,18 @@ export default function Sales() {
       }
     } else if (orderData && selectedCustomer) {
       // Existing customer - just create the order
+      const orderItemsData = orderData.items.map((item: any) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.price
+      }));
+      
       const orderWithCustomer = {
-        ...orderData,
         customerId: selectedCustomer.id,
+        notes: orderData.notes || '',
+        totalAmount: orderData.totalAmount.toString(),
+        status: orderData.status || 'pending',
+        items: orderItemsData
       };
       createOrderMutation.mutate(orderWithCustomer);
     } else if (appointmentData && selectedCustomer) {
