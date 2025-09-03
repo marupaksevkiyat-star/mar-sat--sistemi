@@ -372,25 +372,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Parsed orderData:", JSON.stringify(orderData, null, 2));
       
-      // Önce order'ı oluştur
+      // Önce order'ı oluştur (items olmadan)
       const createdOrder = await storage.createOrder(orderData, []);
+      console.log("Created order ID:", createdOrder.id);
       
-      // Sonra items'ı order ID'si ile hazırla
-      const orderItemsWithOrderId = items.map((item: any) => ({
-        orderId: createdOrder.id,
-        productId: item.productId,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        totalPrice: item.totalPrice,
-      }));
-      
-      const orderItems = z.array(insertOrderItemSchema).parse(orderItemsWithOrderId);
-      
-      console.log("Parsed orderData:", JSON.stringify(orderData, null, 2));
-      console.log("Parsed orderItems:", JSON.stringify(orderItems, null, 2));
-      
-      // Items'ları storage'a ekle
-      if (orderItems.length > 0) {
+      // Eğer items varsa, onları order ID'si ile ekle
+      if (items && items.length > 0) {
+        // Items'ı order ID'si ile hazırla
+        const orderItemsWithOrderId = items.map((item: any) => ({
+          orderId: createdOrder.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.totalPrice,
+        }));
+        
+        console.log("Items with orderId:", JSON.stringify(orderItemsWithOrderId, null, 2));
+        
+        // Zod validation
+        const orderItems = z.array(insertOrderItemSchema).parse(orderItemsWithOrderId);
+        console.log("Validated orderItems:", JSON.stringify(orderItems, null, 2));
+        
+        // Items'ları storage'a ekle
         await storage.addOrderItems(createdOrder.id, orderItems);
       }
       
