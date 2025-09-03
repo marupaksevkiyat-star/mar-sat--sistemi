@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function Navigation() {
   const [location] = useLocation();
@@ -88,27 +89,51 @@ export default function Navigation() {
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full"></span>
             </Button>
             
-            {/* User Info */}
-            <div className="hidden sm:flex items-center space-x-2 text-sm">
-              <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
-                <span className="font-medium text-secondary-foreground" data-testid="text-user-initials">
-                  {user?.firstName?.[0]}{user?.lastName?.[0]}
-                </span>
-              </div>
-              <span className="text-foreground" data-testid="text-user-name">
-                {user?.firstName} {user?.lastName}
-              </span>
-            </div>
-            
-            {/* Logout */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleLogout}
-              data-testid="button-logout"
-            >
-              <i className="fas fa-sign-out-alt"></i>
-            </Button>
+            {/* User Profile Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center space-x-2 text-sm hover:bg-accent" data-testid="button-user-menu">
+                  <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                    <span className="font-medium text-secondary-foreground" data-testid="text-user-initials">
+                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                    </span>
+                  </div>
+                  <span className="hidden sm:block text-foreground" data-testid="text-user-name">
+                    {user?.firstName} {user?.lastName}
+                  </span>
+                  <i className="fas fa-chevron-down text-xs text-muted-foreground"></i>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">{user?.firstName} {user?.lastName}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {user?.role === 'Admin' ? 'Yönetici' : 
+                     user?.role?.includes('Müdürü') ? user?.role :
+                     user?.role?.includes('Personeli') ? user?.role :
+                     user?.role}
+                  </p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">
+                  <i className="fas fa-user mr-2"></i>
+                  Profili Düzenle
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  <i className="fas fa-cog mr-2"></i>
+                  Ayarlar
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  className="cursor-pointer text-red-600 focus:text-red-600"
+                  onClick={handleLogout}
+                  data-testid="button-logout"
+                >
+                  <i className="fas fa-sign-out-alt mr-2"></i>
+                  Çıkış Yap
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Mobile Menu */}
             <div className="md:hidden">
