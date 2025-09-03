@@ -19,7 +19,7 @@ export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeModal, setActiveModal] = useState<'visits' | 'sales' | 'orders' | 'users' | 'add-user' | null>(null);
+  const [activeModal, setActiveModal] = useState<'visits' | 'sales' | 'orders' | 'users' | 'add-user' | 'edit-user' | null>(null);
   const [newUser, setNewUser] = useState({
     firstName: '',
     lastName: '',
@@ -27,6 +27,7 @@ export default function Admin() {
     role: '',
     password: ''
   });
+  const [editingUser, setEditingUser] = useState<any>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -98,6 +99,79 @@ export default function Admin() {
       toast({
         title: "Hata",
         description: "Kullanıcı eklenirken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Edit user mutation
+  const editUserMutation = useMutation({
+    mutationFn: async (userData: any) => {
+      return await apiRequest(`/api/users/${userData.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(userData),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Kullanıcı güncellendi",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      setActiveModal('users');
+      setEditingUser(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Hata",
+        description: "Kullanıcı güncellenirken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return await apiRequest(`/api/users/${userId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Kullanıcı silindi",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Hata",
+        description: "Kullanıcı silinirken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Toggle user status mutation
+  const toggleStatusMutation = useMutation({
+    mutationFn: async ({ userId, status }: { userId: string, status: string }) => {
+      return await apiRequest(`/api/users/${userId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Kullanıcı durumu güncellendi",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Hata",
+        description: "Kullanıcı durumu güncellenirken bir hata oluştu",
         variant: "destructive",
       });
     },
@@ -626,21 +700,47 @@ export default function Admin() {
                   
                   <div className="mt-4 pt-4 border-t">
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          setEditingUser(user);
+                          setActiveModal('edit-user');
+                        }}
+                      >
                         <i className="fas fa-edit mr-2"></i>
                         Düzenle
                       </Button>
-                      <Button variant="outline" size="sm">
-                        <i className="fas fa-key mr-2"></i>
-                        Şifre Sıfırla
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          if (confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) {
+                            deleteUserMutation.mutate(user.id);
+                          }
+                        }}
+                        disabled={deleteUserMutation.isPending}
+                      >
+                        <i className="fas fa-trash mr-2"></i>
+                        Sil
                       </Button>
                       {user.status === 'active' ? (
-                        <Button variant="destructive" size="sm">
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => toggleStatusMutation.mutate({ userId: user.id, status: 'inactive' })}
+                          disabled={toggleStatusMutation.isPending}
+                        >
                           <i className="fas fa-ban mr-2"></i>
                           Devre Dışı Bırak
                         </Button>
                       ) : (
-                        <Button variant="default" size="sm">
+                        <Button 
+                          variant="default" 
+                          size="sm"
+                          onClick={() => toggleStatusMutation.mutate({ userId: user.id, status: 'active' })}
+                          disabled={toggleStatusMutation.isPending}
+                        >
                           <i className="fas fa-check mr-2"></i>
                           Aktifleştir
                         </Button>
@@ -768,6 +868,99 @@ export default function Admin() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Modal */}
+      <Dialog open={activeModal === 'edit-user'} onOpenChange={() => setActiveModal(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-user-edit text-blue-600"></i>
+              Kullanıcı Düzenle
+            </DialogTitle>
+          </DialogHeader>
+          {editingUser && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="editFirstName">Ad</Label>
+                <Input
+                  id="editFirstName"
+                  value={editingUser.firstName}
+                  onChange={(e) => setEditingUser({...editingUser, firstName: e.target.value})}
+                  placeholder="Kullanıcının adı"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editLastName">Soyad</Label>
+                <Input
+                  id="editLastName"
+                  value={editingUser.lastName}
+                  onChange={(e) => setEditingUser({...editingUser, lastName: e.target.value})}
+                  placeholder="Kullanıcının soyadı"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editEmail">E-posta</Label>
+                <Input
+                  id="editEmail"
+                  type="email"
+                  value={editingUser.email}
+                  onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
+                  placeholder="kullanici@company.com"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editRole">Rol</Label>
+                <Select value={editingUser.role} onValueChange={(value) => setEditingUser({...editingUser, role: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kullanıcı rolü seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Satış Müdürü">Satış Müdürü</SelectItem>
+                    <SelectItem value="Satış Personeli">Satış Personeli</SelectItem>
+                    <SelectItem value="Üretim Müdürü">Üretim Müdürü</SelectItem>
+                    <SelectItem value="Üretim Personeli">Üretim Personeli</SelectItem>
+                    <SelectItem value="Muhasebe Müdürü">Muhasebe Müdürü</SelectItem>
+                    <SelectItem value="Muhasebe Personeli">Muhasebe Personeli</SelectItem>
+                    <SelectItem value="Sevkiyat Müdürü">Sevkiyat Müdürü</SelectItem>
+                    <SelectItem value="Sevkiyat Personeli">Sevkiyat Personeli</SelectItem>
+                    <SelectItem value="Admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setActiveModal('users')}
+                  className="flex-1"
+                >
+                  İptal
+                </Button>
+                <Button 
+                  onClick={() => editUserMutation.mutate(editingUser)}
+                  disabled={editUserMutation.isPending || !editingUser.firstName || !editingUser.lastName || !editingUser.email || !editingUser.role}
+                  className="flex-1"
+                >
+                  {editUserMutation.isPending ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Güncelleniyor...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-save mr-2"></i>
+                      Güncelle
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
