@@ -44,7 +44,7 @@ export default function Admin() {
     retry: false,
   });
 
-  // Detailed data for modals
+  // Detailed data for modals - Get all visits for admin
   const { data: allVisits } = useQuery({
     queryKey: ["/api/visits"],
     retry: false,

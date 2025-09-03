@@ -288,7 +288,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { date } = req.query;
       
       const salesPersonId = userRole === 'admin' ? undefined : userId;
-      const visitDate = date ? new Date(date as string) : undefined;
+      // For admin, if no date specified, get all visits from last 30 days
+      let visitDate = date ? new Date(date as string) : undefined;
+      if (userRole === 'admin' && !date) {
+        visitDate = undefined; // Get all visits for admin
+      }
       
       const visits = await storage.getVisits(salesPersonId, visitDate);
       res.json(visits);
