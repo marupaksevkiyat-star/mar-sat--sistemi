@@ -229,14 +229,16 @@ export default function Sales() {
               unitPrice: item.price
             }));
             
-            const orderWithCustomer = {
-              customerId: newCustomer.id,
-              notes: orderData.notes || '',
-              totalAmount: orderData.totalAmount.toString(),
-              status: orderData.status || 'pending',
+            const orderPayload = {
+              order: {
+                customerId: newCustomer.id,
+                notes: orderData.notes || '',
+                totalAmount: orderData.totalAmount.toString(),
+                status: orderData.status || 'pending'
+              },
               items: orderItemsData
             };
-            createOrderMutation.mutate(orderWithCustomer);
+            createOrderMutation.mutate(orderPayload);
           }
         });
       } else if (appointmentData) {
@@ -261,14 +263,16 @@ export default function Sales() {
         unitPrice: item.price
       }));
       
-      const orderWithCustomer = {
-        customerId: selectedCustomer.id,
-        notes: orderData.notes || '',
-        totalAmount: orderData.totalAmount.toString(),
-        status: orderData.status || 'pending',
+      const orderPayload = {
+        order: {
+          customerId: selectedCustomer.id,
+          notes: orderData.notes || '',
+          totalAmount: orderData.totalAmount.toString(),
+          status: orderData.status || 'pending'
+        },
         items: orderItemsData
       };
-      createOrderMutation.mutate(orderWithCustomer);
+      createOrderMutation.mutate(orderPayload);
     } else if (appointmentData && selectedCustomer) {
       // Existing customer - just create the appointment
       const appointmentWithCustomer = {
