@@ -10,6 +10,7 @@ import VisitForm from "@/components/sales/visit-form";
 import CustomerForm from "@/components/sales/customer-form";
 import DailyAppointments from "@/components/sales/daily-appointments";
 import DailyVisits from "@/components/sales/daily-visits";
+import OrderForm from "@/components/sales/order-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
