@@ -62,7 +62,7 @@ export default function Home() {
   const getDashboardTitle = () => {
     const userRole = user?.role || '';
     
-    if (userRole === 'admin') return "Yönetici Dashboard";
+    if (userRole === 'admin' || userRole === 'Admin') return "Yönetici Dashboard";
     if (userRole === 'sales' || userRole.includes('Satış')) return "Satış Dashboard";
     if (userRole === 'production' || userRole.includes('Üretim')) return "Üretim Dashboard";
     if (userRole === 'shipping' || userRole.includes('Sevkiyat')) return "Sevkiyat Dashboard";
@@ -75,7 +75,7 @@ export default function Home() {
     const userRole = user?.role || '';
     
     // Admin - tüm kartları görebilir
-    if (userRole === 'admin') {
+    if (userRole === 'admin' || userRole === 'Admin') {
       return [
         {
           title: "Günlük Ziyaretler",
@@ -243,7 +243,7 @@ export default function Home() {
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-foreground">{getDashboardTitle()}</h2>
           <p className="text-muted-foreground mt-1">
-            {user?.firstName} {user?.lastName} - {user?.role === 'admin' ? 'Yönetici' : 
+            {user?.firstName} {user?.lastName} - {user?.role === 'admin' || user?.role === 'Admin' ? 'Yönetici' : 
              user?.role === 'sales' ? 'Satış Personeli' :
              user?.role === 'production' ? 'Üretim Personeli' :
              user?.role === 'shipping' ? 'Sevkiyat Personeli' : user?.role}
