@@ -363,7 +363,7 @@ export default function Admin() {
                   </p>
                   <p className="text-sm text-muted-foreground mb-2">
                     <i className="fas fa-map-marker-alt mr-2"></i>
-                    Konum: {visit.latitude?.toFixed(4)}, {visit.longitude?.toFixed(4)}
+                    Konum: {visit.latitude ? Number(visit.latitude).toFixed(4) : 'N/A'}, {visit.longitude ? Number(visit.longitude).toFixed(4) : 'N/A'}
                   </p>
                   {visit.notes && (
                     <p className="text-sm bg-muted p-3 rounded-lg">
