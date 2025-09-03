@@ -73,6 +73,10 @@ export interface IStorage {
     activeOrders: number;
     monthlySales: number;
     deliveryRate: number;
+    pendingOrders: number;
+    productionOrders: number;
+    shippingOrders: number;
+    deliveredOrders: number;
   }>;
   
   // Invoice operations
@@ -554,11 +558,48 @@ export class DatabaseStorage implements IStorage {
       ? (deliveredOrdersResult.count / totalOrdersResult.count) * 100 
       : 0;
 
+    // Order status breakdown
+    let pendingOrdersQuery = db
+      .select({ count: count() })
+      .from(orders)
+      .where(eq(orders.status, 'pending'));
+    
+    let productionOrdersQuery = db
+      .select({ count: count() })
+      .from(orders)
+      .where(sql`${orders.status} IN ('production', 'production_ready')`);
+    
+    let shippingOrdersQuery = db
+      .select({ count: count() })
+      .from(orders)
+      .where(eq(orders.status, 'shipping'));
+    
+    let deliveredOrdersForStatsQuery = db
+      .select({ count: count() })
+      .from(orders)
+      .where(eq(orders.status, 'delivered'));
+
+    if (userId) {
+      pendingOrdersQuery = pendingOrdersQuery.where(eq(orders.salesPersonId, userId));
+      productionOrdersQuery = productionOrdersQuery.where(eq(orders.salesPersonId, userId));
+      shippingOrdersQuery = shippingOrdersQuery.where(eq(orders.salesPersonId, userId));
+      deliveredOrdersForStatsQuery = deliveredOrdersForStatsQuery.where(eq(orders.salesPersonId, userId));
+    }
+
+    const [pendingResult] = await pendingOrdersQuery;
+    const [productionResult] = await productionOrdersQuery;
+    const [shippingResult] = await shippingOrdersQuery;
+    const [deliveredStatsResult] = await deliveredOrdersForStatsQuery;
+
     return {
       dailyVisits: dailyVisitsResult.count,
       activeOrders: activeOrdersResult.count,
       monthlySales: parseFloat(monthlySalesResult.total || '0'),
       deliveryRate: Math.round(deliveryRate * 10) / 10,
+      pendingOrders: pendingResult.count,
+      productionOrders: productionResult.count,
+      shippingOrders: shippingResult.count,
+      deliveredOrders: deliveredStatsResult.count,
     };
   }
 
