@@ -1361,7 +1361,7 @@ export default function Admin() {
                     name: newProduct.name,
                     description: newProduct.description,
                     code: newProduct.code,
-                    price: parseFloat(newProduct.price || '0'),
+                    price: newProduct.price || '0',
                     category: newProduct.category || 'Genel',
                   });
                 }}
@@ -1542,7 +1542,7 @@ export default function Admin() {
                       name: editingProduct.name,
                       description: editingProduct.description,
                       code: editingProduct.code,
-                      price: editingProduct.price,
+                      price: editingProduct.price?.toString() || '0',
                       category: editingProduct.category || 'Genel',
                     });
                   }}
