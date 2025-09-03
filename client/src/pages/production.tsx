@@ -30,17 +30,17 @@ export default function Production() {
   }, [isAuthenticated, isLoading, toast]);
 
   const { data: pendingOrders, isLoading: pendingLoading } = useQuery({
-    queryKey: ["/api/orders", "pending"],
+    queryKey: ["/api/orders?status=pending"],
     retry: false,
   });
 
   const { data: activeOrders, isLoading: activeLoading } = useQuery({
-    queryKey: ["/api/orders", "production"],
+    queryKey: ["/api/orders?status=production"],
     retry: false,
   });
 
   const { data: completedOrders, isLoading: completedLoading } = useQuery({
-    queryKey: ["/api/orders", "production_ready"],
+    queryKey: ["/api/orders?status=production_ready"],
     retry: false,
   });
 
