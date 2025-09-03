@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Check, Clock, X } from "lucide-react";
+import { Check, Clock, X, Plus } from "lucide-react";
+import AppointmentForm from "./appointment-form";
+import OrderForm from "./order-form";
 
 interface CustomerFormProps {
   customer?: any;
@@ -26,6 +28,8 @@ export default function CustomerForm({
     email: customer?.email || "",
     address: customer?.address || "",
   });
+  const [showOrderForm, setShowOrderForm] = useState(false);
+  const [showAppointmentForm, setShowAppointmentForm] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -40,6 +44,17 @@ export default function CustomerForm({
       return;
     }
 
+    if (outcome === 'sale') {
+      setShowOrderForm(true);
+      return;
+    }
+
+    if (outcome === 'follow_up') {
+      setShowAppointmentForm(true);
+      return;
+    }
+
+    // For not_interested, complete directly
     const customerData = customer ? null : {
       ...formData,
       latitude: currentLocation?.lat?.toString(),
@@ -49,7 +64,61 @@ export default function CustomerForm({
     onComplete(outcome, customerData);
   };
 
+  const handleOrderSubmit = (orderData: any) => {
+    const customerData = customer ? null : {
+      ...formData,
+      latitude: currentLocation?.lat?.toString(),
+      longitude: currentLocation?.lng?.toString(),
+    };
+
+    onComplete('sale', customerData, orderData);
+  };
+
+  const handleAppointmentSubmit = (appointmentData: any) => {
+    const customerData = customer ? null : {
+      ...formData,
+      latitude: currentLocation?.lat?.toString(),
+      longitude: currentLocation?.lng?.toString(),
+    };
+
+    onComplete('follow_up', customerData, appointmentData);
+  };
+
   const isNewCustomer = !customer;
+
+  // Show order form if sale is selected
+  if (showOrderForm) {
+    const customerForOrder = customer || { 
+      id: 'new', 
+      name: formData.companyName,
+      companyName: formData.companyName 
+    };
+    
+    return (
+      <OrderForm
+        customer={customerForOrder}
+        onSubmit={handleOrderSubmit}
+        onCancel={() => setShowOrderForm(false)}
+      />
+    );
+  }
+
+  // Show appointment form if follow-up is selected
+  if (showAppointmentForm) {
+    const customerForAppointment = customer || { 
+      id: 'new', 
+      name: formData.companyName,
+      companyName: formData.companyName 
+    };
+    
+    return (
+      <AppointmentForm
+        customer={customerForAppointment}
+        onSubmit={handleAppointmentSubmit}
+        onCancel={() => setShowAppointmentForm(false)}
+      />
+    );
+  }
 
   return (
     <Card className="shadow-sm">
