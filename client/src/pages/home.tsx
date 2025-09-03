@@ -8,10 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { useLocation } from "wouter";
 
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -78,6 +80,7 @@ export default function Home() {
             color="blue"
             isLoading={statsLoading}
             data-testid="card-daily-visits"
+            onClick={() => setLocation('/sales')}
           />
           
           <StatsCard
@@ -88,6 +91,7 @@ export default function Home() {
             color="yellow"
             isLoading={statsLoading}
             data-testid="card-active-orders"
+            onClick={() => setLocation('/production')}
           />
           
           <StatsCard
@@ -99,6 +103,7 @@ export default function Home() {
             color="green"
             isLoading={statsLoading}
             data-testid="card-monthly-sales"
+            onClick={() => setLocation('/admin')}
           />
           
           <StatsCard
@@ -109,6 +114,7 @@ export default function Home() {
             color="purple"
             isLoading={statsLoading}
             data-testid="card-delivery-rate"
+            onClick={() => setLocation('/shipping')}
           />
         </div>
 
