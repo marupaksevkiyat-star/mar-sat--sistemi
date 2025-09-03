@@ -413,6 +413,14 @@ export default function Sales() {
                   <OrderForm
                     customer={selectedCustomerForSale}
                     onSubmit={(orderData) => {
+                      console.log("=== FULL DEBUG INFO ===");
+                      console.log("Raw orderData:", JSON.stringify(orderData, null, 2));
+                      console.log("selectedCustomerForSale:", JSON.stringify(selectedCustomerForSale, null, 2));
+                      console.log("orderData keys:", Object.keys(orderData));
+                      console.log("orderData.customerId:", orderData.customerId);
+                      console.log("orderData.totalAmount:", orderData.totalAmount);
+                      console.log("orderData.items:", orderData.items);
+                      
                       // Veri kontrolü ve düzeltme
                       const orderItemsData = orderData.items?.map((item: any) => ({
                         productId: item.productId,
@@ -421,10 +429,15 @@ export default function Sales() {
                       })) || [];
                       
                       // customerId ve totalAmount'u güvenli şekilde al
-                      const customerId = selectedCustomerForSale?.id;
+                      const customerId = orderData.customerId || selectedCustomerForSale?.id;
                       const totalAmount = orderData.totalAmount || 0;
                       
+                      console.log("Processed customerId:", customerId);
+                      console.log("Processed totalAmount:", totalAmount);
+                      console.log("Processed items:", orderItemsData);
+                      
                       if (!customerId) {
+                        console.error("CustomerId is missing!");
                         toast({
                           title: "Hata",
                           description: "Müşteri bilgisi eksik",
@@ -434,6 +447,7 @@ export default function Sales() {
                       }
                       
                       if (orderItemsData.length === 0) {
+                        console.error("No items selected!");
                         toast({
                           title: "Hata", 
                           description: "En az bir ürün seçmelisiniz",
@@ -450,6 +464,8 @@ export default function Sales() {
                         items: orderItemsData
                       };
                       
+                      console.log("Final orderPayload:", JSON.stringify(orderPayload, null, 2));
+                      
                       createOrderMutation.mutate(orderPayload, {
                         onSuccess: () => {
                           setSelectedCustomerForSale(null);
@@ -459,6 +475,7 @@ export default function Sales() {
                           });
                         },
                         onError: (error) => {
+                          console.error("Order mutation error:", error);
                           toast({
                             title: "Hata",
                             description: "Sipariş oluşturulurken bir hata oluştu",
