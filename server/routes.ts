@@ -73,11 +73,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // For now, return mock users since we don't have a full user management system
       const mockUsers = [
-        { id: 'admin', firstName: 'Admin', lastName: 'User', email: 'admin@system.com', role: 'admin', status: 'active' },
-        { id: 'sales1', firstName: 'Ahmet', lastName: 'Yılmaz', email: 'ahmet@company.com', role: 'sales', status: 'active' },
-        { id: 'sales2', firstName: 'Ayşe', lastName: 'Demir', email: 'ayse@company.com', role: 'sales', status: 'active' },
-        { id: 'production1', firstName: 'Mehmet', lastName: 'Kaya', email: 'mehmet@company.com', role: 'production', status: 'active' },
-        { id: 'shipping1', firstName: 'Fatma', lastName: 'Özkan', email: 'fatma@company.com', role: 'shipping', status: 'active' },
+        { id: 'admin', firstName: 'Admin', lastName: 'User', email: 'admin@system.com', role: 'Admin', status: 'active' },
+        { id: 'sales_manager', firstName: 'Ahmet', lastName: 'Yılmaz', email: 'ahmet@company.com', role: 'Satış Müdürü', status: 'active' },
+        { id: 'sales_staff', firstName: 'Ayşe', lastName: 'Demir', email: 'ayse@company.com', role: 'Satış Personeli', status: 'active' },
+        { id: 'production_manager', firstName: 'Mehmet', lastName: 'Kaya', email: 'mehmet@company.com', role: 'Üretim Müdürü', status: 'active' },
+        { id: 'production_staff', firstName: 'Zeynep', lastName: 'Çelik', email: 'zeynep@company.com', role: 'Üretim Personeli', status: 'active' },
+        { id: 'accounting_manager', firstName: 'Ali', lastName: 'Öztürk', email: 'ali@company.com', role: 'Muhasebe Müdürü', status: 'active' },
+        { id: 'accounting_staff', firstName: 'Elif', lastName: 'Şahin', email: 'elif@company.com', role: 'Muhasebe Personeli', status: 'active' },
+        { id: 'shipping_manager', firstName: 'Fatma', lastName: 'Özkan', email: 'fatma@company.com', role: 'Sevkiyat Müdürü', status: 'active' },
+        { id: 'shipping_staff', firstName: 'Murat', lastName: 'Arslan', email: 'murat@company.com', role: 'Sevkiyat Personeli', status: 'inactive' },
       ];
       res.json(mockUsers);
     } catch (error) {
