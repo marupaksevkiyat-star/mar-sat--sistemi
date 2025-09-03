@@ -507,6 +507,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Today's appointments for sales staff
+  app.get('/api/appointments/today/:date', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.user.id;
+      const userRole = req.session.user.role;
+      const date = req.params.date;
+      
+      const salesPersonId = userRole === 'admin' ? undefined : userId;
+      const appointmentDate = new Date(date);
+      
+      const appointments = await storage.getAppointments(salesPersonId, appointmentDate);
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error fetching today's appointments:", error);
+      res.status(500).json({ message: "Failed to fetch today's appointments" });
+    }
+  });
+
   app.put('/api/appointments/:id', isAuthenticated, async (req, res) => {
     try {
       const updates = insertAppointmentSchema.partial().parse(req.body);

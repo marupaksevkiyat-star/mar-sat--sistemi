@@ -8,6 +8,7 @@ import Navigation from "@/components/layout/navigation";
 import LocationTracker from "@/components/sales/location-tracker";
 import VisitForm from "@/components/sales/visit-form";
 import CustomerForm from "@/components/sales/customer-form";
+import DailyAppointments from "@/components/sales/daily-appointments";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
@@ -208,6 +209,9 @@ export default function Sales() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Daily Appointments */}
+            <DailyAppointments onStartVisit={handleSelectCustomer} />
+
             {/* Daily Stats */}
             <Card>
               <CardHeader>
