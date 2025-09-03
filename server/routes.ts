@@ -370,12 +370,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         salesPersonId: userId,
       });
       
-      const orderItems = z.array(insertOrderItemSchema).parse(items);
+      console.log("Parsed orderData:", JSON.stringify(orderData, null, 2));
+      
+      // Önce order'ı oluştur
+      const createdOrder = await storage.createOrder(orderData, []);
+      
+      // Sonra items'ı order ID'si ile hazırla
+      const orderItemsWithOrderId = items.map((item: any) => ({
+        orderId: createdOrder.id,
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.totalPrice,
+      }));
+      
+      const orderItems = z.array(insertOrderItemSchema).parse(orderItemsWithOrderId);
       
       console.log("Parsed orderData:", JSON.stringify(orderData, null, 2));
       console.log("Parsed orderItems:", JSON.stringify(orderItems, null, 2));
       
-      const createdOrder = await storage.createOrder(orderData, orderItems);
+      // Items'ları storage'a ekle
+      if (orderItems.length > 0) {
+        await storage.addOrderItems(createdOrder.id, orderItems);
+      }
+      
       res.json(createdOrder);
     } catch (error) {
       console.error("Error creating order:", error);
