@@ -359,9 +359,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.user.id;
       console.log("Received request body:", JSON.stringify(req.body, null, 2));
       
-      // Direkt request body'den order verilerini al  
       const { customerId, totalAmount, status, notes, items } = req.body;
       
+      // Order verilerini hazırla
       const orderData = insertOrderSchema.parse({
         customerId,
         totalAmount,
@@ -370,33 +370,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         salesPersonId: userId,
       });
       
-      console.log("Parsed orderData:", JSON.stringify(orderData, null, 2));
+      // Items verilerini hazırla (orderId olmadan - storage ekleyecek)
+      const orderItems = (items || []).map((item: any) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.totalPrice,
+      }));
       
-      // Önce order'ı oluştur (items olmadan)
-      const createdOrder = await storage.createOrder(orderData, []);
-      console.log("Created order ID:", createdOrder.id);
+      console.log("Order data:", JSON.stringify(orderData, null, 2));
+      console.log("Order items:", JSON.stringify(orderItems, null, 2));
       
-      // Eğer items varsa, onları order ID'si ile ekle
-      if (items && items.length > 0) {
-        // Items'ı order ID'si ile hazırla
-        const orderItemsWithOrderId = items.map((item: any) => ({
-          orderId: createdOrder.id,
-          productId: item.productId,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          totalPrice: item.totalPrice,
-        }));
-        
-        console.log("Items with orderId:", JSON.stringify(orderItemsWithOrderId, null, 2));
-        
-        // Zod validation
-        const orderItems = z.array(insertOrderItemSchema).parse(orderItemsWithOrderId);
-        console.log("Validated orderItems:", JSON.stringify(orderItems, null, 2));
-        
-        // Items'ları storage'a ekle
-        await storage.addOrderItems(createdOrder.id, orderItems);
-      }
+      // Storage'ın createOrder metodu her şeyi handle ediyor
+      const createdOrder = await storage.createOrder(orderData, orderItems);
       
+      console.log("Order created successfully:", createdOrder.id);
       res.json(createdOrder);
     } catch (error) {
       console.error("Error creating order:", error);

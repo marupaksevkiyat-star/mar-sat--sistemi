@@ -17,12 +17,12 @@ interface OrderItem {
   productId: string;
   productName: string;
   quantity: number;
-  price: number;
+  unitPrice: number;
 }
 
 export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormProps) {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([
-    { productId: "", productName: "", quantity: 1, price: 0 }
+    { productId: "", productName: "", quantity: 1, unitPrice: 0 }
   ]);
   const [notes, setNotes] = useState("");
 
@@ -32,7 +32,7 @@ export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormPro
   });
 
   const addOrderItem = () => {
-    setOrderItems([...orderItems, { productId: "", productName: "", quantity: 1, price: 0 }]);
+    setOrderItems([...orderItems, { productId: "", productName: "", quantity: 1, unitPrice: 0 }]);
   };
 
   const removeOrderItem = (index: number) => {
@@ -50,7 +50,7 @@ export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormPro
       const product = (products as any[]).find(p => p.id === value);
       if (product) {
         newItems[index].productName = product.name;
-        newItems[index].price = product.price || 0;
+        newItems[index].unitPrice = product.price || 0;
       }
     }
     
@@ -58,7 +58,7 @@ export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormPro
   };
 
   const calculateTotal = () => {
-    return orderItems.reduce((total, item) => total + (item.quantity * item.price), 0);
+    return orderItems.reduce((total, item) => total + (item.quantity * item.unitPrice), 0);
   };
 
   const handleSubmit = () => {
@@ -69,11 +69,19 @@ export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormPro
       return;
     }
 
+    // Server formatına uygun items hazırla
+    const formattedItems = validItems.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice.toString(),
+      totalPrice: (item.quantity * item.unitPrice).toString()
+    }));
+
     const orderData = {
       customerId: customer.id,
       notes,
-      items: validItems,
-      totalAmount: calculateTotal(),
+      items: formattedItems,
+      totalAmount: calculateTotal().toString(),
       status: 'pending'
     };
 
@@ -136,15 +144,15 @@ export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormPro
                 <Label>Birim Fiyat (₺)</Label>
                 <Input
                   type="number"
-                  value={item.price}
-                  onChange={(e) => updateOrderItem(index, 'price', parseFloat(e.target.value) || 0)}
+                  value={item.unitPrice}
+                  onChange={(e) => updateOrderItem(index, 'unitPrice', parseFloat(e.target.value) || 0)}
                 />
               </div>
             </div>
             
             {item.productId && (
               <div className="text-right text-sm font-medium">
-                Toplam: ₺{(item.quantity * item.price).toLocaleString()}
+                Toplam: ₺{(item.quantity * item.unitPrice).toLocaleString()}
               </div>
             )}
           </div>
