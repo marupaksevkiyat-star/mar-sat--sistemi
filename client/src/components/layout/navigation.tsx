@@ -115,11 +115,21 @@ export default function Navigation() {
                   </p>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => {
+                    alert('Profil düzenleme özelliği yakında eklenecek!');
+                  }}
+                >
                   <i className="fas fa-user mr-2"></i>
                   Profili Düzenle
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => {
+                    alert('Ayarlar sayfası yakında eklenecek!');
+                  }}
+                >
                   <i className="fas fa-cog mr-2"></i>
                   Ayarlar
                 </DropdownMenuItem>
