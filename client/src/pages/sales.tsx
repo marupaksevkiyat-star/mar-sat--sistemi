@@ -21,6 +21,8 @@ export default function Sales() {
   const [showCustomerForm, setShowCustomerForm] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [showSalesForm, setShowSalesForm] = useState(false);
+  const [selectedCustomerForSale, setSelectedCustomerForSale] = useState<any>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -39,6 +41,11 @@ export default function Sales() {
   const { data: nearbyCustomers, isLoading: nearbyLoading } = useQuery({
     queryKey: ["/api/customers/nearby", currentLocation?.lat, currentLocation?.lng],
     enabled: !!currentLocation,
+    retry: false,
+  });
+
+  const { data: allCustomers, isLoading: customersLoading } = useQuery({
+    queryKey: ["/api/customers"],
     retry: false,
   });
 
@@ -193,10 +200,13 @@ export default function Sales() {
   };
 
   const handleNewCustomer = () => {
-    console.log('handleNewCustomer çağrıldı, showCustomerForm:', showCustomerForm);
     setSelectedCustomer(null);
     setShowCustomerForm(true);
-    console.log('showCustomerForm true yapıldı');
+  };
+
+  const handleNewSale = (customer: any) => {
+    setSelectedCustomerForSale(customer);
+    setShowSalesForm(true);
   };
 
   const handleCompleteVisit = (outcome: string, customerData?: any, orderData?: any, appointmentData?: any) => {
@@ -311,39 +321,141 @@ export default function Sales() {
           <p className="text-muted-foreground mt-1">Saha ziyaretleri ve müşteri yönetimi</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Visit Panel */}
-          <div className="lg:col-span-2 space-y-6">
-            <LocationTracker 
-              onLocationUpdate={setCurrentLocation}
-              nearbyCustomers={nearbyCustomers}
-              onSelectCustomer={handleSelectCustomer}
-              onNewCustomer={handleNewCustomer}
-              isLoading={nearbyLoading}
+        {/* Ana İki Kart - Yeni Ziyaret ve Yeni Satış */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Yeni Ziyaret */}
+          <LocationTracker 
+            onLocationUpdate={setCurrentLocation}
+            nearbyCustomers={nearbyCustomers}
+            onSelectCustomer={handleSelectCustomer}
+            onNewCustomer={handleNewCustomer}
+            isLoading={nearbyLoading}
+          />
+
+          {/* Yeni Satış - Mevcut Müşteriler */}
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle>Yeni Satış</CardTitle>
+              <p className="text-sm text-muted-foreground">Mevcut müşterilere satış yap</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {customersLoading ? (
+                <div className="space-y-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-muted rounded-lg animate-pulse" />
+                        <div className="space-y-1">
+                          <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+                          <div className="h-3 w-20 bg-muted rounded animate-pulse" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : allCustomers?.length === 0 ? (
+                <div className="text-center py-6 border border-dashed border-border rounded-lg">
+                  <i className="fas fa-building text-4xl text-muted-foreground mb-2"></i>
+                  <p className="text-sm text-muted-foreground">Henüz müşteri bulunmuyor</p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {allCustomers?.map((customer: any) => (
+                    <div
+                      key={customer.id}
+                      className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
+                      onClick={() => handleNewSale(customer)}
+                      data-testid={`customer-sale-${customer.id}`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          customer.status === 'active' ? 'bg-blue-100' : 
+                          customer.status === 'potential' ? 'bg-green-100' : 'bg-gray-100'
+                        }`}>
+                          <i className={`fas ${
+                            customer.status === 'active' ? 'fa-building text-blue-600' :
+                            customer.status === 'potential' ? 'fa-store text-green-600' :
+                            'fa-building text-gray-600'
+                          } text-sm`}></i>
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground text-sm">
+                            {customer.companyName}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {customer.contactPerson}
+                          </p>
+                        </div>
+                      </div>
+                      <i className="fas fa-shopping-cart text-muted-foreground"></i>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Form'lar */}
+        {showCustomerForm && (
+          <div className="mb-8">
+            <CustomerForm
+              customer={selectedCustomer}
+              onComplete={handleCompleteVisit}
+              onCancel={() => {
+                setShowCustomerForm(false);
+                setSelectedCustomer(null);
+              }}
+              currentLocation={currentLocation}
             />
-
-            {showCustomerForm && (
-              <CustomerForm
-                customer={selectedCustomer}
-                onComplete={handleCompleteVisit}
-                onCancel={() => {
-                  setShowCustomerForm(false);
-                  setSelectedCustomer(null);
-                }}
-                currentLocation={currentLocation}
-              />
-            )}
           </div>
+        )}
 
-          {/* Sidebar */}
+        {showSalesForm && selectedCustomerForSale && (
+          <div className="mb-8">
+            <OrderForm
+              customer={selectedCustomerForSale}
+              onSubmit={(orderData) => {
+                // Direkt sipariş oluştur
+                const orderItemsData = orderData.items.map((item: any) => ({
+                  productId: item.productId,
+                  quantity: item.quantity,
+                  price: item.price.toString(),
+                }));
+                
+                const orderPayload = {
+                  customerId: selectedCustomerForSale.id,
+                  totalAmount: orderData.totalAmount.toString(),
+                  status: 'pending',
+                  notes: orderData.notes || '',
+                  items: orderItemsData
+                };
+                
+                createOrderMutation.mutate(orderPayload, {
+                  onSuccess: () => {
+                    setShowSalesForm(false);
+                    setSelectedCustomerForSale(null);
+                  }
+                });
+              }}
+              onCancel={() => {
+                setShowSalesForm(false);
+                setSelectedCustomerForSale(null);
+              }}
+            />
+          </div>
+        )}
+
+        {/* Diğer Özellikler - Alt Kısım */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Daily Visits */}
+          <DailyVisits />
+          
+          {/* Daily Appointments */}
+          <DailyAppointments onStartVisit={handleSelectCustomer} />
+
+          {/* Daily Stats + Map */}
           <div className="space-y-6">
-            {/* Daily Visits */}
-            <DailyVisits />
-            
-            {/* Daily Appointments */}
-            <DailyAppointments onStartVisit={handleSelectCustomer} />
-
-            {/* Daily Stats */}
             <Card>
               <CardHeader>
                 <CardTitle>Bugünkü Aktivite</CardTitle>
@@ -372,7 +484,6 @@ export default function Sales() {
               </CardContent>
             </Card>
 
-            {/* Map Placeholder */}
             <Card>
               <CardHeader>
                 <CardTitle>Konum Haritası</CardTitle>
