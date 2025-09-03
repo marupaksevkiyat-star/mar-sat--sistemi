@@ -10,7 +10,7 @@ import OrderForm from "./order-form";
 
 interface CustomerFormProps {
   customer?: any;
-  onComplete: (outcome: string, customerData?: any, orderData?: any) => void;
+  onComplete: (outcome: string, customerData?: any, orderData?: any, appointmentData?: any) => void;
   onCancel: () => void;
   currentLocation?: { lat: number; lng: number } | null;
 }
@@ -81,7 +81,7 @@ export default function CustomerForm({
       longitude: currentLocation?.lng?.toString(),
     };
 
-    onComplete('follow_up', customerData, appointmentData);
+    onComplete('follow_up', customerData, null, appointmentData);
   };
 
   const isNewCustomer = !customer;

@@ -78,6 +78,68 @@ export default function Sales() {
     },
   });
 
+  const createOrderMutation = useMutation({
+    mutationFn: async (orderData: any) => {
+      return await apiRequest("POST", "/api/orders", orderData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Sipariş başarıyla oluşturuldu",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+    },
+    onError: (error: Error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Hata",
+        description: "Sipariş oluşturulurken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createAppointmentMutation = useMutation({
+    mutationFn: async (appointmentData: any) => {
+      return await apiRequest("POST", "/api/appointments", appointmentData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Randevu başarıyla planlandı",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: (error: Error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Hata",
+        description: "Randevu oluşturulurken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
   const createVisitMutation = useMutation({
     mutationFn: async (visitData: any) => {
       return await apiRequest("POST", "/api/visits", visitData);
@@ -134,7 +196,7 @@ export default function Sales() {
     setShowCustomerForm(true);
   };
 
-  const handleCompleteVisit = (outcome: string, customerData?: any, orderData?: any) => {
+  const handleCompleteVisit = (outcome: string, customerData?: any, orderData?: any, appointmentData?: any) => {
     // Create visit record
     const visitData = {
       customerId: selectedCustomer?.id,
@@ -147,14 +209,54 @@ export default function Sales() {
 
     createVisitMutation.mutate(visitData);
 
-    // If creating new customer
+    // If creating new customer, handle customer creation first
     if (!selectedCustomer && customerData) {
-      createCustomerMutation.mutate({
+      const newCustomerData = {
         ...customerData,
         latitude: currentLocation?.lat?.toString(),
         longitude: currentLocation?.lng?.toString(),
         status: outcome === 'not_interested' ? 'not_interested' : 'active',
-      });
+      };
+      
+      // If there's order data, we need to create customer first, then order
+      if (orderData) {
+        createCustomerMutation.mutate(newCustomerData, {
+          onSuccess: (newCustomer) => {
+            const orderWithCustomer = {
+              ...orderData,
+              customerId: newCustomer.id,
+            };
+            createOrderMutation.mutate(orderWithCustomer);
+          }
+        });
+      } else if (appointmentData) {
+        // If there's appointment data, create customer first, then appointment
+        createCustomerMutation.mutate(newCustomerData, {
+          onSuccess: (newCustomer) => {
+            const appointmentWithCustomer = {
+              ...appointmentData,
+              customerId: newCustomer.id,
+            };
+            createAppointmentMutation.mutate(appointmentWithCustomer);
+          }
+        });
+      } else {
+        createCustomerMutation.mutate(newCustomerData);
+      }
+    } else if (orderData && selectedCustomer) {
+      // Existing customer - just create the order
+      const orderWithCustomer = {
+        ...orderData,
+        customerId: selectedCustomer.id,
+      };
+      createOrderMutation.mutate(orderWithCustomer);
+    } else if (appointmentData && selectedCustomer) {
+      // Existing customer - just create the appointment
+      const appointmentWithCustomer = {
+        ...appointmentData,
+        customerId: selectedCustomer.id,
+      };
+      createAppointmentMutation.mutate(appointmentWithCustomer);
     }
 
     setShowCustomerForm(false);
