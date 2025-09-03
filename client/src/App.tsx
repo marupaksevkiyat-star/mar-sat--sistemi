@@ -13,7 +13,40 @@ import Shipping from "@/pages/shipping";
 import Admin from "@/pages/admin";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  const canAccess = (requiredRole: string) => {
+    const userRole = user?.role || '';
+    
+    // Admin her şeye erişebilir
+    if (userRole === 'admin') return true;
+    
+    // Specific role checks
+    if (requiredRole === 'sales') {
+      return userRole === 'sales' || userRole.includes('Satış');
+    }
+    if (requiredRole === 'production') {
+      return userRole === 'production' || userRole.includes('Üretim');
+    }
+    if (requiredRole === 'shipping') {
+      return userRole === 'shipping' || userRole.includes('Sevkiyat');
+    }
+    if (requiredRole === 'admin') {
+      return userRole === 'admin';
+    }
+    
+    return false;
+  };
+
+  const ProtectedRoute = ({ component: Component, requiredRole }: { component: any, requiredRole?: string }) => {
+    if (!requiredRole) return <Component />;
+    
+    if (!canAccess(requiredRole)) {
+      return <NotFound />;
+    }
+    
+    return <Component />;
+  };
 
   return (
     <Switch>
@@ -22,10 +55,18 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
-          <Route path="/sales" component={Sales} />
-          <Route path="/production" component={Production} />
-          <Route path="/shipping" component={Shipping} />
-          <Route path="/admin" component={Admin} />
+          <Route path="/sales">
+            <ProtectedRoute component={Sales} requiredRole="sales" />
+          </Route>
+          <Route path="/production">
+            <ProtectedRoute component={Production} requiredRole="production" />
+          </Route>
+          <Route path="/shipping">
+            <ProtectedRoute component={Shipping} requiredRole="shipping" />
+          </Route>
+          <Route path="/admin">
+            <ProtectedRoute component={Admin} requiredRole="admin" />
+          </Route>
         </>
       )}
       <Route component={NotFound} />

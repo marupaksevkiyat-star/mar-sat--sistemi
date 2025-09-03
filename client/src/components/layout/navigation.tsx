@@ -33,17 +33,59 @@ export default function Navigation() {
     }
   };
 
-  const navigationItems = [
-    { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
-    { path: "/sales", label: "Satış", icon: "fas fa-users" },
-    { path: "/production", label: "Üretim", icon: "fas fa-cogs" },
-    { path: "/shipping", label: "Sevkiyat", icon: "fas fa-truck" },
-    { path: "/admin", label: "Yönetim", icon: "fas fa-shield-alt", adminOnly: true },
-  ];
+  const getNavigationItems = () => {
+    const userRole = user?.role || '';
+    
+    // Admin - tüm sayfaları görebilir
+    if (userRole === 'admin') {
+      return [
+        { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+        { path: "/sales", label: "Satış", icon: "fas fa-users" },
+        { path: "/production", label: "Üretim", icon: "fas fa-cogs" },
+        { path: "/shipping", label: "Sevkiyat", icon: "fas fa-truck" },
+        { path: "/admin", label: "Yönetim", icon: "fas fa-shield-alt" },
+      ];
+    }
+    
+    // Satış personeli - sadece satış sayfalarını görebilir
+    if (userRole === 'sales' || userRole.includes('Satış')) {
+      return [
+        { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+        { path: "/sales", label: "Satış", icon: "fas fa-users" },
+      ];
+    }
+    
+    // Üretim personeli - sadece üretim sayfalarını görebilir
+    if (userRole === 'production' || userRole.includes('Üretim')) {
+      return [
+        { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+        { path: "/production", label: "Üretim", icon: "fas fa-cogs" },
+      ];
+    }
+    
+    // Sevkiyat personeli - sadece sevkiyat sayfalarını görebilir
+    if (userRole === 'shipping' || userRole.includes('Sevkiyat')) {
+      return [
+        { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+        { path: "/shipping", label: "Sevkiyat", icon: "fas fa-truck" },
+      ];
+    }
+    
+    // Muhasebe personeli - dashboard ve kendi alanları
+    if (userRole === 'accounting' || userRole.includes('Muhasebe')) {
+      return [
+        { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+        { path: "/accounting", label: "Muhasebe", icon: "fas fa-calculator" },
+      ];
+    }
+    
+    // Varsayılan - sadece dashboard
+    return [
+      { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+    ];
+  };
 
-  const filteredItems = navigationItems.filter(item => 
-    !item.adminOnly || user?.role === 'admin'
-  );
+  const filteredItems = getNavigationItems();
 
   const isActive = (path: string) => {
     if (path === "/") return location === "/";
