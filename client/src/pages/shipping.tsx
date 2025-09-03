@@ -32,26 +32,26 @@ export default function Shipping() {
   }, [isAuthenticated, isLoading, toast]);
 
   const { data: readyOrders, isLoading: readyLoading } = useQuery({
-    queryKey: ["/api/orders?status=production_ready"],
+    queryKey: ["/api/orders", "status", "production_ready"],
+    queryFn: () => fetch("/api/orders?status=production_ready", { credentials: "include" }).then(res => res.json()),
     retry: false,
   });
 
   const { data: shippingOrders, isLoading: shippingLoading } = useQuery({
-    queryKey: ["/api/orders?status=shipping"],
+    queryKey: ["/api/orders", "status", "shipping"],
+    queryFn: () => fetch("/api/orders?status=shipping", { credentials: "include" }).then(res => res.json()),
     retry: false,
   });
 
   const { data: deliveredOrders, isLoading: deliveredLoading } = useQuery({
-    queryKey: ["/api/orders?status=delivered"],
+    queryKey: ["/api/orders", "status", "delivered"],
+    queryFn: () => fetch("/api/orders?status=delivered", { credentials: "include" }).then(res => res.json()),
     retry: false,
   });
 
   const createDeliveryNoteMutation = useMutation({
     mutationFn: async ({ orderId }: { orderId: string }) => {
-      return await apiRequest(`/api/orders/${orderId}/status`, {
-        method: 'PUT',
-        body: JSON.stringify({ status: "shipping" }),
-      });
+      return await apiRequest('PUT', `/api/orders/${orderId}/status`, { status: "shipping" });
     },
     onSuccess: (data, variables) => {
       toast({
@@ -59,6 +59,8 @@ export default function Shipping() {
         description: "İrsaliye oluşturuldu",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production_ready"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "shipping"] });
       
       // Set as active delivery
       const order = readyOrders?.find((o: any) => o.id === variables.orderId);
@@ -100,6 +102,8 @@ export default function Shipping() {
         description: "Teslimat tamamlandı",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "shipping"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "delivered"] });
       setActiveDelivery(null);
     },
     onError: (error: Error) => {
