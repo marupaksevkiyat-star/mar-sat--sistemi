@@ -59,10 +59,7 @@ export default function InvoicesPage() {
   });
 
   const createInvoiceMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/invoices", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
+    mutationFn: (data: any) => apiRequest("POST", "/api/invoices", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
       setShowCreateDialog(false);
@@ -74,10 +71,7 @@ export default function InvoicesPage() {
 
   const updateInvoiceStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: InvoiceStatus }) => 
-      apiRequest(`/api/invoices/${id}/status`, {
-        method: "PATCH",
-        body: JSON.stringify({ status }),
-      }),
+      apiRequest("PATCH", `/api/invoices/${id}/status`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
     },

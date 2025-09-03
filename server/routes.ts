@@ -7,7 +7,8 @@ import {
   insertOrderSchema,
   insertOrderItemSchema,
   insertVisitSchema,
-  insertAppointmentSchema
+  insertAppointmentSchema,
+  insertInvoiceSchema
 } from "@shared/schema";
 import { z } from "zod";
 import session from "express-session";
@@ -533,6 +534,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating appointment:", error);
       res.status(400).json({ message: "Failed to update appointment" });
+    }
+  });
+
+  // Invoice routes
+  app.post('/api/invoices', isAuthenticated, async (req, res) => {
+    try {
+      const invoiceData = insertInvoiceSchema.parse(req.body);
+      const invoice = await storage.createInvoice(invoiceData);
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error creating invoice:", error);
+      res.status(400).json({ message: "Failed to create invoice" });
+    }
+  });
+
+  app.get('/api/invoices', isAuthenticated, async (req, res) => {
+    try {
+      const { status } = req.query;
+      const filters = status && status !== 'all' ? { status: status as string } : undefined;
+      const invoices = await storage.getInvoices(filters);
+      res.json(invoices);
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      res.status(500).json({ message: "Failed to fetch invoices" });
+    }
+  });
+
+  app.patch('/api/invoices/:id/status', isAuthenticated, async (req, res) => {
+    try {
+      const { status } = req.body;
+      const updates = status === 'shipped' ? { shippedAt: new Date() } : 
+                      status === 'delivered' ? { deliveredAt: new Date() } : {};
+      const invoice = await storage.updateInvoiceStatus(req.params.id, status, updates);
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error updating invoice status:", error);
+      res.status(400).json({ message: "Failed to update invoice status" });
     }
   });
 
