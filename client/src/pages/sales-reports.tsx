@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, TrendingUp, DollarSign, Users, FileText, Download } from "lucide-react";
+import { Calendar, TrendingUp, DollarSign, Users, FileText, Download, ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 type ReportPeriod = 'daily' | 'weekly' | 'monthly';
 
@@ -43,6 +44,120 @@ export default function SalesReportsPage() {
       case 'monthly': return 'Aylık';
       default: return 'Günlük';
     }
+  };
+
+  const exportToCSV = () => {
+    const data = [];
+    
+    // Add summary data
+    const summary = salesData?.summary || {};
+    data.push(['SATIŞ ÖZETİ']);
+    data.push(['Toplam Satış', formatCurrency(summary.totalSales || 0)]);
+    data.push(['Sipariş Sayısı', summary.orderCount || 0]);
+    data.push(['Ortalama Sipariş', formatCurrency(summary.averageOrder || 0)]);
+    data.push(['']);
+    
+    // Add sales by person
+    if (salesByPerson && salesByPerson.length > 0) {
+      data.push(['SATIŞ ELEMANI PERFORMANSI']);
+      data.push(['Satış Elemanı', 'Toplam Satış', 'Sipariş Sayısı', 'Ortalama']);
+      salesByPerson.forEach((person: any) => {
+        data.push([
+          `${person.firstName} ${person.lastName}`,
+          formatCurrency(person.totalSales || 0),
+          person.orderCount || 0,
+          formatCurrency(person.averageOrder || 0)
+        ]);
+      });
+      data.push(['']);
+    }
+    
+    // Add top products
+    if (topProducts && topProducts.length > 0) {
+      data.push(['EN ÇOK SATAN ÜRÜNLER']);
+      data.push(['Ürün Adı', 'Satış Miktarı', 'Toplam Tutar']);
+      topProducts.forEach((product: any) => {
+        data.push([
+          product.name,
+          product.quantity || 0,
+          formatCurrency(product.totalSales || 0)
+        ]);
+      });
+    }
+    
+    const csvContent = data.map(row => row.join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `satis-raporu-${getPeriodLabel(selectedPeriod)}-${selectedDate}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportToExcel = () => {
+    // Simple Excel-like format using HTML table
+    const summary = salesData?.summary || {};
+    
+    let htmlContent = `
+      <table border="1">
+        <tr><td colspan="4"><strong>SATIŞ RAPORU - ${getPeriodLabel(selectedPeriod).toUpperCase()} (${formatDate(selectedDate)})</strong></td></tr>
+        <tr><td colspan="4"></td></tr>
+        <tr><td colspan="4"><strong>ÖZET</strong></td></tr>
+        <tr><td>Toplam Satış</td><td>${formatCurrency(summary.totalSales || 0)}</td><td></td><td></td></tr>
+        <tr><td>Sipariş Sayısı</td><td>${summary.orderCount || 0}</td><td></td><td></td></tr>
+        <tr><td>Ortalama Sipariş</td><td>${formatCurrency(summary.averageOrder || 0)}</td><td></td><td></td></tr>
+        <tr><td colspan="4"></td></tr>
+    `;
+    
+    if (salesByPerson && salesByPerson.length > 0) {
+      htmlContent += `
+        <tr><td colspan="4"><strong>SATIŞCI PERFORMANSI</strong></td></tr>
+        <tr><td><strong>Satış Elemanı</strong></td><td><strong>Toplam Satış</strong></td><td><strong>Sipariş Sayısı</strong></td><td><strong>Ortalama</strong></td></tr>
+      `;
+      salesByPerson.forEach((person: any) => {
+        htmlContent += `
+          <tr>
+            <td>${person.firstName} ${person.lastName}</td>
+            <td>${formatCurrency(person.totalSales || 0)}</td>
+            <td>${person.orderCount || 0}</td>
+            <td>${formatCurrency(person.averageOrder || 0)}</td>
+          </tr>
+        `;
+      });
+      htmlContent += '<tr><td colspan="4"></td></tr>';
+    }
+    
+    if (topProducts && topProducts.length > 0) {
+      htmlContent += `
+        <tr><td colspan="4"><strong>EN ÇOK SATAN ÜRÜNLER</strong></td></tr>
+        <tr><td><strong>Ürün Adı</strong></td><td><strong>Satış Miktarı</strong></td><td><strong>Toplam Tutar</strong></td><td></td></tr>
+      `;
+      topProducts.forEach((product: any) => {
+        htmlContent += `
+          <tr>
+            <td>${product.name}</td>
+            <td>${product.quantity || 0}</td>
+            <td>${formatCurrency(product.totalSales || 0)}</td>
+            <td></td>
+          </tr>
+        `;
+      });
+    }
+    
+    htmlContent += '</table>';
+    
+    const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `satis-raporu-${getPeriodLabel(selectedPeriod)}-${selectedDate}.xls`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const getDateInputType = () => {
@@ -112,10 +227,25 @@ export default function SalesReportsPage() {
               data-testid="input-report-date"
             />
             
-            <Button variant="outline" data-testid="button-export-report">
-              <Download className="w-4 h-4 mr-2" />
-              Dışa Aktar
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" data-testid="button-export-report">
+                  <Download className="w-4 h-4 mr-2" />
+                  Dışa Aktar
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={exportToCSV} data-testid="menu-export-csv">
+                  <FileText className="w-4 h-4 mr-2" />
+                  CSV Formatında İndir
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={exportToExcel} data-testid="menu-export-excel">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Excel Formatında İndir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
