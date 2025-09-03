@@ -69,19 +69,17 @@ export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormPro
       return;
     }
 
-    // Server formatına uygun items hazırla
-    const formattedItems = validItems.map(item => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice.toString(),
-      totalPrice: (item.quantity * item.unitPrice).toString()
-    }));
-
+    // Basit format
     const orderData = {
       customerId: customer.id,
       notes,
-      items: formattedItems,
-      totalAmount: calculateTotal().toString(),
+      items: validItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.quantity * item.unitPrice
+      })),
+      totalAmount: calculateTotal(),
       status: 'pending'
     };
 

@@ -413,34 +413,9 @@ export default function Sales() {
                   <OrderForm
                     customer={selectedCustomerForSale}
                     onSubmit={(orderData) => {
-                      console.log("Order submission:", orderData);
-                      
-                      // OrderForm zaten doğru format gönderiyor, direkt kullan
-                      const orderPayload = {
-                        customerId: orderData.customerId,
-                        totalAmount: orderData.totalAmount,
-                        status: orderData.status,
-                        notes: orderData.notes,
-                        items: orderData.items
-                      };
-                      
-                      console.log("Final orderPayload:", JSON.stringify(orderPayload, null, 2));
-                      
-                      createOrderMutation.mutate(orderPayload, {
+                      createOrderMutation.mutate(orderData, {
                         onSuccess: () => {
                           setSelectedCustomerForSale(null);
-                          toast({
-                            title: "Başarılı",
-                            description: "Sipariş başarıyla oluşturuldu!",
-                          });
-                        },
-                        onError: (error) => {
-                          console.error("Order mutation error:", error);
-                          toast({
-                            title: "Hata",
-                            description: "Sipariş oluşturulurken bir hata oluştu",
-                            variant: "destructive",
-                          });
                         }
                       });
                     }}
