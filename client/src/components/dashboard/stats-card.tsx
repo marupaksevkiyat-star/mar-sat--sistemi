@@ -11,6 +11,7 @@ interface StatsCardProps {
   color: "blue" | "green" | "yellow" | "purple" | "red";
   isLoading?: boolean;
   "data-testid"?: string;
+  onClick?: () => void;
 }
 
 export default function StatsCard({
@@ -23,6 +24,7 @@ export default function StatsCard({
   color,
   isLoading = false,
   "data-testid": testId,
+  onClick,
 }: StatsCardProps) {
   const colorClasses = {
     blue: "bg-blue-100 text-blue-600",
@@ -53,7 +55,11 @@ export default function StatsCard({
   }
 
   return (
-    <Card className="shadow-sm hover:shadow-md transition-shadow" data-testid={testId}>
+    <Card 
+      className={`shadow-sm hover:shadow-md transition-all ${onClick ? 'cursor-pointer hover:scale-105' : ''}`} 
+      data-testid={testId}
+      onClick={onClick}
+    >
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
