@@ -70,7 +70,7 @@ export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormPro
     }
 
     const orderData = {
-      customerId: customer.id,
+      customerId: customer.id === 'new' ? null : customer.id,
       notes,
       items: validItems,
       totalAmount: calculateTotal(),
