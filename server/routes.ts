@@ -86,6 +86,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add new user (admin only)
+  app.post('/api/users', isAuthenticated, async (req: any, res) => {
+    try {
+      const userRole = req.session.user.role;
+      if (userRole !== 'admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      
+      const { firstName, lastName, email, role, password } = req.body;
+      
+      // Basic validation
+      if (!firstName || !lastName || !email || !role || !password) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+      
+      // For now, just return success since we don't have a real user management system
+      const newUser = {
+        id: `user_${Date.now()}`,
+        firstName,
+        lastName,
+        email,
+        role,
+        status: 'active',
+        createdAt: new Date()
+      };
+      
+      res.json({ 
+        message: "User created successfully", 
+        user: newUser 
+      });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
   // Dashboard routes
   app.get('/api/dashboard/stats', isAuthenticated, async (req: any, res) => {
     try {

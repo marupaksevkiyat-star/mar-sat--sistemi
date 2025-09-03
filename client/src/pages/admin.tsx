@@ -8,12 +8,25 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
-  const [activeModal, setActiveModal] = useState<'visits' | 'sales' | 'orders' | 'users' | null>(null);
+  const queryClient = useQueryClient();
+  const [activeModal, setActiveModal] = useState<'visits' | 'sales' | 'orders' | 'users' | 'add-user' | null>(null);
+  const [newUser, setNewUser] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    role: '',
+    password: ''
+  });
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -62,6 +75,32 @@ export default function Admin() {
     queryKey: ["/api/users"],
     retry: false,
     enabled: activeModal === 'users',
+  });
+
+  // Add user mutation
+  const addUserMutation = useMutation({
+    mutationFn: async (userData: any) => {
+      return await apiRequest('/api/users', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Yeni kullanıcı eklendi",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      setActiveModal('users');
+      setNewUser({ firstName: '', lastName: '', email: '', role: '', password: '' });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Hata",
+        description: "Kullanıcı eklenirken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -623,9 +662,109 @@ export default function Admin() {
             )}
             
             <div className="pt-4 border-t">
-              <Button className="w-full">
+              <Button 
+                className="w-full" 
+                onClick={() => setActiveModal('add-user')}
+              >
                 <i className="fas fa-plus mr-2"></i>
                 Yeni Kullanıcı Ekle
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add User Modal */}
+      <Dialog open={activeModal === 'add-user'} onOpenChange={() => setActiveModal(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-user-plus text-blue-600"></i>
+              Yeni Kullanıcı Ekle
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="firstName">Ad</Label>
+              <Input
+                id="firstName"
+                value={newUser.firstName}
+                onChange={(e) => setNewUser({...newUser, firstName: e.target.value})}
+                placeholder="Kullanıcının adı"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="lastName">Soyad</Label>
+              <Input
+                id="lastName"
+                value={newUser.lastName}
+                onChange={(e) => setNewUser({...newUser, lastName: e.target.value})}
+                placeholder="Kullanıcının soyadı"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="email">E-posta</Label>
+              <Input
+                id="email"
+                type="email"
+                value={newUser.email}
+                onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                placeholder="kullanici@company.com"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="role">Rol</Label>
+              <Select value={newUser.role} onValueChange={(value) => setNewUser({...newUser, role: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Kullanıcı rolü seçin" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sales">Satış</SelectItem>
+                  <SelectItem value="production">Üretim</SelectItem>
+                  <SelectItem value="shipping">Sevkiyat</SelectItem>
+                  <SelectItem value="admin">Yönetici</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="password">Şifre</Label>
+              <Input
+                id="password"
+                type="password"
+                value={newUser.password}
+                onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                placeholder="Kullanıcı şifresi"
+              />
+            </div>
+            
+            <div className="flex gap-2 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setActiveModal('users')}
+                className="flex-1"
+              >
+                İptal
+              </Button>
+              <Button 
+                onClick={() => addUserMutation.mutate(newUser)}
+                disabled={addUserMutation.isPending || !newUser.firstName || !newUser.lastName || !newUser.email || !newUser.role || !newUser.password}
+                className="flex-1"
+              >
+                {addUserMutation.isPending ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Ekleniyor...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-save mr-2"></i>
+                    Kaydet
+                  </>
+                )}
               </Button>
             </div>
           </div>
