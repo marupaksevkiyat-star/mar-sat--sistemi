@@ -200,7 +200,7 @@ export default function Admin() {
   }
 
   // Check if user has admin role
-  if (user?.role !== 'admin') {
+  if (user?.role !== 'admin' && user?.role !== 'Admin') {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -222,18 +222,18 @@ export default function Admin() {
   };
 
   const customerStats = {
-    totalCustomers: customers?.length || 0,
+    totalCustomers: (customers as any[])?.length || 0,
   };
 
   const productStats = {
-    totalProducts: products?.length || 0,
+    totalProducts: (products as any[])?.length || 0,
   };
 
   // Calculate monthly target percentage
   const monthlyTarget = {
-    current: dashboardStats?.monthlySales || 0,
+    current: (dashboardStats as any)?.monthlySales || 0,
     target: 500000, // 500K target
-    percentage: dashboardStats?.monthlySales ? Math.round((dashboardStats.monthlySales / 500000) * 100) : 0,
+    percentage: (dashboardStats as any)?.monthlySales ? Math.round(((dashboardStats as any).monthlySales / 500000) * 100) : 0,
   };
 
   const satisfaction = {
@@ -258,7 +258,7 @@ export default function Admin() {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-sm text-muted-foreground">
-              Hoş geldiniz, {user?.firstName} {user?.lastName}
+              Hoş geldiniz, {(user as any)?.firstName} {(user as any)?.lastName}
             </div>
             <Button 
               variant="outline" 
@@ -294,7 +294,7 @@ export default function Admin() {
               <p className="text-sm text-muted-foreground mb-4">Satış elemanı ziyaret detayları</p>
               <div className="flex items-center text-sm">
                 <span className="font-medium text-foreground">
-                  {dashboardStats?.dailyVisits || 0}
+                  {(dashboardStats as any)?.dailyVisits || 0}
                 </span>
                 <span className="text-muted-foreground ml-1">bugünkü ziyaret</span>
               </div>
@@ -314,7 +314,7 @@ export default function Admin() {
               <p className="text-sm text-muted-foreground mb-4">Firmalar bazında satış raporu</p>
               <div className="flex items-center text-sm">
                 <span className="font-medium text-foreground">
-                  ₺{dashboardStats?.monthlySales ? ((dashboardStats.monthlySales as number) / 1000).toFixed(1) : '0'}K
+                  ₺{(dashboardStats as any)?.monthlySales ? (((dashboardStats as any).monthlySales as number) / 1000).toFixed(1) : '0'}K
                 </span>
                 <span className="text-muted-foreground ml-1">bu ay</span>
               </div>
@@ -334,7 +334,7 @@ export default function Admin() {
               <p className="text-sm text-muted-foreground mb-4">Sipariş içerikleri ve detayları</p>
               <div className="flex items-center text-sm">
                 <span className="font-medium text-foreground">
-                  {dashboardStats?.activeOrders || 0}
+                  {(dashboardStats as any)?.activeOrders || 0}
                 </span>
                 <span className="text-muted-foreground ml-1">aktif sipariş</span>
               </div>

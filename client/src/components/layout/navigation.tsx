@@ -37,10 +37,12 @@ export default function Navigation() {
     const userRole = user?.role || '';
     
     // Admin - tüm sayfaları görebilir
-    if (userRole === 'admin') {
+    if (userRole === 'admin' || userRole === 'Admin') {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
         { path: "/sales", label: "Satış", icon: "fas fa-users" },
+        { path: "/sales-reports", label: "Satış Raporları", icon: "fas fa-chart-bar" },
+        { path: "/invoices", label: "İrsaliyeler", icon: "fas fa-file-invoice" },
         { path: "/production", label: "Üretim", icon: "fas fa-cogs" },
         { path: "/shipping", label: "Sevkiyat", icon: "fas fa-truck" },
         { path: "/admin", label: "Yönetim", icon: "fas fa-shield-alt" },

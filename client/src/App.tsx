@@ -8,6 +8,8 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import Sales from "@/pages/sales";
+import SalesReports from "@/pages/sales-reports";
+import Invoices from "@/pages/invoices";
 import Production from "@/pages/production";
 import Shipping from "@/pages/shipping";
 import Admin from "@/pages/admin";
@@ -19,7 +21,7 @@ function Router() {
     const userRole = user?.role || '';
     
     // Admin her şeye erişebilir
-    if (userRole === 'admin') return true;
+    if (userRole === 'admin' || userRole === 'Admin') return true;
     
     // Specific role checks
     if (requiredRole === 'sales') {
@@ -32,7 +34,7 @@ function Router() {
       return userRole === 'shipping' || userRole.includes('Sevkiyat');
     }
     if (requiredRole === 'admin') {
-      return userRole === 'admin';
+      return userRole === 'admin' || userRole === 'Admin';
     }
     
     return false;
@@ -63,6 +65,12 @@ function Router() {
           </Route>
           <Route path="/shipping">
             <ProtectedRoute component={Shipping} requiredRole="shipping" />
+          </Route>
+          <Route path="/sales-reports">
+            <ProtectedRoute component={SalesReports} requiredRole="admin" />
+          </Route>
+          <Route path="/invoices">
+            <ProtectedRoute component={Invoices} requiredRole="admin" />
           </Route>
           <Route path="/admin">
             <ProtectedRoute component={Admin} requiredRole="admin" />
