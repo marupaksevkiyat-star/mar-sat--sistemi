@@ -421,11 +421,12 @@ export default function Sales() {
                       console.log("orderData.totalAmount:", orderData.totalAmount);
                       console.log("orderData.items:", orderData.items);
                       
-                      // Veri kontrolü ve düzeltme
+                      // Veri kontrolü ve düzeltme - server için doğru format
                       const orderItemsData = orderData.items?.map((item: any) => ({
                         productId: item.productId,
                         quantity: item.quantity,
-                        price: item.price.toString(),
+                        unitPrice: item.price.toString(),
+                        totalPrice: (item.quantity * item.price).toString(),
                       })) || [];
                       
                       // customerId ve totalAmount'u güvenli şekilde al
