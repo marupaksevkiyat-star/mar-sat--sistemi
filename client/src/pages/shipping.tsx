@@ -32,17 +32,17 @@ export default function Shipping() {
   }, [isAuthenticated, isLoading, toast]);
 
   const { data: readyOrders, isLoading: readyLoading } = useQuery({
-    queryKey: ["/api/orders", "production_ready"],
+    queryKey: ["/api/orders?status=production_ready"],
     retry: false,
   });
 
   const { data: shippingOrders, isLoading: shippingLoading } = useQuery({
-    queryKey: ["/api/orders", "shipping"],
+    queryKey: ["/api/orders?status=shipping"],
     retry: false,
   });
 
   const { data: deliveredOrders, isLoading: deliveredLoading } = useQuery({
-    queryKey: ["/api/orders", "delivered"],
+    queryKey: ["/api/orders?status=delivered"],
     retry: false,
   });
 
