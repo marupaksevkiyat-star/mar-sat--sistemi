@@ -13,6 +13,8 @@ import DailyVisits from "@/components/sales/daily-visits";
 import OrderForm from "@/components/sales/order-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { useEffect } from "react";
 
 export default function Sales() {
@@ -333,64 +335,69 @@ export default function Sales() {
             isLoading={nearbyLoading}
           />
 
-          {/* Yeni Satış - Mevcut Müşteriler */}
+          {/* Yeni Satış - Müşteri Seçimi */}
           <Card className="shadow-sm">
             <CardHeader>
               <CardTitle>Yeni Satış</CardTitle>
               <p className="text-sm text-muted-foreground">Mevcut müşterilere satış yap</p>
             </CardHeader>
             <CardContent className="space-y-4">
-              {customersLoading ? (
-                <div className="space-y-2">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-muted rounded-lg animate-pulse" />
-                        <div className="space-y-1">
-                          <div className="h-4 w-32 bg-muted rounded animate-pulse" />
-                          <div className="h-3 w-20 bg-muted rounded animate-pulse" />
+              <div className="space-y-2">
+                <Label htmlFor="customer-select">Müşteri Seçin</Label>
+                <Select 
+                  onValueChange={(customerId) => {
+                    const customer = allCustomers?.find((c: any) => c.id === customerId);
+                    if (customer) {
+                      handleNewSale(customer);
+                    }
+                  }}
+                  disabled={customersLoading || !allCustomers?.length}
+                >
+                  <SelectTrigger className="w-full" data-testid="select-customer">
+                    <SelectValue 
+                      placeholder={
+                        customersLoading ? "Yükleniyror..." : 
+                        !allCustomers?.length ? "Müşteri bulunmuyor" :
+                        "Müşteri seçin"
+                      } 
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allCustomers?.map((customer: any) => (
+                      <SelectItem 
+                        key={customer.id} 
+                        value={customer.id}
+                        data-testid={`customer-option-${customer.id}`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-6 h-6 rounded-md flex items-center justify-center ${
+                            customer.status === 'active' ? 'bg-blue-100' : 
+                            customer.status === 'potential' ? 'bg-green-100' : 'bg-gray-100'
+                          }`}>
+                            <i className={`fas ${
+                              customer.status === 'active' ? 'fa-building text-blue-600' :
+                              customer.status === 'potential' ? 'fa-store text-green-600' :
+                              'fa-building text-gray-600'
+                            } text-xs`}></i>
+                          </div>
+                          <div>
+                            <span className="font-medium">{customer.companyName}</span>
+                            <span className="text-muted-foreground text-sm ml-2">({customer.contactPerson})</span>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : allCustomers?.length === 0 ? (
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {!customersLoading && allCustomers?.length === 0 && (
                 <div className="text-center py-6 border border-dashed border-border rounded-lg">
                   <i className="fas fa-building text-4xl text-muted-foreground mb-2"></i>
                   <p className="text-sm text-muted-foreground">Henüz müşteri bulunmuyor</p>
-                </div>
-              ) : (
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {allCustomers?.map((customer: any) => (
-                    <div
-                      key={customer.id}
-                      className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
-                      onClick={() => handleNewSale(customer)}
-                      data-testid={`customer-sale-${customer.id}`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          customer.status === 'active' ? 'bg-blue-100' : 
-                          customer.status === 'potential' ? 'bg-green-100' : 'bg-gray-100'
-                        }`}>
-                          <i className={`fas ${
-                            customer.status === 'active' ? 'fa-building text-blue-600' :
-                            customer.status === 'potential' ? 'fa-store text-green-600' :
-                            'fa-building text-gray-600'
-                          } text-sm`}></i>
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground text-sm">
-                            {customer.companyName}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {customer.contactPerson}
-                          </p>
-                        </div>
-                      </div>
-                      <i className="fas fa-shopping-cart text-muted-foreground"></i>
-                    </div>
-                  ))}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Önce "Yeni Ziyaret" ile müşteri ekleyin
+                  </p>
                 </div>
               )}
             </CardContent>
