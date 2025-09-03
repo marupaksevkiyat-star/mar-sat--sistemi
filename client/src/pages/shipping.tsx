@@ -48,8 +48,9 @@ export default function Shipping() {
 
   const createDeliveryNoteMutation = useMutation({
     mutationFn: async ({ orderId }: { orderId: string }) => {
-      return await apiRequest("PUT", `/api/orders/${orderId}/status`, {
-        status: "shipping",
+      return await apiRequest(`/api/orders/${orderId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: "shipping" }),
       });
     },
     onSuccess: (data, variables) => {

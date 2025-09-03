@@ -9,8 +9,14 @@ export default function Navigation() {
   const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST" });
+      window.location.reload();
+    } catch (error) {
+      console.error("Logout error:", error);
+      window.location.reload();
+    }
   };
 
   const navigationItems = [

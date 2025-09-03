@@ -71,7 +71,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatsCard
             title="Günlük Ziyaretler"
-            value={stats?.dailyVisits?.toString() || "0"}
+            value={(stats as any)?.dailyVisits?.toString() || "0"}
             change="+12%"
             changeType="positive"
             icon="fas fa-map-marker-alt"
@@ -82,7 +82,7 @@ export default function Home() {
           
           <StatsCard
             title="Aktif Siparişler"
-            value={stats?.activeOrders?.toString() || "0"}
+            value={(stats as any)?.activeOrders?.toString() || "0"}
             subtitle="üretimde"
             icon="fas fa-clipboard-list"
             color="yellow"
@@ -92,7 +92,7 @@ export default function Home() {
           
           <StatsCard
             title="Aylık Satış"
-            value={stats?.monthlySales ? `₺${(stats.monthlySales / 1000).toFixed(1)}K` : "₺0"}
+            value={(stats as any)?.monthlySales ? `₺${((stats as any).monthlySales / 1000).toFixed(1)}K` : "₺0"}
             change="+8.2%"
             changeType="positive"
             icon="fas fa-lira-sign"
@@ -103,7 +103,7 @@ export default function Home() {
           
           <StatsCard
             title="Teslimat Oranı"
-            value={stats?.deliveryRate ? `${stats.deliveryRate}%` : "0%"}
+            value={(stats as any)?.deliveryRate ? `${(stats as any).deliveryRate}%` : "0%"}
             subtitle="Mükemmel performans"
             icon="fas fa-truck"
             color="purple"
@@ -115,11 +115,11 @@ export default function Home() {
         {/* Recent Activities & Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <RecentOrders orders={recentOrders} isLoading={ordersLoading} />
+            <RecentOrders orders={recentOrders as any} isLoading={ordersLoading} />
           </div>
           
           <div>
-            <Schedule appointments={todayAppointments} isLoading={appointmentsLoading} />
+            <Schedule appointments={todayAppointments as any} isLoading={appointmentsLoading} />
           </div>
         </div>
       </main>

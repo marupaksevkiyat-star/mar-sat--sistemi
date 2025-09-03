@@ -46,8 +46,9 @@ export default function Production() {
 
   const startProductionMutation = useMutation({
     mutationFn: async ({ orderId }: { orderId: string }) => {
-      return await apiRequest("PUT", `/api/orders/${orderId}/status`, {
-        status: "production",
+      return await apiRequest(`/api/orders/${orderId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: "production" }),
       });
     },
     onSuccess: () => {
@@ -116,8 +117,9 @@ export default function Production() {
 
   const completeProductionMutation = useMutation({
     mutationFn: async ({ orderId }: { orderId: string }) => {
-      return await apiRequest("PUT", `/api/orders/${orderId}/status`, {
-        status: "production_ready",
+      return await apiRequest(`/api/orders/${orderId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: "production_ready" }),
       });
     },
     onSuccess: () => {

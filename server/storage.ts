@@ -277,10 +277,10 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(orders.createdAt));
 
     if (filters?.status) {
-      query = query.where(eq(orders.status, filters.status as any));
+      query = query.where(eq(orders.status, filters.status as any)) as any;
     }
     if (filters?.salesPersonId) {
-      query = query.where(eq(orders.salesPersonId, filters.salesPersonId));
+      query = query.where(eq(orders.salesPersonId, filters.salesPersonId)) as any;
     }
 
     const ordersData = await query;
@@ -298,7 +298,7 @@ export class DatabaseStorage implements IStorage {
           ...orderData.orders,
           customer: orderData.customers!,
           salesPerson: orderData.users!,
-          items: items.map(item => ({
+          items: items.map((item: any) => ({
             ...item.order_items,
             product: item.products!,
           })),
@@ -564,7 +564,7 @@ export class DatabaseStorage implements IStorage {
           ...orderData.orders,
           customer: orderData.customers!,
           salesPerson: orderData.users!,
-          items: items.map(item => ({
+          items: items.map((item: any) => ({
             ...item.order_items,
             product: item.products!,
           })),
