@@ -357,38 +357,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.session.user.id;
-      console.log("Received request body:", JSON.stringify(req.body, null, 2));
-      
       const { customerId, totalAmount, status, notes, items } = req.body;
       
-      // Order verilerini hazırla
-      const orderData = insertOrderSchema.parse({
+      // Basit order oluşturma
+      const orderData = {
         customerId,
-        totalAmount,
+        totalAmount: totalAmount?.toString() || '0',
         status: status || 'pending',
         notes: notes || '',
         salesPersonId: userId,
-      });
+      };
       
-      // Items verilerini hazırla (orderId olmadan - storage ekleyecek)
-      const orderItems = (items || []).map((item: any) => ({
+      // Items'ları hazırla
+      const orderItems = Array.isArray(items) ? items.map((item: any) => ({
         productId: item.productId,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        totalPrice: item.totalPrice,
-      }));
+        quantity: parseInt(item.quantity) || 1,
+        unitPrice: item.unitPrice?.toString() || '0',
+        totalPrice: item.totalPrice?.toString() || '0',
+      })) : [];
       
-      console.log("Order data:", JSON.stringify(orderData, null, 2));
-      console.log("Order items:", JSON.stringify(orderItems, null, 2));
-      
-      // Storage'ın createOrder metodu her şeyi handle ediyor
+      // Siparişi oluştur
       const createdOrder = await storage.createOrder(orderData, orderItems);
       
-      console.log("Order created successfully:", createdOrder.id);
-      res.json(createdOrder);
+      res.json({ success: true, order: createdOrder });
     } catch (error) {
-      console.error("Error creating order:", error);
-      res.status(400).json({ message: "Failed to create order" });
+      console.error("Sipariş oluşturma hatası:", error);
+      res.status(400).json({ message: "Sipariş oluşturulamadı" });
     }
   });
 

@@ -222,32 +222,31 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  // Order operations
-  async createOrder(order: InsertOrder, items: InsertOrderItem[]): Promise<OrderWithDetails> {
+  // Order operations - Basit ve güvenli
+  async createOrder(order: InsertOrder, items: InsertOrderItem[] = []): Promise<Order> {
     return await db.transaction(async (tx) => {
-      // Generate order number
+      // Order number oluştur
       const orderNumber = `SIP-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
       
-      // Create order
+      // Order'ı oluştur
       const [createdOrder] = await tx
         .insert(orders)
         .values({ ...order, orderNumber })
         .returning();
 
-      // Create order items
-      const orderItemsWithOrderId = items.map(item => ({
-        ...item,
-        orderId: createdOrder.id,
-      }));
-      
-      const createdItems = await tx
-        .insert(orderItems)
-        .values(orderItemsWithOrderId)
-        .returning();
+      // Items varsa ekle
+      if (items && items.length > 0) {
+        const orderItemsWithOrderId = items.map(item => ({
+          ...item,
+          orderId: createdOrder.id,
+        }));
+        
+        await tx
+          .insert(orderItems)
+          .values(orderItemsWithOrderId);
+      }
 
-      // Get full order details
-      const result = await this.getOrderWithDetails(createdOrder.id, tx);
-      return result as OrderWithDetails;
+      return createdOrder;
     });
   }
 
