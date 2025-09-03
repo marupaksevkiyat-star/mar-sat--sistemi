@@ -193,8 +193,10 @@ export default function Sales() {
   };
 
   const handleNewCustomer = () => {
+    console.log('handleNewCustomer çağrıldı, showCustomerForm:', showCustomerForm);
     setSelectedCustomer(null);
     setShowCustomerForm(true);
+    console.log('showCustomerForm true yapıldı');
   };
 
   const handleCompleteVisit = (outcome: string, customerData?: any, orderData?: any, appointmentData?: any) => {
