@@ -933,6 +933,17 @@ export default function Admin() {
                 </Select>
               </div>
               
+              <div>
+                <Label htmlFor="editPassword">Yeni Şifre (İsteğe bağlı)</Label>
+                <Input
+                  id="editPassword"
+                  type="password"
+                  value={editingUser.password || ''}
+                  onChange={(e) => setEditingUser({...editingUser, password: e.target.value})}
+                  placeholder="Boş bırakılırsa şifre değişmez"
+                />
+              </div>
+              
               <div className="flex gap-2 pt-4">
                 <Button 
                   variant="outline" 

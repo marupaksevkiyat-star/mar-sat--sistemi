@@ -135,7 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { id } = req.params;
-      const { firstName, lastName, email, role, status } = req.body;
+      const { firstName, lastName, email, role, status, password } = req.body;
       
       // Basic validation
       if (!firstName || !lastName || !email || !role) {
@@ -150,7 +150,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         role,
         status: status || 'active',
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        ...(password && { passwordUpdated: true }) // Only include if password was provided
       };
       
       res.json({ 
