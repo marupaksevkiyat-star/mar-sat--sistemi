@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
@@ -21,6 +21,10 @@ const isAuthenticated = (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Body parser middleware
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  
   // Session setup
   app.use(session({
     secret: 'demo-secret',
