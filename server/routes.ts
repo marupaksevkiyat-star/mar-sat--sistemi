@@ -67,7 +67,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/users', isAuthenticated, async (req: any, res) => {
     try {
       const userRole = req.session.user.role;
-      if (userRole !== 'admin') {
+      if (userRole !== 'admin' && userRole !== 'Admin') {
         return res.status(403).json({ message: "Admin access required" });
       }
       
@@ -94,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/users', isAuthenticated, async (req: any, res) => {
     try {
       const userRole = req.session.user.role;
-      if (userRole !== 'admin') {
+      if (userRole !== 'admin' && userRole !== 'Admin') {
         return res.status(403).json({ message: "Admin access required" });
       }
       
@@ -130,7 +130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/users/:id', isAuthenticated, async (req: any, res) => {
     try {
       const userRole = req.session.user.role;
-      if (userRole !== 'admin') {
+      if (userRole !== 'admin' && userRole !== 'Admin') {
         return res.status(403).json({ message: "Admin access required" });
       }
       
@@ -168,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/users/:id', isAuthenticated, async (req: any, res) => {
     try {
       const userRole = req.session.user.role;
-      if (userRole !== 'admin') {
+      if (userRole !== 'admin' && userRole !== 'Admin') {
         return res.status(403).json({ message: "Admin access required" });
       }
       
@@ -192,7 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/users/:id/status', isAuthenticated, async (req: any, res) => {
     try {
       const userRole = req.session.user.role;
-      if (userRole !== 'admin') {
+      if (userRole !== 'admin' && userRole !== 'Admin') {
         return res.status(403).json({ message: "Admin access required" });
       }
       
