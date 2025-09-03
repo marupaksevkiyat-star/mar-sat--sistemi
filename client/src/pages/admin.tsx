@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
-  const [activeModal, setActiveModal] = useState<'visits' | 'sales' | 'orders' | null>(null);
+  const [activeModal, setActiveModal] = useState<'visits' | 'sales' | 'orders' | 'users' | null>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -55,6 +55,13 @@ export default function Admin() {
     queryKey: ["/api/orders"],
     retry: false,
     enabled: activeModal === 'sales' || activeModal === 'orders',
+  });
+
+  // Get all users for user management modal
+  const { data: allUsers } = useQuery({
+    queryKey: ["/api/users"],
+    retry: false,
+    enabled: activeModal === 'users',
   });
 
   if (isLoading) {
@@ -195,7 +202,11 @@ export default function Admin() {
         {/* Admin Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* User Management */}
-          <Card className="hover:shadow-md transition-shadow cursor-pointer" data-testid="card-user-management">
+          <Card 
+            className="hover:shadow-md transition-all cursor-pointer hover:scale-105" 
+            onClick={() => setActiveModal('users')}
+            data-testid="card-user-management"
+          >
             <CardContent className="p-6">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <i className="fas fa-users text-blue-600 text-xl"></i>
@@ -524,6 +535,99 @@ export default function Admin() {
                 <p className="text-muted-foreground">Henüz sipariş bulunmuyor.</p>
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* User Management Modal */}
+      <Dialog open={activeModal === 'users'} onOpenChange={() => setActiveModal(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-users text-blue-600"></i>
+              Kullanıcı Yönetimi
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {allUsers && (allUsers as any[]).length > 0 ? (
+              (allUsers as any[]).map((user: any) => (
+                <Card key={user.id} className="p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i className="fas fa-user text-blue-600 text-lg"></i>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground">
+                          {user.firstName} {user.lastName}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          {user.email}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          ID: {user.id}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant={
+                        user.role === 'admin' ? 'default' : 
+                        user.role === 'sales' ? 'secondary' : 
+                        user.role === 'production' ? 'outline' : 
+                        'destructive'
+                      }>
+                        {user.role === 'admin' ? 'Yönetici' :
+                         user.role === 'sales' ? 'Satış' :
+                         user.role === 'production' ? 'Üretim' :
+                         user.role === 'shipping' ? 'Sevkiyat' :
+                         user.role}
+                      </Badge>
+                      <div className="mt-2">
+                        <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
+                          {user.status === 'active' ? 'Aktif' : 'Pasif'}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <i className="fas fa-edit mr-2"></i>
+                        Düzenle
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <i className="fas fa-key mr-2"></i>
+                        Şifre Sıfırla
+                      </Button>
+                      {user.status === 'active' ? (
+                        <Button variant="destructive" size="sm">
+                          <i className="fas fa-ban mr-2"></i>
+                          Devre Dışı Bırak
+                        </Button>
+                      ) : (
+                        <Button variant="default" size="sm">
+                          <i className="fas fa-check mr-2"></i>
+                          Aktifleştir
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <i className="fas fa-users text-4xl text-muted-foreground mb-4"></i>
+                <p className="text-muted-foreground">Kullanıcı bulunamadı.</p>
+              </div>
+            )}
+            
+            <div className="pt-4 border-t">
+              <Button className="w-full">
+                <i className="fas fa-plus mr-2"></i>
+                Yeni Kullanıcı Ekle
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
