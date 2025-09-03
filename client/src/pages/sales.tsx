@@ -413,56 +413,15 @@ export default function Sales() {
                   <OrderForm
                     customer={selectedCustomerForSale}
                     onSubmit={(orderData) => {
-                      console.log("=== FULL DEBUG INFO ===");
-                      console.log("Raw orderData:", JSON.stringify(orderData, null, 2));
-                      console.log("selectedCustomerForSale:", JSON.stringify(selectedCustomerForSale, null, 2));
-                      console.log("orderData keys:", Object.keys(orderData));
-                      console.log("orderData.customerId:", orderData.customerId);
-                      console.log("orderData.totalAmount:", orderData.totalAmount);
-                      console.log("orderData.items:", orderData.items);
+                      console.log("Order submission:", orderData);
                       
-                      // Veri kontrolü ve düzeltme - server için doğru format
-                      const orderItemsData = orderData.items?.map((item: any) => ({
-                        productId: item.productId,
-                        quantity: item.quantity,
-                        unitPrice: item.price.toString(),
-                        totalPrice: (item.quantity * item.price).toString(),
-                      })) || [];
-                      
-                      // customerId ve totalAmount'u güvenli şekilde al
-                      const customerId = orderData.customerId || selectedCustomerForSale?.id;
-                      const totalAmount = orderData.totalAmount || 0;
-                      
-                      console.log("Processed customerId:", customerId);
-                      console.log("Processed totalAmount:", totalAmount);
-                      console.log("Processed items:", orderItemsData);
-                      
-                      if (!customerId) {
-                        console.error("CustomerId is missing!");
-                        toast({
-                          title: "Hata",
-                          description: "Müşteri bilgisi eksik",
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      
-                      if (orderItemsData.length === 0) {
-                        console.error("No items selected!");
-                        toast({
-                          title: "Hata", 
-                          description: "En az bir ürün seçmelisiniz",
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      
+                      // OrderForm zaten doğru format gönderiyor, direkt kullan
                       const orderPayload = {
-                        customerId: customerId,
-                        totalAmount: totalAmount.toString(),
-                        status: 'pending',
-                        notes: orderData.notes || '',
-                        items: orderItemsData
+                        customerId: orderData.customerId,
+                        totalAmount: orderData.totalAmount,
+                        status: orderData.status,
+                        notes: orderData.notes,
+                        items: orderData.items
                       };
                       
                       console.log("Final orderPayload:", JSON.stringify(orderPayload, null, 2));
