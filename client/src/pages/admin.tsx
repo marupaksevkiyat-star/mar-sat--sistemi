@@ -19,7 +19,7 @@ export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeModal, setActiveModal] = useState<'visits' | 'sales' | 'orders' | 'users' | 'add-user' | 'edit-user' | null>(null);
+  const [activeModal, setActiveModal] = useState<'visits' | 'sales' | 'orders' | 'users' | 'add-user' | 'edit-user' | 'customers' | 'products' | null>(null);
   const [newUser, setNewUser] = useState({
     firstName: '',
     lastName: '',
@@ -350,7 +350,11 @@ export default function Admin() {
           </Card>
 
           {/* Customer Management */}
-          <Card className="hover:shadow-md transition-shadow cursor-pointer" data-testid="card-customer-management">
+          <Card 
+            className="hover:shadow-md transition-all cursor-pointer hover:scale-105" 
+            onClick={() => setActiveModal('customers')}
+            data-testid="card-customer-management"
+          >
             <CardContent className="p-6">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                 <i className="fas fa-building text-green-600 text-xl"></i>
@@ -367,7 +371,11 @@ export default function Admin() {
           </Card>
 
           {/* Product Management */}
-          <Card className="hover:shadow-md transition-shadow cursor-pointer" data-testid="card-product-management">
+          <Card 
+            className="hover:shadow-md transition-all cursor-pointer hover:scale-105" 
+            onClick={() => setActiveModal('products')}
+            data-testid="card-product-management"
+          >
             <CardContent className="p-6">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                 <i className="fas fa-boxes text-purple-600 text-xl"></i>
@@ -986,6 +994,169 @@ export default function Admin() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Customer Management Modal */}
+      <Dialog open={activeModal === 'customers'} onOpenChange={() => setActiveModal(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-building text-green-600"></i>
+              Müşteri Yönetimi
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-medium">Müşteri Listesi</h3>
+              <Button>
+                <i className="fas fa-plus mr-2"></i>
+                Yeni Müşteri Ekle
+              </Button>
+            </div>
+            
+            {customers && (customers as any[]).length > 0 ? (
+              <div className="space-y-4">
+                {(customers as any[]).map((customer: any) => (
+                  <Card key={customer.id} className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                          <i className="fas fa-building text-green-600 text-lg"></i>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-foreground">
+                            {customer.name}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {customer.address}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Tel: {customer.phone} | Email: {customer.email}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant={customer.status === 'active' ? 'default' : 'secondary'}>
+                          {customer.status === 'active' ? 'Aktif' : 'Pasif'}
+                        </Badge>
+                        <div className="mt-2">
+                          <Badge variant="outline">
+                            {customer.segment || 'Standart'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          <i className="fas fa-edit mr-2"></i>
+                          Düzenle
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <i className="fas fa-eye mr-2"></i>
+                          Detaylar
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <i className="fas fa-map-marker-alt mr-2"></i>
+                          Konum
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <i className="fas fa-building text-4xl text-muted-foreground mb-4"></i>
+                <p className="text-muted-foreground">Müşteri bulunamadı.</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Product Management Modal */}
+      <Dialog open={activeModal === 'products'} onOpenChange={() => setActiveModal(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-boxes text-purple-600"></i>
+              Ürün Yönetimi
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-medium">Ürün Listesi</h3>
+              <Button>
+                <i className="fas fa-plus mr-2"></i>
+                Yeni Ürün Ekle
+              </Button>
+            </div>
+            
+            {products && (products as any[]).length > 0 ? (
+              <div className="space-y-4">
+                {(products as any[]).map((product: any) => (
+                  <Card key={product.id} className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                          <i className="fas fa-box text-purple-600 text-lg"></i>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-foreground">
+                            {product.name}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {product.description}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Kod: {product.code}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-foreground">
+                          ₺{product.price?.toLocaleString() || '0'}
+                        </div>
+                        <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>
+                          {product.status === 'active' ? 'Aktif' : 'Pasif'}
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="flex justify-between items-center">
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <i className="fas fa-edit mr-2"></i>
+                            Düzenle
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <i className="fas fa-eye mr-2"></i>
+                            Detaylar
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <i className="fas fa-chart-line mr-2"></i>
+                            Satış
+                          </Button>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Kategori: {product.category || 'Genel'}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <i className="fas fa-boxes text-4xl text-muted-foreground mb-4"></i>
+                <p className="text-muted-foreground">Ürün bulunamadı.</p>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
