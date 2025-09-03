@@ -357,14 +357,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.session.user.id;
-      const { order, items } = req.body;
+      console.log("Received request body:", JSON.stringify(req.body, null, 2));
+      
+      // Direkt request body'den order verilerini al  
+      const { customerId, totalAmount, status, notes, items } = req.body;
       
       const orderData = insertOrderSchema.parse({
-        ...order,
+        customerId,
+        totalAmount,
+        status: status || 'pending',
+        notes: notes || '',
         salesPersonId: userId,
       });
       
       const orderItems = z.array(insertOrderItemSchema).parse(items);
+      
+      console.log("Parsed orderData:", JSON.stringify(orderData, null, 2));
+      console.log("Parsed orderItems:", JSON.stringify(orderItems, null, 2));
       
       const createdOrder = await storage.createOrder(orderData, orderItems);
       res.json(createdOrder);
