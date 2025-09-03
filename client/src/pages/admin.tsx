@@ -81,10 +81,7 @@ export default function Admin() {
   // Add user mutation
   const addUserMutation = useMutation({
     mutationFn: async (userData: any) => {
-      return await apiRequest('/api/users', {
-        method: 'POST',
-        body: JSON.stringify(userData),
-      });
+      return await apiRequest('POST', '/api/users', userData);
     },
     onSuccess: () => {
       toast({
@@ -108,13 +105,7 @@ export default function Admin() {
   const editUserMutation = useMutation({
     mutationFn: async (userData: any) => {
       console.log("Updating user:", userData);
-      return await apiRequest(`/api/users/${userData.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(userData),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      return await apiRequest('PUT', `/api/users/${userData.id}`, userData);
     },
     onSuccess: () => {
       toast({
@@ -138,9 +129,7 @@ export default function Admin() {
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest(`/api/users/${userId}`, {
-        method: 'DELETE',
-      });
+      return await apiRequest('DELETE', `/api/users/${userId}`);
     },
     onSuccess: () => {
       toast({
@@ -161,10 +150,7 @@ export default function Admin() {
   // Toggle user status mutation
   const toggleStatusMutation = useMutation({
     mutationFn: async ({ userId, status }: { userId: string, status: string }) => {
-      return await apiRequest(`/api/users/${userId}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status }),
-      });
+      return await apiRequest('PATCH', `/api/users/${userId}/status`, { status });
     },
     onSuccess: () => {
       toast({
