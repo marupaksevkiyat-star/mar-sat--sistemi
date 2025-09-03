@@ -28,17 +28,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     saveUninitialized: false,
   }));
 
+  // User credentials for login
+  const userCredentials = {
+    'admin': { password: '1234', user: { id: 'admin', firstName: 'Admin', lastName: 'User', email: 'admin@system.com', role: 'Admin' }},
+    'ahmet': { password: '1234', user: { id: 'sales_manager', firstName: 'Ahmet', lastName: 'Yılmaz', email: 'ahmet@company.com', role: 'Satış Müdürü' }},
+    'ayse': { password: '1234', user: { id: 'sales_staff', firstName: 'Ayşe', lastName: 'Demir', email: 'ayse@company.com', role: 'Satış Personeli' }},
+    'mehmet': { password: '1234', user: { id: 'production_manager', firstName: 'Mehmet', lastName: 'Kaya', email: 'mehmet@company.com', role: 'Üretim Müdürü' }},
+    'zeynep': { password: '1234', user: { id: 'production_staff', firstName: 'Zeynep', lastName: 'Çelik', email: 'zeynep@company.com', role: 'Üretim Personeli' }},
+    'ali': { password: '1234', user: { id: 'accounting_manager', firstName: 'Ali', lastName: 'Öztürk', email: 'ali@company.com', role: 'Muhasebe Müdürü' }},
+    'elif': { password: '1234', user: { id: 'accounting_staff', firstName: 'Elif', lastName: 'Şahin', email: 'elif@company.com', role: 'Muhasebe Personeli' }},
+    'fatma': { password: '1234', user: { id: 'shipping_manager', firstName: 'Fatma', lastName: 'Özkan', email: 'fatma@company.com', role: 'Sevkiyat Müdürü' }},
+    'murat': { password: '1234', user: { id: 'shipping_staff', firstName: 'Murat', lastName: 'Arslan', email: 'murat@company.com', role: 'Sevkiyat Personeli' }}
+  };
+
   // Simple login route
   app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    if (username === 'admin' && password === '1234') {
-      req.session.user = {
-        id: 'admin',
-        firstName: 'Admin',
-        lastName: 'User',
-        email: 'admin@system.com',
-        role: 'admin'
-      };
+    const userCred = userCredentials[username.toLowerCase()];
+    
+    if (userCred && userCred.password === password) {
+      req.session.user = userCred.user;
       res.json({ success: true });
     } else {
       res.status(401).json({ message: 'Invalid credentials' });
