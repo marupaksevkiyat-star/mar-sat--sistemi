@@ -356,11 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.session.user.id;
-      console.log("Received order payload:", JSON.stringify(req.body, null, 2));
-      
       const { order, items } = req.body;
-      console.log("Extracted order:", order);
-      console.log("Extracted items:", items);
       
       const orderData = insertOrderSchema.parse({
         ...order,
