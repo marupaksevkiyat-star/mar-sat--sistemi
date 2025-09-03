@@ -233,7 +233,8 @@ export class DatabaseStorage implements IStorage {
         .returning();
 
       // Get full order details
-      return await this.getOrderWithDetails(createdOrder.id, tx);
+      const result = await this.getOrderWithDetails(createdOrder.id, tx);
+      return result as OrderWithDetails;
     });
   }
 
@@ -241,7 +242,7 @@ export class DatabaseStorage implements IStorage {
     return await this.getOrderWithDetails(id);
   }
 
-  private async getOrderWithDetails(id: string, tx?: any): Promise<OrderWithDetails> {
+  private async getOrderWithDetails(id: string, tx?: any): Promise<OrderWithDetails | undefined> {
     const dbQuery = tx || db;
     
     const [orderData] = await dbQuery
@@ -250,6 +251,10 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(customers, eq(orders.customerId, customers.id))
       .leftJoin(users, eq(orders.salesPersonId, users.id))
       .where(eq(orders.id, id));
+
+    if (!orderData) {
+      return undefined;
+    }
 
     const items = await dbQuery
       .select()
@@ -261,7 +266,7 @@ export class DatabaseStorage implements IStorage {
       ...orderData.orders,
       customer: orderData.customers!,
       salesPerson: orderData.users!,
-      items: items.map(item => ({
+      items: items.map((item: any) => ({
         ...item.order_items,
         product: item.products!,
       })),
