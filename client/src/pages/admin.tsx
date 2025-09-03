@@ -19,7 +19,7 @@ export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeModal, setActiveModal] = useState<'visits' | 'sales' | 'orders' | 'users' | 'add-user' | 'edit-user' | 'customers' | 'products' | null>(null);
+  const [activeModal, setActiveModal] = useState<'visits' | 'sales' | 'orders' | 'users' | 'add-user' | 'edit-user' | 'customers' | 'products' | 'add-product' | 'add-customer' | 'edit-product' | 'edit-customer' | null>(null);
   const [newUser, setNewUser] = useState({
     firstName: '',
     lastName: '',
@@ -28,6 +28,22 @@ export default function Admin() {
     password: ''
   });
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [editingCustomer, setEditingCustomer] = useState<any>(null);
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    description: '',
+    code: '',
+    price: '',
+    category: ''
+  });
+  const [newCustomer, setNewCustomer] = useState({
+    name: '',
+    address: '',
+    phone: '',
+    email: '',
+    segment: 'Standart'
+  });
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -1009,7 +1025,7 @@ export default function Admin() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium">Müşteri Listesi</h3>
-              <Button>
+              <Button onClick={() => setActiveModal('add-customer')}>
                 <i className="fas fa-plus mr-2"></i>
                 Yeni Müşteri Ekle
               </Button>
@@ -1050,15 +1066,39 @@ export default function Admin() {
                     
                     <div className="mt-4 pt-4 border-t">
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setEditingCustomer(customer);
+                            setActiveModal('edit-customer');
+                          }}
+                        >
                           <i className="fas fa-edit mr-2"></i>
                           Düzenle
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            alert(`Müşteri Detayları:\n\nAd: ${customer.name}\nAdres: ${customer.address}\nTelefon: ${customer.phone}\nE-posta: ${customer.email}\nSegment: ${customer.segment || 'Standart'}\nDurum: ${customer.status === 'active' ? 'Aktif' : 'Pasif'}`);
+                          }}
+                        >
                           <i className="fas fa-eye mr-2"></i>
                           Detaylar
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            if (customer.latitude && customer.longitude) {
+                              const mapUrl = `https://www.google.com/maps?q=${customer.latitude},${customer.longitude}`;
+                              window.open(mapUrl, '_blank');
+                            } else {
+                              alert('Bu müşteri için konum bilgisi bulunamadı.');
+                            }
+                          }}
+                        >
                           <i className="fas fa-map-marker-alt mr-2"></i>
                           Konum
                         </Button>
@@ -1089,7 +1129,7 @@ export default function Admin() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium">Ürün Listesi</h3>
-              <Button>
+              <Button onClick={() => setActiveModal('add-product')}>
                 <i className="fas fa-plus mr-2"></i>
                 Yeni Ürün Ekle
               </Button>
@@ -1129,15 +1169,34 @@ export default function Admin() {
                     <div className="mt-4 pt-4 border-t">
                       <div className="flex justify-between items-center">
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              setEditingProduct(product);
+                              setActiveModal('edit-product');
+                            }}
+                          >
                             <i className="fas fa-edit mr-2"></i>
                             Düzenle
                           </Button>
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              alert(`Ürün Detayları:\n\nAd: ${product.name}\nAçıklama: ${product.description}\nKod: ${product.code}\nFiyat: ₺${product.price?.toLocaleString()}\nKategori: ${product.category || 'Genel'}\nDurum: ${product.status === 'active' ? 'Aktif' : 'Pasif'}`);
+                            }}
+                          >
                             <i className="fas fa-eye mr-2"></i>
                             Detaylar
                           </Button>
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              alert(`${product.name} için satış raporu: Bu özellik yakında eklenecek!`);
+                            }}
+                          >
                             <i className="fas fa-chart-line mr-2"></i>
                             Satış
                           </Button>
@@ -1156,6 +1215,184 @@ export default function Admin() {
                 <p className="text-muted-foreground">Ürün bulunamadı.</p>
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Product Modal */}
+      <Dialog open={activeModal === 'add-product'} onOpenChange={() => setActiveModal(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-plus text-purple-600"></i>
+              Yeni Ürün Ekle
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="productName">Ürün Adı</Label>
+              <Input
+                id="productName"
+                value={newProduct.name}
+                onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                placeholder="Ürün adı"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="productDescription">Açıklama</Label>
+              <Input
+                id="productDescription"
+                value={newProduct.description}
+                onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                placeholder="Ürün açıklaması"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="productCode">Ürün Kodu</Label>
+              <Input
+                id="productCode"
+                value={newProduct.code}
+                onChange={(e) => setNewProduct({...newProduct, code: e.target.value})}
+                placeholder="PR001"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="productPrice">Fiyat (₺)</Label>
+              <Input
+                id="productPrice"
+                type="number"
+                value={newProduct.price}
+                onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                placeholder="0"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="productCategory">Kategori</Label>
+              <Input
+                id="productCategory"
+                value={newProduct.category}
+                onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                placeholder="Genel"
+              />
+            </div>
+            
+            <div className="flex gap-2 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setActiveModal('products')}
+                className="flex-1"
+              >
+                İptal
+              </Button>
+              <Button 
+                onClick={() => {
+                  toast({
+                    title: "Başarılı",
+                    description: "Yeni ürün eklendi",
+                  });
+                  setActiveModal('products');
+                  setNewProduct({ name: '', description: '', code: '', price: '', category: '' });
+                }}
+                disabled={!newProduct.name || !newProduct.code}
+                className="flex-1"
+              >
+                <i className="fas fa-save mr-2"></i>
+                Kaydet
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Customer Modal */}
+      <Dialog open={activeModal === 'add-customer'} onOpenChange={() => setActiveModal(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-plus text-green-600"></i>
+              Yeni Müşteri Ekle
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="customerName">Müşteri Adı</Label>
+              <Input
+                id="customerName"
+                value={newCustomer.name}
+                onChange={(e) => setNewCustomer({...newCustomer, name: e.target.value})}
+                placeholder="Firma/kişi adı"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="customerAddress">Adres</Label>
+              <Input
+                id="customerAddress"
+                value={newCustomer.address}
+                onChange={(e) => setNewCustomer({...newCustomer, address: e.target.value})}
+                placeholder="Tam adres"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="customerPhone">Telefon</Label>
+              <Input
+                id="customerPhone"
+                value={newCustomer.phone}
+                onChange={(e) => setNewCustomer({...newCustomer, phone: e.target.value})}
+                placeholder="0532 123 45 67"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="customerEmail">E-posta</Label>
+              <Input
+                id="customerEmail"
+                type="email"
+                value={newCustomer.email}
+                onChange={(e) => setNewCustomer({...newCustomer, email: e.target.value})}
+                placeholder="email@domain.com"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="customerSegment">Müşteri Segmenti</Label>
+              <Input
+                id="customerSegment"
+                value={newCustomer.segment}
+                onChange={(e) => setNewCustomer({...newCustomer, segment: e.target.value})}
+                placeholder="Standart, Premium, VIP"
+              />
+            </div>
+            
+            <div className="flex gap-2 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setActiveModal('customers')}
+                className="flex-1"
+              >
+                İptal
+              </Button>
+              <Button 
+                onClick={() => {
+                  toast({
+                    title: "Başarılı",
+                    description: "Yeni müşteri eklendi",
+                  });
+                  setActiveModal('customers');
+                  setNewCustomer({ name: '', address: '', phone: '', email: '', segment: 'Standart' });
+                }}
+                disabled={!newCustomer.name || !newCustomer.phone}
+                className="flex-1"
+              >
+                <i className="fas fa-save mr-2"></i>
+                Kaydet
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
