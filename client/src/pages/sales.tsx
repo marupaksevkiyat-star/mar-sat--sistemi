@@ -413,25 +413,42 @@ export default function Sales() {
                   <OrderForm
                     customer={selectedCustomerForSale}
                     onSubmit={(orderData) => {
-                      console.log('OrderForm verisi:', orderData);
-                      console.log('Seçilen müşteri:', selectedCustomerForSale);
-                      
-                      // Sipariş verilerini düzelt
-                      const orderItemsData = orderData.items.map((item: any) => ({
+                      // Veri kontrolü ve düzeltme
+                      const orderItemsData = orderData.items?.map((item: any) => ({
                         productId: item.productId,
                         quantity: item.quantity,
                         price: item.price.toString(),
-                      }));
+                      })) || [];
+                      
+                      // customerId ve totalAmount'u güvenli şekilde al
+                      const customerId = selectedCustomerForSale?.id;
+                      const totalAmount = orderData.totalAmount || 0;
+                      
+                      if (!customerId) {
+                        toast({
+                          title: "Hata",
+                          description: "Müşteri bilgisi eksik",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      
+                      if (orderItemsData.length === 0) {
+                        toast({
+                          title: "Hata", 
+                          description: "En az bir ürün seçmelisiniz",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
                       
                       const orderPayload = {
-                        customerId: orderData.customerId || selectedCustomerForSale.id,
-                        totalAmount: orderData.totalAmount.toString(),
+                        customerId: customerId,
+                        totalAmount: totalAmount.toString(),
                         status: 'pending',
                         notes: orderData.notes || '',
                         items: orderItemsData
                       };
-                      
-                      console.log('Gönderilen sipariş:', orderPayload);
                       
                       createOrderMutation.mutate(orderPayload, {
                         onSuccess: () => {
@@ -442,7 +459,6 @@ export default function Sales() {
                           });
                         },
                         onError: (error) => {
-                          console.error('Sipariş hatası:', error);
                           toast({
                             title: "Hata",
                             description: "Sipariş oluşturulurken bir hata oluştu",
