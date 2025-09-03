@@ -235,9 +235,32 @@ export default function Admin() {
       <Navigation />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground">Yönetim Paneli</h2>
-          <p className="text-muted-foreground mt-1">Sistem ayarları ve kullanıcı yönetimi</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground">Yönetim Paneli</h2>
+            <p className="text-muted-foreground mt-1">Sistem ayarları ve kullanıcı yönetimi</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-muted-foreground">
+              Hoş geldiniz, {user?.firstName} {user?.lastName}
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={async () => {
+                try {
+                  await apiRequest('POST', '/api/logout');
+                  window.location.href = '/';
+                } catch (error) {
+                  console.error('Logout error:', error);
+                }
+              }}
+              className="text-red-600 border-red-600 hover:bg-red-50"
+            >
+              <i className="fas fa-sign-out-alt mr-2"></i>
+              Çıkış Yap
+            </Button>
+          </div>
         </div>
 
         {/* Dashboard Stats - Clickable Cards */}
