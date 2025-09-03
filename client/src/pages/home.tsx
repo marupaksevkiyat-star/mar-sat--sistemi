@@ -78,21 +78,45 @@ export default function Home() {
     if (userRole === 'admin' || userRole === 'Admin') {
       return [
         {
+          title: "Bekleyen Siparişler",
+          value: (stats as any)?.pendingOrders?.toString() || "0",
+          subtitle: "onay bekliyor",
+          icon: "fas fa-clock",
+          color: "orange",
+          onClick: () => setLocation('/production')
+        },
+        {
+          title: "Üretimde", 
+          value: (stats as any)?.productionOrders?.toString() || "0",
+          subtitle: "üretiliyor",
+          icon: "fas fa-cogs",
+          color: "blue",
+          onClick: () => setLocation('/production')
+        },
+        {
+          title: "Sevkiyat",
+          value: (stats as any)?.shippingOrders?.toString() || "0",
+          subtitle: "yolda",
+          icon: "fas fa-truck",
+          color: "purple",
+          onClick: () => setLocation('/shipping')
+        },
+        {
+          title: "Teslim Edilen",
+          value: (stats as any)?.deliveredOrders?.toString() || "0",
+          subtitle: "tamamlandı",
+          icon: "fas fa-check-circle",
+          color: "green",
+          onClick: () => setLocation('/admin')
+        },
+        {
           title: "Günlük Ziyaretler",
           value: (stats as any)?.dailyVisits?.toString() || "0",
           change: "+12%",
           changeType: "positive",
           icon: "fas fa-map-marker-alt",
-          color: "blue",
+          color: "cyan",
           onClick: () => setLocation('/sales')
-        },
-        {
-          title: "Aktif Siparişler", 
-          value: (stats as any)?.activeOrders?.toString() || "0",
-          subtitle: "üretimde",
-          icon: "fas fa-clipboard-list",
-          color: "yellow",
-          onClick: () => setLocation('/production')
         },
         {
           title: "Aylık Satış",
@@ -100,16 +124,8 @@ export default function Home() {
           change: "+8.2%",
           changeType: "positive",
           icon: "fas fa-lira-sign",
-          color: "green",
-          onClick: () => setLocation('/admin')
-        },
-        {
-          title: "Teslimat Oranı",
-          value: (stats as any)?.deliveryRate ? `${(stats as any).deliveryRate}%` : "0%",
-          subtitle: "Mükemmel performans",
-          icon: "fas fa-truck",
-          color: "purple",
-          onClick: () => setLocation('/shipping')
+          color: "emerald",
+          onClick: () => setLocation('/sales-reports')
         }
       ];
     }
@@ -251,7 +267,7 @@ export default function Home() {
         </div>
 
         {/* Role-based Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {getStatsCards().map((card, index) => (
             <StatsCard
               key={index}
