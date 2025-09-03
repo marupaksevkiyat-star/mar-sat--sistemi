@@ -1396,6 +1396,188 @@ export default function Admin() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Product Modal */}
+      <Dialog open={activeModal === 'edit-product'} onOpenChange={() => setActiveModal(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-edit text-purple-600"></i>
+              Ürün Düzenle
+            </DialogTitle>
+          </DialogHeader>
+          {editingProduct && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="editProductName">Ürün Adı</Label>
+                <Input
+                  id="editProductName"
+                  value={editingProduct.name}
+                  onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})}
+                  placeholder="Ürün adı"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editProductDescription">Açıklama</Label>
+                <Input
+                  id="editProductDescription"
+                  value={editingProduct.description}
+                  onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
+                  placeholder="Ürün açıklaması"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editProductCode">Ürün Kodu</Label>
+                <Input
+                  id="editProductCode"
+                  value={editingProduct.code}
+                  onChange={(e) => setEditingProduct({...editingProduct, code: e.target.value})}
+                  placeholder="PR001"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editProductPrice">Fiyat (₺)</Label>
+                <Input
+                  id="editProductPrice"
+                  type="number"
+                  value={editingProduct.price || ''}
+                  onChange={(e) => setEditingProduct({...editingProduct, price: parseFloat(e.target.value) || 0})}
+                  placeholder="0"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editProductCategory">Kategori</Label>
+                <Input
+                  id="editProductCategory"
+                  value={editingProduct.category || ''}
+                  onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
+                  placeholder="Genel"
+                />
+              </div>
+              
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setActiveModal('products')}
+                  className="flex-1"
+                >
+                  İptal
+                </Button>
+                <Button 
+                  onClick={() => {
+                    toast({
+                      title: "Başarılı",
+                      description: "Ürün bilgileri güncellendi",
+                    });
+                    setActiveModal('products');
+                    setEditingProduct(null);
+                  }}
+                  disabled={!editingProduct.name || !editingProduct.code}
+                  className="flex-1"
+                >
+                  <i className="fas fa-save mr-2"></i>
+                  Güncelle
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Customer Modal */}
+      <Dialog open={activeModal === 'edit-customer'} onOpenChange={() => setActiveModal(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-edit text-green-600"></i>
+              Müşteri Düzenle
+            </DialogTitle>
+          </DialogHeader>
+          {editingCustomer && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="editCustomerName">Müşteri Adı</Label>
+                <Input
+                  id="editCustomerName"
+                  value={editingCustomer.name}
+                  onChange={(e) => setEditingCustomer({...editingCustomer, name: e.target.value})}
+                  placeholder="Firma/kişi adı"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editCustomerAddress">Adres</Label>
+                <Input
+                  id="editCustomerAddress"
+                  value={editingCustomer.address}
+                  onChange={(e) => setEditingCustomer({...editingCustomer, address: e.target.value})}
+                  placeholder="Tam adres"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editCustomerPhone">Telefon</Label>
+                <Input
+                  id="editCustomerPhone"
+                  value={editingCustomer.phone}
+                  onChange={(e) => setEditingCustomer({...editingCustomer, phone: e.target.value})}
+                  placeholder="0532 123 45 67"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editCustomerEmail">E-posta</Label>
+                <Input
+                  id="editCustomerEmail"
+                  type="email"
+                  value={editingCustomer.email}
+                  onChange={(e) => setEditingCustomer({...editingCustomer, email: e.target.value})}
+                  placeholder="email@domain.com"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editCustomerSegment">Müşteri Segmenti</Label>
+                <Input
+                  id="editCustomerSegment"
+                  value={editingCustomer.segment || 'Standart'}
+                  onChange={(e) => setEditingCustomer({...editingCustomer, segment: e.target.value})}
+                  placeholder="Standart, Premium, VIP"
+                />
+              </div>
+              
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setActiveModal('customers')}
+                  className="flex-1"
+                >
+                  İptal
+                </Button>
+                <Button 
+                  onClick={() => {
+                    toast({
+                      title: "Başarılı",
+                      description: "Müşteri bilgileri güncellendi",
+                    });
+                    setActiveModal('customers');
+                    setEditingCustomer(null);
+                  }}
+                  disabled={!editingCustomer.name || !editingCustomer.phone}
+                  className="flex-1"
+                >
+                  <i className="fas fa-save mr-2"></i>
+                  Güncelle
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
