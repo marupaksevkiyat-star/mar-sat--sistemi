@@ -1,0 +1,101 @@
+
+
+
+
+
+Proje Açıklaması: Satış ve Üretim Yönetim Sistemi
+Madde I.	1. Projenin Amacı
+Bu proje, saha satış personelinin iş süreçlerini dijitalleştirerek verimliliği artırmayı, üretim sürecini ve sevkiyat yönetimini kolaylaştırmayı hedefler. Tüm satış, üretim, sevkiyat ve teslimat süreçleri tek bir entegre sistem üzerinden takip edilerek hatalar azaltılır, süreçler hızlanır ve departmanlar arası koordinasyon sağlanır.
+ 
+Madde II.	2. Satış Personeli Süreci
+Madde III.	2.1 Ziyaret Başlangıcı (Konum Tespiti)
+•	Satış personeli, mobil cihazından CRM uygulamasını açar.
+•	"Yeni Ziyaret" butonuna tıklar.
+•	Sistem cihazın GPS konumunu alır.
+•	Konuma yakın işletmeler harita servisinden listelenir.
+•	Satış personeline hem listeden seçim hem manuel giriş seçeneği sunulur.
+Madde IV.	2.2 Müşteri Seçimi
+•	Listede müşteri varsa:
+o	Müşteri bilgileri otomatik forma doldurulur.
+o	Eksik bilgiler satış personeli tarafından tamamlanır.
+•	Müşteri listede yoksa:
+o	Manuel müşteri kaydı formu açılır.
+o	GPS konum bilgisi ile adres otomatik doldurulur.
+o	Satış personeli bilgileri manuel girer.
+o	Konum bilgisi gizli alanlarda saklanır.
+Madde V.	2.3 Ziyaretin Sonucu
+•	Satış gerçekleştiyse:
+o	Müşteri veritabanına kaydedilir.
+o	Sipariş formu açılır, müşteri bilgileri önceden seçili olur.
+o	Ürün ve miktar bilgileri girilerek sipariş tamamlanır.
+•	Müşteri ilgilenmiyorsa:
+o	Müşteri yine kaydedilir, ancak "not_interested" durumu ile.
+o	Sipariş formu açılmaz.
+•	Takip gerekli ise:
+o	Müşteri potansiyel olarak kaydedilir.
+o	Randevu planlama formu açılır.
+o	Randevu tarihi ve saati girilir ve kaydedilir.
+Madde VI.	2.4 Takip Süreci
+•	Satış personelinin paneli günlük randevuları sorgular ve listeler.
+•	Randevu günü geldiğinde uyarı verir.
+•	Randevuya tıklayınca sipariş veya ilgilenmeme gibi seçenekler tekrar sunulur.
+•	Süreç potansiyel müşteri sipariş ya da ilgilenmeme durumuna gelene kadar devam eder.
+ 
+Madde VII.	3. Üretim Süreci
+Madde VIII.	3.1 Sipariş Üretim Hattına Düşer
+•	Satış personeli siparişi kaydeder.
+•	Sipariş durumu "pending" (bekliyor) olarak veritabanına eklenir.
+•	Üretim paneli bekleyen siparişleri düzenli olarak Backend’den alır ve listeler.
+Madde IX.	3.2 Üretim Süreci ve Esnek Değişiklikler
+•	Üretim personeli siparişi seçer ve "Üretime Başla" der.
+•	Sipariş durumu "production" olarak güncellenir.
+•	Üretim sırasında ürün miktarları güncellenebilir.
+•	Sistem güncellemeleri backend’e gönderir ve toplam tutar otomatik hesaplanır.
+•	Üretim durumu gerçek zamanlı ve doğru şekilde sistemde tutulur.
+ 
+Madde X.	4. Sevkiyat Süreci
+Madde XI.	4.1 Üretimden Sevkiyata Devir Teslim
+•	Üretim tamamlanınca sipariş durumu "production_ready" (sevkiyata hazır) olur.
+•	Sevkiyat panelinde "Sevkiyata Hazır Siparişler" listelenir.
+•	Sevkiyat sorumlusu "İrsaliye Oluştur" butonuna basar.
+•	Sipariş bilgileri irsaliye kalemlerine aktarılır.
+•	Sipariş durumu "shipping" (sevkiyatta) olarak güncellenir.
+Madde XII.	4.2 Sahada Dijital Teslimat ve İmza
+•	Sevkiyat personeli mobil cihazdan teslimat ekranını açar.
+•	Harita üzerinden navigasyon aktif edilir.
+•	Teslimat adresine gidilir.
+•	Müşteriden dijital imza alınır.
+•	Teslim alan kişinin adı yazılır.
+•	"Teslim Et" butonuna basılarak teslimat bilgileri kaydedilir.
+•	Müşterinin e-posta adresine teslimat detayları mail olarak gönderilir.
+•	İrsaliye durumu "delivered" (teslim edildi) olur.
+•	Sipariş durumu da tüm panellerde teslim edildi olarak güncellenir.
+Madde XIII.	4.3 Faturalandırma ve Süreç Tamamlama
+•	Teslim edilmiş irsaliyeler otomatik olarak muhasebe panelinde "Faturalanacak İrsaliyeler" listesine eklenir.
+•	Muhasebe personeli seçilen irsaliyeleri tek tuşla faturalandırabilir.
+•	Aynı müşteriye ait ürünler birleştirilerek fatura oluşturulur.
+•	Fatura bilgileri müşterinin cari hesabına borç olarak işlenir.
+•	Böylece satıştan tahsilata kadar tam entegre süreç tamamlanır.
+ 
+Madde XIV.	5. Admin Paneli
+Madde XV.	5.1 Yetki ve Kullanıcı Yönetimi
+•	Admin kullanıcı tüm sistem yetkilerine sahiptir.
+•	Kullanıcılar, müşteriler, ürünler, siparişler, departmanlar, roller, yetki yönetimi modülleri bulunur.
+Madde XVI.	5.2 Sistem İzleme ve Ayarlar
+•	Dashboard ile aylık satış, ziyaret, tahsilat verileri takip edilir.
+•	Sipariş durumu özetleri (bekleyen, üretimde, tamamlanan, teslim edilen) gösterilir.
+•	Bugünkü randevular listelenir.
+•	Müşteri haritası görüntülenir.
+•	Mail ayarları ve sistem kurulumu yapılabilir.
+ 
+Madde XVII.	6. Teknik Detaylar
+•	GPS ve konum tespiti ile saha hareketleri takip edilir.
+•	Harita servisleri kullanılarak müşteri ve teslimat adresleri yönetilir.
+•	REST API endpointleri ile frontend ve backend arasında veri alışverişi yapılır.
+•	Mobil ve web uygulamaları senkronize çalışır.
+•	Dijital imza ve teslimat onayı güvenli ve doğrulanabilir şekilde kaydedilir.
+•	E-posta servisi ile müşterilere otomatik bildirim gönderilir.
+ 
+Madde XVIII.	7. Özet ve Sonuç
+Bu sistem, saha satış personelinin, üretim ve sevkiyat ekiplerinin tüm iş akışlarını dijitalleştirerek gerçek zamanlı takip ve yönetim sağlar. Satıştan teslimata kadar her aşama entegre çalışır, süreçler otomatikleştirilir ve veriler merkezi olarak saklanır. Böylece operasyonel verimlilik artırılır, insan hataları minimize edilir ve müşteri memnuniyeti yükseltilir.
+
