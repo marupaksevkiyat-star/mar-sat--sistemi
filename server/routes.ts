@@ -1,7 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
   insertCustomerSchema, 
   insertProductSchema,
@@ -11,16 +10,52 @@ import {
   insertAppointmentSchema
 } from "@shared/schema";
 import { z } from "zod";
+import session from "express-session";
+
+// Simple auth middleware for demo
+const isAuthenticated = (req: any, res: any, next: any) => {
+  if (req.session?.user) {
+    return next();
+  }
+  return res.status(401).json({ message: "Unauthorized" });
+};
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
+  // Session setup
+  app.use(session({
+    secret: 'demo-secret',
+    resave: false,
+    saveUninitialized: false,
+  }));
+
+  // Simple login route
+  app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === 'admin' && password === '1234') {
+      req.session.user = {
+        id: 'admin',
+        firstName: 'Admin',
+        lastName: 'User',
+        email: 'admin@system.com',
+        role: 'admin'
+      };
+      res.json({ success: true });
+    } else {
+      res.status(401).json({ message: 'Invalid credentials' });
+    }
+  });
+
+  // Logout route
+  app.post('/api/logout', (req, res) => {
+    req.session.destroy(() => {
+      res.json({ success: true });
+    });
+  });
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
+      const user = req.session.user;
       res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -31,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Dashboard routes
   app.get('/api/dashboard/stats', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.user.id;
       const stats = await storage.getDashboardStats(userId);
       res.json(stats);
     } catch (error) {
@@ -53,7 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/dashboard/today-appointments', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.user.id;
       const appointments = await storage.getTodayAppointments(userId);
       res.json(appointments);
     } catch (error) {
@@ -65,7 +100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Customer routes
   app.post('/api/customers', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.user.id;
       const customerData = insertCustomerSchema.parse({
         ...req.body,
         salesPersonId: userId,
@@ -80,8 +115,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/customers', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const userRole = req.user.claims.role;
+      const userId = req.session.user.id;
+      const userRole = req.session.user.role;
       const salesPersonId = userRole === 'admin' ? undefined : userId;
       const customers = await storage.getCustomers(salesPersonId);
       res.json(customers);
@@ -159,7 +194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Order routes
   app.post('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.user.id;
       const { order, items } = req.body;
       
       const orderData = insertOrderSchema.parse({
@@ -179,8 +214,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const userRole = req.user.claims.role;
+      const userId = req.session.user.id;
+      const userRole = req.session.user.role;
       const { status } = req.query;
       
       const filters: any = {};
@@ -233,7 +268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Visit routes
   app.post('/api/visits', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.user.id;
       const visitData = insertVisitSchema.parse({
         ...req.body,
         salesPersonId: userId,
@@ -248,8 +283,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/visits', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const userRole = req.user.claims.role;
+      const userId = req.session.user.id;
+      const userRole = req.session.user.role;
       const { date } = req.query;
       
       const salesPersonId = userRole === 'admin' ? undefined : userId;
@@ -277,7 +312,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Appointment routes
   app.post('/api/appointments', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.user.id;
       const appointmentData = insertAppointmentSchema.parse({
         ...req.body,
         salesPersonId: userId,
@@ -292,8 +327,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/appointments', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const userRole = req.user.claims.role;
+      const userId = req.session.user.id;
+      const userRole = req.session.user.role;
       const { date } = req.query;
       
       const salesPersonId = userRole === 'admin' ? undefined : userId;
