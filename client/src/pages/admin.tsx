@@ -107,9 +107,13 @@ export default function Admin() {
   // Edit user mutation
   const editUserMutation = useMutation({
     mutationFn: async (userData: any) => {
+      console.log("Updating user:", userData);
       return await apiRequest(`/api/users/${userData.id}`, {
         method: 'PUT',
         body: JSON.stringify(userData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
     },
     onSuccess: () => {
@@ -122,9 +126,10 @@ export default function Admin() {
       setEditingUser(null);
     },
     onError: (error: Error) => {
+      console.error("Edit user error:", error);
       toast({
         title: "Hata",
-        description: "Kullanıcı güncellenirken bir hata oluştu",
+        description: `Kullanıcı güncellenirken bir hata oluştu: ${error.message}`,
         variant: "destructive",
       });
     },
