@@ -208,12 +208,15 @@ export default function LocationTracker({
         </div>
 
         <Button 
-          onClick={onNewCustomer} 
+          onClick={() => {
+            console.log('Yeni Satış butonuna tıklandı');
+            onNewCustomer();
+          }} 
           className="w-full" 
-          data-testid="button-add-new-customer"
+          data-testid="button-new-sale"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Yeni Müşteri Ekle
+          Yeni Satış
         </Button>
       </CardContent>
     </Card>
