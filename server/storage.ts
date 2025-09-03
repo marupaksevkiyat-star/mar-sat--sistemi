@@ -287,15 +287,21 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(orders)
       .leftJoin(customers, eq(orders.customerId, customers.id))
-      .leftJoin(users, eq(orders.salesPersonId, users.id))
-      .orderBy(desc(orders.createdAt));
+      .leftJoin(users, eq(orders.salesPersonId, users.id));
 
+    const conditions = [];
     if (filters?.status) {
-      query = query.where(eq(orders.status, filters.status as any)) as any;
+      conditions.push(eq(orders.status, filters.status as any));
     }
     if (filters?.salesPersonId) {
-      query = query.where(eq(orders.salesPersonId, filters.salesPersonId)) as any;
+      conditions.push(eq(orders.salesPersonId, filters.salesPersonId));
     }
+
+    if (conditions.length > 0) {
+      query = query.where(conditions.length === 1 ? conditions[0] : and(...conditions)) as any;
+    }
+
+    query = query.orderBy(desc(orders.createdAt)) as any;
 
     const ordersData = await query;
     
