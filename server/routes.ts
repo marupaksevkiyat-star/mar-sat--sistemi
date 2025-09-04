@@ -466,6 +466,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // TEST: Delivered orders grouped by customer - ÖNCE BURAYA TAŞIDIM
+  app.get('/api/test-delivered-orders', async (req, res) => {
+    console.log("🚀 BAŞLADI: delivered-by-customer endpoint");
+    try {
+      // Basit SQL sorgusu ile test edelim
+      const result = await db.select().from(orders).where(eq(orders.status, 'delivered')).limit(5);
+      console.log("📦 Raw delivered orders:", result.length);
+      
+      if (result.length === 0) {
+        console.log("❌ No delivered orders found in database");
+        return res.json([]);
+      }
+      
+      // Basit grouping - sadece test için
+      const mockData = result.map(order => ({
+        customerId: order.customerId,
+        customer: { companyName: "Test Firma", id: order.customerId },
+        totalOrders: 1,
+        totalAmount: parseFloat(order.totalAmount),
+        orders: [order],
+        products: {}
+      }));
+      
+      console.log("✅ Returning mock data:", mockData.length, "items");
+      res.json(mockData);
+    } catch (error) {
+      console.error("❌ HATA delivered-by-customer:", error);
+      res.status(500).json({ message: "Database error: " + error.message });
+    }
+  });
+
   app.get('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.session.user.id;
@@ -835,36 +866,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delivered orders grouped by customer - for bulk invoicing
-  app.get('/api/orders/delivered-by-customer', isAuthenticated, async (req, res) => {
-    console.log("🚀 BAŞLADI: delivered-by-customer endpoint");
-    try {
-      // Basit SQL sorgusu ile test edelim
-      const result = await db.select().from(orders).where(eq(orders.status, 'delivered')).limit(5);
-      console.log("📦 Raw delivered orders:", result.length);
-      
-      if (result.length === 0) {
-        console.log("❌ No delivered orders found in database");
-        return res.json([]);
-      }
-      
-      // Basit grouping - sadece test için
-      const mockData = result.map(order => ({
-        customerId: order.customerId,
-        customer: { companyName: "Test Firma", id: order.customerId },
-        totalOrders: 1,
-        totalAmount: parseFloat(order.totalAmount),
-        orders: [order],
-        products: {}
-      }));
-      
-      console.log("✅ Returning mock data:", mockData.length, "items");
-      res.json(mockData);
-    } catch (error) {
-      console.error("❌ HATA delivered-by-customer:", error);
-      res.status(500).json({ message: "Database error: " + error.message });
-    }
-  });
 
   // Get orders ready for shipping (production_ready status)
   app.get('/api/orders/ready-for-shipping', isAuthenticated, async (req, res) => {
