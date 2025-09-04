@@ -1261,6 +1261,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // İrsaliye API endpoints
+  
+  // Faturaya ait irsaliyeleri getir
+  app.get('/api/invoices/:invoiceId/delivery-slips', isAuthenticated, async (req: any, res) => {
+    try {
+      const { invoiceId } = req.params;
+      
+      // Şimdilik simulated data - veritabanı tabloları hazır olduğunda gerçek data gelecek
+      const mockDeliverySlips = [
+        {
+          id: '1',
+          deliverySlipNumber: 'IRS-2025-001',
+          status: 'delivered',
+          deliveredAt: new Date('2025-09-02'),
+          driverName: 'Mehmet Şoför',
+          vehiclePlate: '34ABC123',
+          notes: 'Tam teslimat yapıldı',
+          items: [
+            { productName: 'Ürün A', quantity: 10, deliveredQuantity: 10 },
+            { productName: 'Ürün B', quantity: 5, deliveredQuantity: 5 }
+          ]
+        },
+        {
+          id: '2', 
+          deliverySlipNumber: 'IRS-2025-002',
+          status: 'delivered',
+          deliveredAt: new Date('2025-09-03'),
+          driverName: 'Ali Şoför',
+          vehiclePlate: '06XYZ789',
+          notes: 'Eksik teslimat - 2 adet eksik',
+          items: [
+            { productName: 'Ürün C', quantity: 8, deliveredQuantity: 6 },
+            { productName: 'Ürün D', quantity: 12, deliveredQuantity: 12 }
+          ]
+        }
+      ];
+      
+      res.json(mockDeliverySlips);
+    } catch (error) {
+      console.error("Error fetching delivery slips:", error);
+      res.status(500).json({ message: "Failed to fetch delivery slips" });
+    }
+  });
+
+  // İrsaliye detayını getir
+  app.get('/api/delivery-slips/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Şimdilik simulated data
+      const mockDeliverySlip = {
+        id,
+        deliverySlipNumber: `IRS-2025-00${id}`,
+        status: 'delivered',
+        deliveryAddress: 'Örnek Mahallesi, Test Sokak No:1, İstanbul',
+        recipientName: 'Ahmet Yılmaz',
+        recipientPhone: '0532 123 45 67',
+        driverName: 'Mehmet Şoför',
+        driverPhone: '0533 987 65 43',
+        vehiclePlate: '34ABC123',
+        deliveredAt: new Date(),
+        notes: 'Teslimat tamamlandı',
+        items: [
+          {
+            id: '1',
+            productName: 'Test Ürün A',
+            quantity: 10,
+            deliveredQuantity: 10,
+            unit: 'adet',
+            notes: ''
+          },
+          {
+            id: '2',
+            productName: 'Test Ürün B', 
+            quantity: 5,
+            deliveredQuantity: 4,
+            unit: 'kutu',
+            notes: '1 adet eksik - hasarlı'
+          }
+        ]
+      };
+      
+      res.json(mockDeliverySlip);
+    } catch (error) {
+      console.error("Error fetching delivery slip:", error);
+      res.status(500).json({ message: "Failed to fetch delivery slip" });
+    }
+  });
+
   // İrsaliye e-posta gönderme endpoint'i (mailto: link yaklaşımı)
   app.post('/api/orders/send-invoice', isAuthenticated, async (req: any, res) => {
     try {

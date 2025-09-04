@@ -59,9 +59,48 @@ interface InvoiceDetails {
   };
 }
 
+interface DeliverySlip {
+  id: string;
+  deliverySlipNumber: string;
+  status: string;
+  deliveredAt: string;
+  driverName: string;
+  vehiclePlate: string;
+  notes: string;
+  items: {
+    productName: string;
+    quantity: number;
+    deliveredQuantity: number;
+  }[];
+}
+
+interface DeliverySlipDetail {
+  id: string;
+  deliverySlipNumber: string;
+  status: string;
+  deliveryAddress: string;
+  recipientName: string;
+  recipientPhone: string;
+  driverName: string;
+  driverPhone: string;
+  vehiclePlate: string;
+  deliveredAt: string;
+  notes: string;
+  items: {
+    id: string;
+    productName: string;
+    quantity: number;
+    deliveredQuantity: number;
+    unit: string;
+    notes: string;
+  }[];
+}
+
 export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
   const [, setLocation] = useLocation();
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showDeliverySlipDialog, setShowDeliverySlipDialog] = useState(false);
+  const [selectedDeliverySlip, setSelectedDeliverySlip] = useState<DeliverySlipDetail | null>(null);
   const [paymentForm, setPaymentForm] = useState({
     amount: '',
     paymentMethod: '',
@@ -84,6 +123,20 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
 
   const { data: items, isLoading: itemsLoading } = useQuery({
     queryKey: [`/api/invoices/${invoiceId}/items`],
+    retry: false,
+  });
+
+  // İrsaliye listesi
+  const { data: deliverySlips, isLoading: deliverySlipsLoading } = useQuery<DeliverySlip[]>({
+    queryKey: [`/api/invoices/${invoiceId}/delivery-slips`],
+    enabled: !!invoiceId,
+    retry: false,
+  });
+
+  // İrsaliye detayı
+  const { data: deliverySlipDetail } = useQuery<DeliverySlipDetail>({
+    queryKey: [`/api/delivery-slips/${selectedDeliverySlip?.id}`],
+    enabled: !!selectedDeliverySlip?.id,
     retry: false,
   });
 
@@ -175,6 +228,21 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
       month: '2-digit', 
       year: 'numeric'
     });
+  };
+
+  // İrsaliye görüntüleme
+  const handleViewDeliverySlip = async (deliverySlip: DeliverySlip) => {
+    try {
+      const response = await apiRequest('GET', `/api/delivery-slips/${deliverySlip.id}`);
+      setSelectedDeliverySlip(response);
+      setShowDeliverySlipDialog(true);
+    } catch (error) {
+      toast({
+        title: "Hata",
+        description: "İrsaliye detayları yüklenirken bir hata oluştu",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -427,6 +495,63 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
                 )}
               </CardContent>
             </Card>
+
+            {/* İrsaliyeler */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="w-5 h-5" />
+                  İrsaliyeler
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {deliverySlipsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+                    <p className="text-sm text-muted-foreground">İrsaliyeler yükleniyor...</p>
+                  </div>
+                ) : (deliverySlips && deliverySlips.length > 0) ? (
+                  <div className="space-y-3">
+                    {deliverySlips.map((deliverySlip) => (
+                      <div 
+                        key={deliverySlip.id} 
+                        className="border rounded-lg p-4 hover:bg-muted/50 cursor-pointer transition-colors"
+                        onClick={() => handleViewDeliverySlip(deliverySlip)}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="font-medium text-blue-600 hover:text-blue-800">
+                              {deliverySlip.deliverySlipNumber}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Teslim Tarihi: {formatDate(deliverySlip.deliveredAt)}
+                            </p>
+                          </div>
+                          <Badge variant={deliverySlip.status === 'delivered' ? 'default' : 'secondary'}>
+                            {deliverySlip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}
+                          </Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          <p><strong>Şoför:</strong> {deliverySlip.driverName}</p>
+                          <p><strong>Araç:</strong> {deliverySlip.vehiclePlate}</p>
+                          {deliverySlip.notes && (
+                            <p><strong>Not:</strong> {deliverySlip.notes}</p>
+                          )}
+                        </div>
+                        <div className="mt-2 text-xs text-muted-foreground">
+                          Kalem sayısı: {deliverySlip.items.length}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Package className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p>Bu faturaya ait irsaliye bulunamadı</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sağ Panel - Ödeme Bilgileri */}
@@ -595,6 +720,98 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
             </Card>
           </div>
         </div>
+
+        {/* İrsaliye Detay Modal */}
+        <Dialog open={showDeliverySlipDialog} onOpenChange={setShowDeliverySlipDialog}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                İrsaliye Detayı: {deliverySlipDetail?.deliverySlipNumber}
+              </DialogTitle>
+            </DialogHeader>
+            
+            {deliverySlipDetail && (
+              <div className="space-y-6">
+                {/* İrsaliye Genel Bilgileri */}
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold mb-3">Teslimat Bilgileri</h3>
+                    <div className="space-y-2 text-sm">
+                      <div><strong>Teslimat Adresi:</strong> {deliverySlipDetail.deliveryAddress}</div>
+                      <div><strong>Teslim Alan:</strong> {deliverySlipDetail.recipientName}</div>
+                      <div><strong>Telefon:</strong> {deliverySlipDetail.recipientPhone}</div>
+                      <div><strong>Teslimat Tarihi:</strong> {formatDate(deliverySlipDetail.deliveredAt)}</div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-3">Nakliye Bilgileri</h3>
+                    <div className="space-y-2 text-sm">
+                      <div><strong>Şoför:</strong> {deliverySlipDetail.driverName}</div>
+                      <div><strong>Telefon:</strong> {deliverySlipDetail.driverPhone}</div>
+                      <div><strong>Araç Plakası:</strong> {deliverySlipDetail.vehiclePlate}</div>
+                      <div><strong>Durum:</strong> 
+                        <Badge variant="default" className="ml-2">
+                          {deliverySlipDetail.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* İrsaliye Kalemleri */}
+                <div>
+                  <h3 className="font-semibold mb-3">İrsaliye Kalemleri</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm border">
+                      <thead>
+                        <tr className="border-b bg-muted/50">
+                          <th className="text-left p-3">Ürün</th>
+                          <th className="text-center p-3">Planlanan</th>
+                          <th className="text-center p-3">Teslim Edilen</th>
+                          <th className="text-center p-3">Birim</th>
+                          <th className="text-left p-3">Notlar</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {deliverySlipDetail.items.map((item) => (
+                          <tr key={item.id} className="border-b">
+                            <td className="p-3 font-medium">{item.productName}</td>
+                            <td className="text-center p-3">{item.quantity}</td>
+                            <td className="text-center p-3">
+                              <span className={item.deliveredQuantity < item.quantity ? 'text-orange-600 font-medium' : ''}>
+                                {item.deliveredQuantity}
+                              </span>
+                            </td>
+                            <td className="text-center p-3">{item.unit}</td>
+                            <td className="p-3">
+                              {item.notes || '-'}
+                              {item.deliveredQuantity < item.quantity && (
+                                <div className="text-xs text-orange-600 mt-1">
+                                  ⚠️ {item.quantity - item.deliveredQuantity} adet eksik
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Genel Notlar */}
+                {deliverySlipDetail.notes && (
+                  <div>
+                    <h3 className="font-semibold mb-3">Genel Notlar</h3>
+                    <div className="bg-muted p-3 rounded text-sm">
+                      {deliverySlipDetail.notes}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
