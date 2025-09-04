@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Search, Building2, FileText, Receipt, Eye, Calendar, ArrowLeft, CreditCard, TrendingUp, AlertTriangle, Plus, DollarSign, Package } from "lucide-react";
+import jsPDF from 'jspdf';
 
 // İrsaliye Component'i
 const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
@@ -32,36 +33,68 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
   };
 
   const handlePdfDownload = (slip: any) => {
-    // Basit PDF indirme - gelecekte gerçek PDF oluşturucu eklenebilir
-    const content = `
-İRSALİYE BELGESI
-
-İrsaliye No: ${slip.deliverySlipNumber}
-Teslimat Tarihi: ${formatDate(slip.deliveredAt)}
-Durum: ${slip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}
-
-Nakliye Bilgileri:
-Şoför: ${slip.driverName}
-Araç Plakası: ${slip.vehiclePlate}
-Not: ${slip.notes || 'Yok'}
-
-İrsaliye Kalemleri:
-${slip.items?.map((item: any) => `${item.productName} - ${item.deliveredQuantity} ${item.unit}`).join('\n') || 'Ürün bulunamadı'}
-
-Teslimat Onayı:
-Tarih: ${formatDate(slip.deliveredAt)}
-Alıcı İmzası: ________________
-    `;
-    
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `irsaliye-${slip.deliverySlipNumber}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    try {
+      const pdf = new jsPDF();
+      
+      // PDF başlığı
+      pdf.setFontSize(20);
+      pdf.text('İRSALİYE BELGESİ', 20, 20);
+      
+      pdf.setFontSize(12);
+      let yPosition = 40;
+      
+      // İrsaliye bilgileri
+      pdf.text(`İrsaliye No: ${slip.deliverySlipNumber}`, 20, yPosition);
+      yPosition += 10;
+      pdf.text(`Teslimat Tarihi: ${formatDate(slip.deliveredAt)}`, 20, yPosition);
+      yPosition += 10;
+      pdf.text(`Durum: ${slip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}`, 20, yPosition);
+      
+      yPosition += 20;
+      pdf.setFontSize(14);
+      pdf.text('Nakliye Bilgileri:', 20, yPosition);
+      yPosition += 10;
+      pdf.setFontSize(12);
+      pdf.text(`Şoför: ${slip.driverName}`, 20, yPosition);
+      yPosition += 10;
+      pdf.text(`Araç Plakası: ${slip.vehiclePlate}`, 20, yPosition);
+      yPosition += 10;
+      if (slip.notes) {
+        pdf.text(`Not: ${slip.notes}`, 20, yPosition);
+        yPosition += 10;
+      }
+      
+      yPosition += 20;
+      pdf.setFontSize(14);
+      pdf.text('İrsaliye Kalemleri:', 20, yPosition);
+      yPosition += 10;
+      pdf.setFontSize(12);
+      
+      if (slip.items && slip.items.length > 0) {
+        slip.items.forEach((item: any) => {
+          pdf.text(`• ${item.productName} - ${item.deliveredQuantity} ${item.unit}`, 20, yPosition);
+          yPosition += 8;
+        });
+      } else {
+        pdf.text('Ürün bulunamadı', 20, yPosition);
+        yPosition += 8;
+      }
+      
+      yPosition += 20;
+      pdf.setFontSize(14);
+      pdf.text('Teslimat Onayı:', 20, yPosition);
+      yPosition += 10;
+      pdf.setFontSize(12);
+      pdf.text(`Tarih: ${formatDate(slip.deliveredAt)}`, 20, yPosition);
+      yPosition += 20;
+      pdf.text('Alıcı İmzası: ________________________', 20, yPosition);
+      
+      // PDF'i indir
+      pdf.save(`irsaliye-${slip.deliverySlipNumber}.pdf`);
+    } catch (error) {
+      console.error('PDF oluşturma hatası:', error);
+      alert('PDF oluşturulurken bir hata oluştu.');
+    }
   };
 
   if (isLoading) {
