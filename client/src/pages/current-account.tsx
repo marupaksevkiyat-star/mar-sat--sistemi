@@ -35,59 +35,148 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
   const handlePdfDownload = (slip: any) => {
     try {
       const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.width;
+      const pageHeight = pdf.internal.pageSize.height;
       
-      // PDF başlığı
+      // Başlık bölümü - üst çerçeve
+      pdf.setLineWidth(1);
+      pdf.rect(10, 10, pageWidth - 20, 40);
+      
+      // Şirket logosu/adı alanı (sol)
+      pdf.setFontSize(16);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('ŞİRKET ADI', 15, 25);
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      pdf.text('Adres: Şirket Adresi', 15, 32);
+      pdf.text('Tel: +90 XXX XXX XX XX', 15, 38);
+      pdf.text('Email: info@sirket.com', 15, 44);
+      
+      // İrsaliye başlığı (sağ)
       pdf.setFontSize(20);
-      pdf.text('İRSALİYE BELGESİ', 20, 20);
-      
+      pdf.setFont(undefined, 'bold');
+      pdf.text('İRSALİYE', pageWidth - 60, 25);
       pdf.setFontSize(12);
-      let yPosition = 40;
+      pdf.setFont(undefined, 'normal');
+      pdf.text(`No: ${slip.deliverySlipNumber}`, pageWidth - 60, 35);
+      pdf.text(`Tarih: ${formatDate(slip.deliveredAt)}`, pageWidth - 60, 42);
       
-      // İrsaliye bilgileri
-      pdf.text(`İrsaliye No: ${slip.deliverySlipNumber}`, 20, yPosition);
-      yPosition += 10;
-      pdf.text(`Teslimat Tarihi: ${formatDate(slip.deliveredAt)}`, 20, yPosition);
-      yPosition += 10;
-      pdf.text(`Durum: ${slip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}`, 20, yPosition);
+      let yPos = 65;
       
-      yPosition += 20;
-      pdf.setFontSize(14);
-      pdf.text('Nakliye Bilgileri:', 20, yPosition);
-      yPosition += 10;
+      // Müşteri bilgileri bölümü
+      pdf.setLineWidth(0.5);
+      pdf.rect(10, yPos, pageWidth - 20, 25);
       pdf.setFontSize(12);
-      pdf.text(`Şoför: ${slip.driverName}`, 20, yPosition);
-      yPosition += 10;
-      pdf.text(`Araç Plakası: ${slip.vehiclePlate}`, 20, yPosition);
-      yPosition += 10;
+      pdf.setFont(undefined, 'bold');
+      pdf.text('MÜŞTERİ BİLGİLERİ', 15, yPos + 8);
+      pdf.setFont(undefined, 'normal');
+      pdf.setFontSize(10);
+      pdf.text('Müşteri Adı: [Müşteri Firma Adı]', 15, yPos + 16);
+      pdf.text('Adres: [Müşteri Adresi]', 15, yPos + 22);
+      
+      yPos += 35;
+      
+      // Nakliye bilgileri bölümü
+      pdf.rect(10, yPos, pageWidth - 20, 25);
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('NAKLİYE BİLGİLERİ', 15, yPos + 8);
+      pdf.setFont(undefined, 'normal');
+      pdf.setFontSize(10);
+      pdf.text(`Şoför: ${slip.driverName}`, 15, yPos + 16);
+      pdf.text(`Araç Plakası: ${slip.vehiclePlate}`, 15, yPos + 22);
       if (slip.notes) {
-        pdf.text(`Not: ${slip.notes}`, 20, yPosition);
-        yPosition += 10;
+        pdf.text(`Not: ${slip.notes}`, 100, yPos + 16);
       }
       
-      yPosition += 20;
-      pdf.setFontSize(14);
-      pdf.text('İrsaliye Kalemleri:', 20, yPosition);
-      yPosition += 10;
-      pdf.setFontSize(12);
+      yPos += 35;
       
+      // Ürün tablosu başlığı
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('ÜRÜN LİSTESİ', 15, yPos + 5);
+      yPos += 15;
+      
+      // Tablo başlığı
+      const tableStartY = yPos;
+      const colWidths = [80, 30, 30, 30]; // Ürün, Miktar, Birim, Teslim
+      const colX = [15, 95, 125, 155];
+      
+      pdf.setLineWidth(0.5);
+      pdf.rect(10, tableStartY, pageWidth - 20, 15);
+      
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('ÜRÜN ADI', colX[0], tableStartY + 10);
+      pdf.text('MİKTAR', colX[1], tableStartY + 10);
+      pdf.text('BİRİM', colX[2], tableStartY + 10);
+      pdf.text('TESLİM', colX[3], tableStartY + 10);
+      
+      // Dikey çizgiler
+      pdf.line(colX[1] - 5, tableStartY, colX[1] - 5, tableStartY + 15);
+      pdf.line(colX[2] - 5, tableStartY, colX[2] - 5, tableStartY + 15);
+      pdf.line(colX[3] - 5, tableStartY, colX[3] - 5, tableStartY + 15);
+      
+      yPos = tableStartY + 15;
+      
+      // Ürün satırları
+      pdf.setFont(undefined, 'normal');
       if (slip.items && slip.items.length > 0) {
-        slip.items.forEach((item: any) => {
-          pdf.text(`• ${item.productName} - ${item.deliveredQuantity} ${item.unit}`, 20, yPosition);
-          yPosition += 8;
+        slip.items.forEach((item: any, index: number) => {
+          const rowHeight = 12;
+          
+          // Satır çerçevesi
+          pdf.rect(10, yPos, pageWidth - 20, rowHeight);
+          
+          // Dikey çizgiler
+          pdf.line(colX[1] - 5, yPos, colX[1] - 5, yPos + rowHeight);
+          pdf.line(colX[2] - 5, yPos, colX[2] - 5, yPos + rowHeight);
+          pdf.line(colX[3] - 5, yPos, colX[3] - 5, yPos + rowHeight);
+          
+          // Ürün bilgileri
+          pdf.text(item.productName || 'Ürün', colX[0], yPos + 8);
+          pdf.text(String(item.quantity || '0'), colX[1], yPos + 8);
+          pdf.text(item.unit || 'Adet', colX[2], yPos + 8);
+          pdf.text(String(item.deliveredQuantity || '0'), colX[3], yPos + 8);
+          
+          yPos += rowHeight;
         });
       } else {
-        pdf.text('Ürün bulunamadı', 20, yPosition);
-        yPosition += 8;
+        // Boş satır
+        pdf.rect(10, yPos, pageWidth - 20, 12);
+        pdf.text('Ürün bulunamadı', colX[0], yPos + 8);
+        yPos += 12;
       }
       
-      yPosition += 20;
-      pdf.setFontSize(14);
-      pdf.text('Teslimat Onayı:', 20, yPosition);
-      yPosition += 10;
+      yPos += 20;
+      
+      // İmza bölümü
+      const signatureY = Math.max(yPos, pageHeight - 80);
+      
+      // Teslimat onayı çerçevesi
+      pdf.setLineWidth(0.5);
+      pdf.rect(10, signatureY, pageWidth - 20, 50);
+      
       pdf.setFontSize(12);
-      pdf.text(`Tarih: ${formatDate(slip.deliveredAt)}`, 20, yPosition);
-      yPosition += 20;
-      pdf.text('Alıcı İmzası: ________________________', 20, yPosition);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('TESLİMAT ONAYI', 15, signatureY + 10);
+      
+      // Sol taraf - Teslim eden
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(`Teslimat Tarihi: ${formatDate(slip.deliveredAt)}`, 15, signatureY + 20);
+      pdf.text(`Durum: ${slip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}`, 15, signatureY + 28);
+      
+      // Sağ taraf - İmza alanı
+      const signatureBoxX = pageWidth - 80;
+      pdf.rect(signatureBoxX, signatureY + 15, 65, 25);
+      pdf.setFontSize(9);
+      pdf.text('ALICI İMZASI', signatureBoxX + 15, signatureY + 45);
+      
+      // Altbilgi
+      pdf.setFontSize(8);
+      pdf.text('Bu belge elektronik ortamda oluşturulmuştur.', 15, pageHeight - 10);
+      pdf.text(`Yazdırma Tarihi: ${new Date().toLocaleDateString('tr-TR')}`, pageWidth - 60, pageHeight - 10);
       
       // PDF'i indir
       pdf.save(`irsaliye-${slip.deliverySlipNumber}.pdf`);
