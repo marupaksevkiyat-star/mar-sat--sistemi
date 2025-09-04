@@ -73,7 +73,6 @@ export default function Navigation() {
     if (userRole === 'shipping' || userRole === 'shipping_staff' || userRole.includes('Sevkiyat')) {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
-        { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
         { path: "/shipping", label: "Sevkiyat", icon: "fas fa-truck" },
       ];
     }
