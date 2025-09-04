@@ -46,6 +46,7 @@ export default function Navigation() {
         { path: "/invoices", label: "İrsaliyeler", icon: "fas fa-file-invoice" },
         { path: "/production", label: "Üretim", icon: "fas fa-cogs" },
         { path: "/shipping", label: "Sevkiyat", icon: "fas fa-truck" },
+        { path: "/mail-settings", label: "Mail Ayarları", icon: "fas fa-envelope-open-text" },
         { path: "/admin", label: "Yönetim", icon: "fas fa-shield-alt" },
       ];
     }

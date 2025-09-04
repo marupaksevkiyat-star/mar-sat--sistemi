@@ -155,6 +155,31 @@ export const invoices = pgTable("invoices", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Mail Settings table - Mail yapılandırmaları için
+export const mailSettings = pgTable("mail_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  settingName: varchar("setting_name").notNull().unique(), // "smtp_settings", "default_from_email", etc.
+  settingValue: text("setting_value"), // JSON string for complex settings
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Mail Templates table - Mail şablonları için  
+export const mailTemplates = pgTable("mail_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  templateName: varchar("template_name").notNull(),
+  templateType: varchar("template_type").notNull(), // "invoice", "order_confirmation", "welcome", etc.
+  subject: varchar("subject").notNull(),
+  htmlContent: text("html_content").notNull(),
+  textContent: text("text_content"),
+  variables: text("variables"), // JSON array of template variables like {{customerName}}
+  isDefault: boolean("is_default").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   customers: many(customers),
@@ -291,6 +316,18 @@ export const insertInvoiceSchema = createInsertSchema(invoices).omit({
   updatedAt: true,
 });
 
+export const insertMailSettingSchema = createInsertSchema(mailSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertMailTemplateSchema = createInsertSchema(mailTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -308,6 +345,10 @@ export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
 export type Appointment = typeof appointments.$inferSelect;
 export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
 export type Invoice = typeof invoices.$inferSelect;
+export type InsertMailSetting = z.infer<typeof insertMailSettingSchema>;
+export type MailSetting = typeof mailSettings.$inferSelect;
+export type InsertMailTemplate = z.infer<typeof insertMailTemplateSchema>;
+export type MailTemplate = typeof mailTemplates.$inferSelect;
 
 // Extended types for API responses
 export type OrderWithDetails = Order & {
