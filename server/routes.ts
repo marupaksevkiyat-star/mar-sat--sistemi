@@ -829,6 +829,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delivered orders grouped by customer - for bulk invoicing
+  app.get('/api/orders/delivered-by-customer', isAuthenticated, async (req, res) => {
+    try {
+      const deliveredOrders = await storage.getOrders({ status: 'delivered' });
+      
+      // Group orders by customer
+      const groupedOrders: Record<string, any> = {};
+      
+      deliveredOrders.forEach(order => {
+        const customerId = order.customerId;
+        if (!groupedOrders[customerId]) {
+          groupedOrders[customerId] = {
+            customerId,
+            customer: order.customer,
+            orders: [],
+            totalOrders: 0,
+            totalAmount: 0,
+            products: {} // Will aggregate products
+          };
+        }
+        
+        groupedOrders[customerId].orders.push(order);
+        groupedOrders[customerId].totalOrders++;
+        groupedOrders[customerId].totalAmount += parseFloat(order.totalAmount || '0');
+        
+        // Aggregate products
+        if (order.items) {
+          order.items.forEach(item => {
+            const productId = item.productId;
+            if (!groupedOrders[customerId].products[productId]) {
+              groupedOrders[customerId].products[productId] = {
+                product: item.product,
+                totalQuantity: 0,
+                totalPrice: 0,
+                deliveries: []
+              };
+            }
+            
+            groupedOrders[customerId].products[productId].totalQuantity += item.quantity;
+            groupedOrders[customerId].products[productId].totalPrice += parseFloat(item.totalPrice || '0');
+            groupedOrders[customerId].products[productId].deliveries.push({
+              orderId: order.id,
+              orderNumber: order.orderNumber,
+              quantity: item.quantity,
+              deliveredAt: order.deliveredAt
+            });
+          });
+        }
+      });
+      
+      res.json(Object.values(groupedOrders));
+    } catch (error) {
+      console.error("Error fetching delivered orders by customer:", error);
+      res.status(500).json({ message: "Failed to fetch delivered orders" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

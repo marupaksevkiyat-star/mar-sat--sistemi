@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Plus, Search, Truck, Package, CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { FileText, Plus, Search, Truck, Package, CheckCircle, Clock, AlertTriangle, Receipt, Layers } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 
 type InvoiceStatus = 'draft' | 'pending' | 'shipped' | 'delivered' | 'cancelled';
@@ -45,6 +46,7 @@ export default function InvoicesPage() {
   const [selectedOrder, setSelectedOrder] = useState<string>("");
   const [shippingAddress, setShippingAddress] = useState("");
   const [notes, setNotes] = useState("");
+  const [activeTab, setActiveTab] = useState<'invoices' | 'deliveries'>('deliveries');
 
   const queryClient = useQueryClient();
 
@@ -58,11 +60,15 @@ export default function InvoicesPage() {
     retry: false,
   });
 
+  const { data: deliveredOrdersByCustomer } = useQuery({
+    queryKey: ["/api/orders/delivered-by-customer"],
+    retry: false,
+  });
+
   const createInvoiceMutation = useMutation({
     mutationFn: (data: any) => apiRequest("POST", "/api/invoices", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
-      // Dashboard verilerini de güncelle
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/recent-orders"] });
       setShowCreateDialog(false);
@@ -77,7 +83,6 @@ export default function InvoicesPage() {
       apiRequest("PATCH", `/api/invoices/${id}/status`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
-      // Dashboard verilerini de güncelle
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/recent-orders"] });
     },
@@ -91,6 +96,17 @@ export default function InvoicesPage() {
       shippingAddress,
       notes,
     });
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('tr-TR', {
+      style: 'currency',
+      currency: 'TRY'
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('tr-TR');
   };
 
   const getStatusIcon = (status: InvoiceStatus) => {
@@ -138,18 +154,6 @@ export default function InvoicesPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const formatCurrency = (amount: string | number) => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(amount));
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -169,175 +173,188 @@ export default function InvoicesPage() {
       <Navigation />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-foreground">İrsaliye Yönetimi</h2>
-            <p className="text-muted-foreground mt-1">Sevkiyat ve teslimat takibi</p>
+            <h2 className="text-3xl font-bold text-foreground">Muhasebe Yönetimi</h2>
+            <p className="text-muted-foreground mt-1">İrsaliye ve fatura işlemleri</p>
           </div>
-          
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-            <DialogTrigger asChild>
-              <Button data-testid="button-create-invoice">
-                <Plus className="w-4 h-4 mr-2" />
-                Yeni İrsaliye
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Yeni İrsaliye Oluştur</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="order-select">Sipariş Seç</Label>
-                  <Select value={selectedOrder} onValueChange={setSelectedOrder}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sipariş seçin" />
+        </div>
+
+        <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="deliveries" className="flex items-center gap-2">
+              <Receipt className="w-4 h-4" />
+              Teslim Edilmiş İrsaliyeler
+            </TabsTrigger>
+            <TabsTrigger value="invoices" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Faturalar
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="deliveries">
+            <Card>
+              <CardHeader>
+                <CardTitle>Müşteri Bazında Teslim Edilmiş Siparişler</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Aynı müşteriye ait irsaliyeleri toplu olarak faturalayabilirsiniz
+                </p>
+              </CardHeader>
+              <CardContent>
+                {deliveredOrdersByCustomer?.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Henüz teslim edilmiş sipariş bulunmuyor
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {(deliveredOrdersByCustomer || []).map((customerData: any) => (
+                      <div key={customerData.customerId} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="font-semibold text-lg">{customerData.customer?.companyName}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {customerData.totalOrders} adet sipariş • Toplam: {formatCurrency(customerData.totalAmount)}
+                            </p>
+                          </div>
+                          <Button className="bg-green-600 hover:bg-green-700">
+                            <Layers className="w-4 h-4 mr-2" />
+                            Toplu Faturala
+                          </Button>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-sm">Toplam Ürünler:</h4>
+                          {Object.values(customerData.products || {}).map((productData: any) => (
+                            <div key={productData.product?.id} className="flex justify-between text-sm bg-muted/50 p-2 rounded">
+                              <span>{productData.product?.name}</span>
+                              <span className="font-medium">
+                                {productData.totalQuantity} adet • {formatCurrency(productData.totalPrice)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <details className="mt-4">
+                          <summary className="cursor-pointer text-sm text-primary">İrsaliye Detayları</summary>
+                          <div className="mt-2 space-y-1">
+                            {customerData.orders.map((order: any) => (
+                              <div key={order.id} className="text-xs text-muted-foreground bg-muted/30 p-2 rounded">
+                                {order.orderNumber} • {formatDate(order.deliveredAt)} • {formatCurrency(order.totalAmount)}
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="invoices">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Faturalar</CardTitle>
+                  <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Yeni İrsaliye
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Yeni İrsaliye Oluştur</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Sipariş Seç</Label>
+                          <Select value={selectedOrder} onValueChange={setSelectedOrder}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Sipariş seçin" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {(orders || []).map((order: any) => (
+                                <SelectItem key={order.id} value={order.id}>
+                                  {order.orderNumber} - {order.customer?.companyName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Sevkiyat Adresi</Label>
+                          <Textarea
+                            value={shippingAddress}
+                            onChange={(e) => setShippingAddress(e.target.value)}
+                            placeholder="Sevkiyat adresi girin"
+                          />
+                        </div>
+                        <Button 
+                          onClick={handleCreateInvoice}
+                          disabled={!selectedOrder || !shippingAddress}
+                          className="w-full"
+                        >
+                          İrsaliye Oluştur
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardHeader>
+              
+              <CardContent>
+                <div className="flex gap-4 mb-6">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="İrsaliye ara..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {(orders as any[] || []).map((order) => (
-                        <SelectItem key={order.id} value={order.id}>
-                          #{order.id.slice(-8)} - {order.customer?.companyName || order.customer?.name}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="all">Tümü</SelectItem>
+                      <SelectItem value="draft">Taslak</SelectItem>
+                      <SelectItem value="pending">Beklemede</SelectItem>
+                      <SelectItem value="shipped">Sevk Edildi</SelectItem>
+                      <SelectItem value="delivered">Teslim Edildi</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label htmlFor="shipping-address">Teslimat Adresi</Label>
-                  <Textarea
-                    id="shipping-address"
-                    value={shippingAddress}
-                    onChange={(e) => setShippingAddress(e.target.value)}
-                    placeholder="Teslimat adresini girin"
-                    data-testid="textarea-shipping-address"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="notes">Notlar (Opsiyonel)</Label>
-                  <Textarea
-                    id="notes"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Ek notlar"
-                    data-testid="textarea-invoice-notes"
-                  />
-                </div>
-                <Button 
-                  onClick={handleCreateInvoice} 
-                  disabled={!selectedOrder || !shippingAddress || createInvoiceMutation.isPending}
-                  className="w-full"
-                  data-testid="button-submit-invoice"
-                >
-                  {createInvoiceMutation.isPending ? "Oluşturuluyor..." : "İrsaliye Oluştur"}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
 
-        {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="İrsaliye no, müşteri adı veya takip numarası ara..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                    data-testid="input-search-invoices"
-                  />
-                </div>
-              </div>
-              <Select value={statusFilter} onValueChange={(value: InvoiceStatus | 'all') => setStatusFilter(value)}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tüm Durumlar</SelectItem>
-                  <SelectItem value="draft">Taslak</SelectItem>
-                  <SelectItem value="pending">Beklemede</SelectItem>
-                  <SelectItem value="shipped">Sevk Edildi</SelectItem>
-                  <SelectItem value="delivered">Teslim Edildi</SelectItem>
-                  <SelectItem value="cancelled">İptal</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Invoices List */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>İrsaliye Listesi</span>
-              <Badge variant="secondary">
-                {filteredInvoices.length} irsaliye
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">İrsaliye No</th>
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Müşteri</th>
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Durum</th>
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Takip No</th>
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Tarih</th>
-                    <th className="text-right py-3 px-2 font-medium text-muted-foreground">Tutar</th>
-                    <th className="text-center py-3 px-2 font-medium text-muted-foreground">İşlemler</th>
-                  </tr>
-                </thead>
-                <tbody>
+                <div className="space-y-4">
                   {filteredInvoices.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="py-8 text-center text-muted-foreground">
-                        <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                        <p>Henüz irsaliye bulunmuyor</p>
-                      </td>
-                    </tr>
+                    <div className="text-center py-8 text-muted-foreground">
+                      İrsaliye bulunamadı
+                    </div>
                   ) : (
                     filteredInvoices.map((invoice) => (
-                      <tr key={invoice.id} className="border-b hover:bg-accent/50">
-                        <td className="py-3 px-2">
-                          <div className="flex items-center gap-2">
-                            {getStatusIcon(invoice.status)}
-                            <span className="font-medium text-sm" data-testid={`invoice-number-${invoice.id}`}>
-                              {invoice.invoiceNumber}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-2 text-sm" data-testid={`invoice-customer-${invoice.id}`}>
-                          <div>
+                      <div key={invoice.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold">{invoice.invoiceNumber}</h3>
+                              <Badge variant={getStatusVariant(invoice.status) as any}>
+                                {getStatusLabel(invoice.status)}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {invoice.customer?.companyName} • {formatDate(invoice.createdAt)}
+                            </p>
                             <p className="font-medium">
-                              {invoice.customer?.companyName || invoice.customer?.name || 'N/A'}
-                            </p>
-                            <p className="text-xs text-muted-foreground truncate max-w-xs">
-                              {invoice.shippingAddress}
+                              {formatCurrency(parseFloat(invoice.order?.totalAmount || '0'))}
                             </p>
                           </div>
-                        </td>
-                        <td className="py-3 px-2">
-                          <Badge variant={getStatusVariant(invoice.status)} data-testid={`invoice-status-${invoice.id}`}>
-                            {getStatusLabel(invoice.status)}
-                          </Badge>
-                        </td>
-                        <td className="py-3 px-2 text-sm" data-testid={`invoice-tracking-${invoice.id}`}>
-                          {invoice.trackingNumber || '-'}
-                        </td>
-                        <td className="py-3 px-2 text-sm" data-testid={`invoice-date-${invoice.id}`}>
-                          {formatDate(invoice.createdAt)}
-                        </td>
-                        <td className="py-3 px-2 text-right font-medium" data-testid={`invoice-amount-${invoice.id}`}>
-                          {invoice.order ? formatCurrency(invoice.order.totalAmount) : '-'}
-                        </td>
-                        <td className="py-3 px-2">
-                          <div className="flex justify-center gap-2">
+                          
+                          <div className="flex gap-2">
                             {invoice.status === 'pending' && (
                               <Button
                                 size="sm"
@@ -346,7 +363,6 @@ export default function InvoicesPage() {
                                   id: invoice.id,
                                   status: 'shipped'
                                 })}
-                                data-testid={`button-ship-${invoice.id}`}
                               >
                                 Sevk Et
                               </Button>
@@ -359,21 +375,20 @@ export default function InvoicesPage() {
                                   id: invoice.id,
                                   status: 'delivered'
                                 })}
-                                data-testid={`button-deliver-${invoice.id}`}
                               >
                                 Teslim Et
                               </Button>
                             )}
                           </div>
-                        </td>
-                      </tr>
+                        </div>
+                      </div>
                     ))
                   )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
