@@ -279,7 +279,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Order operations - Basit ve güvenli
-  async createOrder(order: InsertOrder, items: InsertOrderItem[] = []): Promise<Order> {
+  async createOrder(order: InsertOrder, items: InsertOrderItem[] = []): Promise<OrderWithDetails> {
     return await db.transaction(async (tx) => {
       // Order number oluştur
       const orderNumber = `SIP-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
@@ -302,7 +302,9 @@ export class DatabaseStorage implements IStorage {
           .values(orderItemsWithOrderId);
       }
 
-      return createdOrder;
+      // Full order details ile return et
+      const fullOrder = await this.getOrderWithDetails(createdOrder.id, tx);
+      return fullOrder!;
     });
   }
 
