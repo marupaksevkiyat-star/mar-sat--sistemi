@@ -48,6 +48,7 @@ export interface IStorage {
   getCustomer(id: string): Promise<CustomerWithSalesPerson | undefined>;
   getCustomers(salesPersonId?: string): Promise<CustomerWithSalesPerson[]>;
   updateCustomer(id: string, updates: Partial<InsertCustomer>): Promise<Customer>;
+  deleteCustomer(id: string): Promise<void>;
   getNearbyCustomers(lat: number, lng: number, radiusKm?: number): Promise<CustomerWithSalesPerson[]>;
   
   // Product operations
@@ -174,6 +175,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(customers.id, id))
       .returning();
     return updated;
+  }
+
+  async deleteCustomer(id: string): Promise<void> {
+    await db.delete(customers).where(eq(customers.id, id));
   }
 
   async getNearbyCustomers(lat: number, lng: number, radiusKm: number = 5): Promise<CustomerWithSalesPerson[]> {

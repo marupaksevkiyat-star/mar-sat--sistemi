@@ -352,6 +352,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete customer
+  app.delete('/api/customers/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userRole = req.session.user.role;
+      const customerId = req.params.id;
+      
+      // Check permissions - only admin or the customer's sales person can delete
+      if (userRole !== 'admin' && userRole !== 'Admin') {
+        // For non-admin users, check if they own this customer
+        const customer = await storage.getCustomer(customerId);
+        if (!customer || customer.salesPersonId !== req.session.user.id) {
+          return res.status(403).json({ message: "Bu müşteriyi silme yetkiniz yok" });
+        }
+      }
+      
+      await storage.deleteCustomer(customerId);
+      res.json({ message: "Müşteri başarıyla silindi" });
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      res.status(500).json({ message: "Müşteri silinirken bir hata oluştu" });
+    }
+  });
+
   // Product routes
   app.get('/api/products', isAuthenticated, async (req, res) => {
     try {
