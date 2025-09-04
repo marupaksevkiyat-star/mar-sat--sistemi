@@ -423,7 +423,6 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
                   <div className="text-center py-8 text-muted-foreground">
                     <Package className="w-12 h-12 mx-auto mb-2 opacity-50" />
                     <p>İrsaliye bilgileri bulunamadı</p>
-                    <p className="text-sm mt-1">Ödeme geçmişi ve detaylı irsaliye bilgileri yakında eklenecek...</p>
                   </div>
                 )}
               </CardContent>
@@ -493,20 +492,22 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
                   <div className="text-center py-8 text-muted-foreground">
                     <CreditCard className="w-12 h-12 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">Henüz ödeme yapılmamış</p>
-                    <p className="text-xs mt-1">Ödeme geçmişi ve detaylı irsaliye bilgileri yakında eklenecek...</p>
                   </div>
                 )}
 
                 {/* Ödeme Ekleme Butonu */}
                 {remainingBalance > 0 && (
                   <div className="mt-6 pt-4 border-t">
+                    <Button 
+                      className="w-full" 
+                      size="sm"
+                      onClick={() => setShowPaymentDialog(true)}
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Ödeme Ekle
+                    </Button>
+                    
                     <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-                      <DialogTrigger asChild>
-                        <Button className="w-full" size="sm">
-                          <CreditCard className="w-4 h-4 mr-2" />
-                          Ödeme Ekle
-                        </Button>
-                      </DialogTrigger>
                       <DialogContent className="sm:max-w-md">
                         <DialogHeader>
                           <DialogTitle>Ödeme Ekle</DialogTitle>
