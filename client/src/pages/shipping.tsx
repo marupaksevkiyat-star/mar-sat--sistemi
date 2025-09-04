@@ -61,6 +61,9 @@ export default function Shipping() {
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production_ready"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "shipping"] });
+      // Dashboard verilerini de güncelle
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/recent-orders"] });
       
       // Set as active delivery
       const order = readyOrders?.find((o: any) => o.id === variables.orderId);
@@ -104,6 +107,9 @@ export default function Shipping() {
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "shipping"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "delivered"] });
+      // Dashboard verilerini de güncelle
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/recent-orders"] });
       setActiveDelivery(null);
     },
     onError: (error: Error) => {

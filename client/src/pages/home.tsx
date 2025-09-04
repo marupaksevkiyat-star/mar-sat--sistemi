@@ -32,16 +32,19 @@ export default function Home() {
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
     retry: false,
+    refetchInterval: 30000, // 30 saniyede bir otomatik yenile
   });
 
   const { data: recentOrders, isLoading: ordersLoading } = useQuery({
     queryKey: ["/api/dashboard/recent-orders"],
     retry: false,
+    refetchInterval: 30000, // 30 saniyede bir otomatik yenile
   });
 
   const { data: todayAppointments, isLoading: appointmentsLoading } = useQuery({
     queryKey: ["/api/dashboard/today-appointments"],
     retry: false,
+    refetchInterval: 60000, // 1 dakikada bir otomatik yenile
   });
 
   if (isLoading) {

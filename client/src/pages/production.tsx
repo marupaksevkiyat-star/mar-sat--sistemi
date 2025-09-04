@@ -60,6 +60,9 @@ export default function Production() {
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "pending"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production_ready"] });
+      // Dashboard verilerini de güncelle
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/recent-orders"] });
     },
     onError: (error: Error) => {
       if (isUnauthorizedError(error)) {
@@ -100,6 +103,9 @@ export default function Production() {
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "pending"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production_ready"] });
+      // Dashboard verilerini de güncelle
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/recent-orders"] });
     },
     onError: (error: Error) => {
       if (isUnauthorizedError(error)) {
@@ -134,6 +140,9 @@ export default function Production() {
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "pending"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders", "status", "production_ready"] });
+      // Dashboard verilerini de güncelle
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/recent-orders"] });
     },
     onError: (error: Error) => {
       if (isUnauthorizedError(error)) {
