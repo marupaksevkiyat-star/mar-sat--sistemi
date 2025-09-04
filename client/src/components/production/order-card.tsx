@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Play, Save, Check, Eye } from "lucide-react";
+import { Play, Save, Check, Eye, Plus, Trash2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
 
 interface OrderCardProps {
   order: any;
@@ -24,6 +26,13 @@ export default function OrderCard({
 }: OrderCardProps) {
   const [items, setItems] = useState(order.items || []);
   const [notes, setNotes] = useState(order.productionNotes || "");
+  const [selectedProductId, setSelectedProductId] = useState<string>("");
+
+  // Fetch products for adding new items
+  const { data: products } = useQuery({
+    queryKey: ["/api/products"],
+    retry: false,
+  });
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -72,6 +81,30 @@ export default function OrderCard({
     setItems(updatedItems);
   };
 
+  const addNewItem = () => {
+    if (!selectedProductId) return;
+    
+    const selectedProduct = products?.find?.((p: any) => p.id === selectedProductId);
+    if (!selectedProduct) return;
+
+    const newItem = {
+      productId: selectedProduct.id,
+      product: selectedProduct,
+      quantity: 1,
+      unitPrice: selectedProduct.price,
+      totalPrice: parseFloat(selectedProduct.price),
+      orderId: order.id
+    };
+
+    setItems([...items, newItem]);
+    setSelectedProductId("");
+  };
+
+  const removeItem = (index: number) => {
+    const updatedItems = items.filter((_: any, i: number) => i !== index);
+    setItems(updatedItems);
+  };
+
   const calculateTotal = () => {
     return items.reduce((sum: number, item: any) => sum + parseFloat(item.totalPrice || 0), 0);
   };
@@ -116,7 +149,7 @@ export default function OrderCard({
               <h5 className="font-medium text-foreground mb-3">Sipariş Detayları</h5>
               <div className="space-y-3">
                 {items.map((item: any, index: number) => (
-                  <div key={index} className="flex justify-between items-center text-sm">
+                  <div key={index} className="flex justify-between items-center text-sm p-2 border rounded-md">
                     <span className="text-muted-foreground flex-1">
                       {item.product?.name}
                     </span>
@@ -132,9 +165,47 @@ export default function OrderCard({
                       <span className="text-foreground text-xs">
                         {item.product?.unit || 'Adet'}
                       </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeItem(index)}
+                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                        data-testid={`button-remove-${index}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 ))}
+                
+                {/* Add new item section */}
+                <div className="mt-3 p-3 border-2 border-dashed border-muted rounded-md">
+                  <div className="flex items-center space-x-2">
+                    <Select value={selectedProductId} onValueChange={setSelectedProductId}>
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Ürün seçin..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {products?.filter?.((product: any) => 
+                          !items.some((item: any) => item.productId === product.id)
+                        ).map((product: any) => (
+                          <SelectItem key={product.id} value={product.id}>
+                            {product.name} - {product.price} TL/{product.unit}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="sm"
+                      onClick={addNewItem}
+                      disabled={!selectedProductId}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      data-testid="button-add-product"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
               
               <div className="mt-4 pt-4 border-t border-border">

@@ -297,6 +297,9 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
 export const insertOrderItemSchema = createInsertSchema(orderItems).omit({
   id: true,
   createdAt: true,
+}).extend({
+  unitPrice: z.union([z.string(), z.number()]).transform(val => String(val)),
+  totalPrice: z.union([z.string(), z.number()]).transform(val => String(val)),
 });
 
 export const insertVisitSchema = createInsertSchema(visits).omit({
