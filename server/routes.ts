@@ -2,7 +2,7 @@ import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { orders, invoices, customers, orderItems, products } from "@shared/schema";
+import { orders, invoices, customers, orderItems, products, payments, invoiceItems } from "@shared/schema";
 import { eq, and, inArray, notInArray } from "drizzle-orm";
 import { 
   insertCustomerSchema, 
@@ -12,6 +12,8 @@ import {
   insertVisitSchema,
   insertAppointmentSchema,
   insertInvoiceSchema,
+  insertPaymentSchema,
+  insertInvoiceItemSchema,
   insertMailSettingSchema,
   insertMailTemplateSchema,
   type User
@@ -850,8 +852,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("✅ Bulundu:", customerOrders.length, "teslim edilmiş sipariş");
 
-      // Toplam tutarı hesapla
-      const totalAmount = customerOrders.reduce((sum, order) => sum + parseFloat(order.totalAmount), 0);
+      // Toplam tutarları hesapla
+      const subtotal = customerOrders.reduce((sum, order) => sum + parseFloat(order.totalAmount), 0);
+      const taxAmount = customerOrders.reduce((sum, order) => sum + parseFloat(order.taxAmount || '0'), 0);
+      const totalAmount = subtotal + taxAmount;
 
       // Fatura numarası oluştur (toplu faturalar için özel format)
       const timestamp = new Date();
@@ -859,7 +863,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const timeStr = timestamp.toISOString().slice(11, 19).replace(/:/g, '');
       const bulkInvoiceNumber = `BULK-${dateStr}-${timeStr}`;
 
-      console.log("💰 Toplam tutar:", totalAmount, "TL");
+      console.log("💰 Fatura özeti:", { subtotal, taxAmount, totalAmount }, "TL");
       console.log("📋 Fatura numarası:", bulkInvoiceNumber);
 
       // İlk sipariş referans olarak alınır (aslında birden fazla siparişi temsil eder)
@@ -870,6 +874,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         orderId: referenceOrder.id, // Referans sipariş
         customerId: customerId,
         status: 'generated',
+        subtotalAmount: subtotal.toFixed(2),
+        taxAmount: taxAmount.toFixed(2),
+        totalAmount: totalAmount.toFixed(2),
+        taxRate: "20", // Varsayılan KDV oranı
+        description: `Toplu fatura - ${customerOrders.length} sipariş birleştirildi`,
         shippingAddress: shippingAddress || referenceOrder.deliveryAddress || 'Adres belirtilmedi',
         notes: notes || `Toplu fatura - ${customerOrders.length} sipariş birleştirildi: ${orderIds.join(', ')}`,
         invoiceNumber: bulkInvoiceNumber
@@ -1017,6 +1026,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         orderId: orderIds[0], // Referans sipariş
         customerId: customerId,
         status: 'generated',
+        subtotalAmount: subtotal.toFixed(2),
+        taxAmount: kdvAmount.toFixed(2), 
+        totalAmount: totalWithKdv.toFixed(2),
+        taxRate: vatRate.toString(),
+        description: `Akıllı toplu fatura - ${orderIds.length} sipariş - ${groupedProducts.length} ürün grubu`,
         shippingAddress: selectedOrders[0]?.deliveryAddress || 'Adres belirtilmedi',
         notes: `Akıllı toplu fatura - ${orderIds.length} sipariş - ${groupedProducts.length} ürün grubu - %${vatRate} KDV dahil: ${totalWithKdv.toFixed(2)} TL`,
         invoiceNumber: finalInvoiceNumber
@@ -1027,6 +1041,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .insert(invoices)
         .values(bulkInvoice)
         .returning();
+
+      // İrsaliye bilgilerini kaydet
+      if (groupedProducts.length > 0) {
+        const invoiceItemsToInsert = groupedProducts.map(product => ({
+          invoiceId: savedInvoice.id,
+          productId: product.productId,
+          productName: product.productName,
+          quantity: product.totalQuantity,
+          unit: product.unit,
+          unitPrice: product.unitPrice.toFixed(2),
+          totalPrice: product.totalAmount.toFixed(2)
+        }));
+
+        await db
+          .insert(invoiceItems)
+          .values(invoiceItemsToInsert);
+
+        console.log("📦 İrsaliye bilgileri kaydedildi:", invoiceItemsToInsert.length, "kalem");
+      }
 
       console.log("🎉 Akıllı toplu fatura oluşturuldu:", savedInvoice.invoiceNumber);
 
@@ -1043,6 +1076,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("❌ Akıllı toplu faturalama hatası:", error);
       res.status(500).json({ message: "Akıllı faturalama başarısız: " + error.message });
+    }
+  });
+
+  // Tek fatura detayını getir
+  app.get('/api/invoices/:id', isAuthenticated, async (req, res) => {
+    try {
+      const invoiceId = req.params.id;
+      
+      const [invoice] = await db
+        .select({
+          id: invoices.id,
+          invoiceNumber: invoices.invoiceNumber,
+          status: invoices.status,
+          subtotalAmount: invoices.subtotalAmount,
+          taxAmount: invoices.taxAmount,
+          totalAmount: invoices.totalAmount,
+          taxRate: invoices.taxRate,
+          description: invoices.description,
+          notes: invoices.notes,
+          createdAt: invoices.createdAt,
+          customer: {
+            companyName: customers.companyName,
+            contactPerson: customers.contactPerson,
+            phone: customers.phone,
+            email: customers.email,
+            address: customers.address
+          }
+        })
+        .from(invoices)
+        .innerJoin(customers, eq(invoices.customerId, customers.id))
+        .where(eq(invoices.id, invoiceId))
+        .limit(1);
+      
+      if (!invoice) {
+        return res.status(404).json({ message: "Fatura bulunamadı" });
+      }
+      
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error fetching invoice detail:", error);
+      res.status(500).json({ message: "Failed to fetch invoice detail" });
     }
   });
 
@@ -1077,6 +1151,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating invoice status:", error);
       res.status(400).json({ message: "Failed to update invoice status" });
+    }
+  });
+
+  // Fatura ödeme geçmişini getir
+  app.get('/api/invoices/:id/payments', isAuthenticated, async (req, res) => {
+    try {
+      const invoiceId = req.params.id;
+      
+      const invoicePayments = await db
+        .select({
+          id: payments.id,
+          amount: payments.amount,
+          paymentMethod: payments.paymentMethod,
+          description: payments.description,
+          paymentDate: payments.paymentDate,
+          dueDate: payments.dueDate,
+          status: payments.status,
+          createdAt: payments.createdAt,
+          createdBy: payments.createdBy
+        })
+        .from(payments)
+        .where(eq(payments.invoiceId, invoiceId))
+        .orderBy(payments.paymentDate);
+      
+      res.json(invoicePayments);
+    } catch (error) {
+      console.error("Error fetching invoice payments:", error);
+      res.status(500).json({ message: "Failed to fetch payments" });
+    }
+  });
+
+  // Fatura irsaliye bilgilerini getir
+  app.get('/api/invoices/:id/items', isAuthenticated, async (req, res) => {
+    try {
+      const invoiceId = req.params.id;
+      
+      const invoiceItemsList = await db
+        .select({
+          id: invoiceItems.id,
+          productId: invoiceItems.productId,
+          productName: invoiceItems.productName,
+          quantity: invoiceItems.quantity,
+          unit: invoiceItems.unit,
+          unitPrice: invoiceItems.unitPrice,
+          totalPrice: invoiceItems.totalPrice,
+          createdAt: invoiceItems.createdAt
+        })
+        .from(invoiceItems)
+        .where(eq(invoiceItems.invoiceId, invoiceId))
+        .orderBy(invoiceItems.productName);
+      
+      res.json(invoiceItemsList);
+    } catch (error) {
+      console.error("Error fetching invoice items:", error);
+      res.status(500).json({ message: "Failed to fetch invoice items" });
+    }
+  });
+
+  // Ödeme ekle
+  app.post('/api/payments', isAuthenticated, async (req: any, res) => {
+    try {
+      const paymentData = insertPaymentSchema.parse({
+        ...req.body,
+        createdBy: req.session.user.id
+      });
+      
+      const [payment] = await db
+        .insert(payments)
+        .values(paymentData)
+        .returning();
+      
+      res.json(payment);
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      res.status(400).json({ message: "Failed to create payment" });
     }
   });
 

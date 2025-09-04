@@ -146,7 +146,12 @@ export const invoices = pgTable("invoices", {
   orderId: varchar("order_id").notNull().references(() => orders.id),
   customerId: varchar("customer_id").notNull().references(() => customers.id),
   status: varchar("status").notNull().default("draft"), // draft, pending, shipped, delivered, cancelled
-  shippingAddress: text("shipping_address").notNull(),
+  subtotalAmount: decimal("subtotal_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("20"), // KDV oranı %
+  description: text("description"), // Fatura açıklaması
+  shippingAddress: text("shipping_address"),
   trackingNumber: varchar("tracking_number"),
   notes: text("notes"),
   shippedAt: timestamp("shipped_at"),
@@ -206,6 +211,19 @@ export const accountTransactions = pgTable("account_transactions", {
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   description: text("description").notNull(),
   transactionDate: timestamp("transaction_date").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// İrsaliye detayları tablosu
+export const invoiceItems = pgTable("invoice_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceId: varchar("invoice_id").notNull().references(() => invoices.id, { onDelete: "cascade" }),
+  productId: varchar("product_id").notNull().references(() => products.id),
+  productName: varchar("product_name").notNull(), // Ürün adının kopyası (tarihsel veri için)
+  quantity: integer("quantity").notNull(),
+  unit: varchar("unit").notNull(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -297,6 +315,7 @@ export const invoicesRelations = relations(invoices, ({ one, many }) => ({
   }),
   payments: many(payments),
   accountTransactions: many(accountTransactions),
+  items: many(invoiceItems),
 }));
 
 export const paymentsRelations = relations(payments, ({ one }) => ({
@@ -326,6 +345,17 @@ export const accountTransactionsRelations = relations(accountTransactions, ({ on
   payment: one(payments, {
     fields: [accountTransactions.paymentId],
     references: [payments.id],
+  }),
+}));
+
+export const invoiceItemsRelations = relations(invoiceItems, ({ one }) => ({
+  invoice: one(invoices, {
+    fields: [invoiceItems.invoiceId],
+    references: [invoices.id],
+  }),
+  product: one(products, {
+    fields: [invoiceItems.productId],
+    references: [products.id],
   }),
 }));
 
@@ -409,6 +439,14 @@ export const insertAccountTransactionSchema = createInsertSchema(accountTransact
   amount: z.union([z.string(), z.number()]).transform(val => String(val)),
 });
 
+export const insertInvoiceItemSchema = createInsertSchema(invoiceItems).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  unitPrice: z.union([z.string(), z.number()]).transform(val => String(val)),
+  totalPrice: z.union([z.string(), z.number()]).transform(val => String(val)),
+});
+
 // Types
 export type UpsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -434,6 +472,8 @@ export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type Payment = typeof payments.$inferSelect;
 export type InsertAccountTransaction = z.infer<typeof insertAccountTransactionSchema>;
 export type AccountTransaction = typeof accountTransactions.$inferSelect;
+export type InsertInvoiceItem = z.infer<typeof insertInvoiceItemSchema>;
+export type InvoiceItem = typeof invoiceItems.$inferSelect;
 
 // Extended types for API responses
 export type OrderWithDetails = Order & {
@@ -460,4 +500,6 @@ export type AppointmentWithDetails = Appointment & {
 export type InvoiceWithDetails = Invoice & {
   order: Order;
   customer: Customer;
+  items?: (InvoiceItem & { product: Product })[];
+  payments?: Payment[];
 };
