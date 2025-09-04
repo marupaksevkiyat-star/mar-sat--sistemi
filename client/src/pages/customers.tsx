@@ -49,10 +49,17 @@ export default function Customers() {
 
   // Müşteri silme mutation
   const deleteCustomerMutation = useMutation({
-    mutationFn: (customerId: string) => 
-      fetch(`/api/customers/${customerId}`, {
+    mutationFn: async (customerId: string) => {
+      const response = await fetch(`/api/customers/${customerId}`, {
         method: 'DELETE',
-      }).then(res => res.json()),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/customers'] });
       toast({
@@ -60,7 +67,8 @@ export default function Customers() {
         description: "Müşteri silindi",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error('Delete customer error:', error);
       toast({
         title: "Hata",
         description: "Müşteri silinirken bir hata oluştu",
@@ -71,12 +79,19 @@ export default function Customers() {
 
   // Müşteri güncelleme mutation
   const updateCustomerMutation = useMutation({
-    mutationFn: (data: { id: string } & Partial<Customer>) =>
-      fetch(`/api/customers/${data.id}`, {
+    mutationFn: async (data: { id: string } & Partial<Customer>) => {
+      const response = await fetch(`/api/customers/${data.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-      }).then(res => res.json()),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/customers'] });
       setIsDialogOpen(false);
@@ -86,7 +101,8 @@ export default function Customers() {
         description: "Müşteri güncellendi",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error('Update customer error:', error);
       toast({
         title: "Hata",
         description: "Müşteri güncellenirken bir hata oluştu",
