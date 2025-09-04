@@ -19,12 +19,12 @@ export default function SalesReportsPage() {
     retry: false,
   });
 
-  const { data: topProducts } = useQuery({
+  const { data: topProducts = [] } = useQuery({
     queryKey: ["/api/reports/top-products", selectedPeriod, selectedDate],
     retry: false,
   });
 
-  const { data: salesByPerson } = useQuery({
+  const { data: salesByPerson = [] } = useQuery({
     queryKey: ["/api/reports/sales-by-person", selectedPeriod, selectedDate],
     retry: false,
   });
