@@ -8,7 +8,9 @@ import {
   insertOrderItemSchema,
   insertVisitSchema,
   insertAppointmentSchema,
-  insertInvoiceSchema
+  insertInvoiceSchema,
+  insertMailSettingSchema,
+  insertMailTemplateSchema
 } from "@shared/schema";
 import { z } from "zod";
 import session from "express-session";
@@ -611,6 +613,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Mail link error:', error);
       res.status(500).json({ message: 'E-posta linki oluşturulurken hata oluştu' });
+    }
+  });
+
+  // Mail Settings routes
+  app.get('/api/mail-settings/smtp', isAuthenticated, async (req: any, res) => {
+    try {
+      const setting = await storage.getMailSetting('smtp_settings');
+      if (setting) {
+        const smtpData = JSON.parse(setting.settingValue || '{}');
+        res.json(smtpData);
+      } else {
+        res.json({});
+      }
+    } catch (error) {
+      console.error('Error fetching SMTP settings:', error);
+      res.status(500).json({ message: 'Failed to fetch SMTP settings' });
+    }
+  });
+
+  app.post('/api/mail-settings/smtp', isAuthenticated, async (req: any, res) => {
+    try {
+      const settingData = {
+        settingName: 'smtp_settings',
+        settingValue: JSON.stringify(req.body),
+        isActive: true
+      };
+      await storage.setMailSetting(settingData);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error saving SMTP settings:', error);
+      res.status(500).json({ message: 'Failed to save SMTP settings' });
+    }
+  });
+
+  // Mail Templates routes
+  app.get('/api/mail-templates', isAuthenticated, async (req: any, res) => {
+    try {
+      const templates = await storage.getMailTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error('Error fetching mail templates:', error);
+      res.status(500).json({ message: 'Failed to fetch mail templates' });
+    }
+  });
+
+  app.get('/api/mail-templates/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const template = await storage.getMailTemplate(req.params.id);
+      if (!template) {
+        return res.status(404).json({ message: 'Template not found' });
+      }
+      res.json(template);
+    } catch (error) {
+      console.error('Error fetching mail template:', error);
+      res.status(500).json({ message: 'Failed to fetch mail template' });
+    }
+  });
+
+  app.post('/api/mail-templates', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertMailTemplateSchema.parse(req.body);
+      const template = await storage.createMailTemplate(validatedData);
+      res.json(template);
+    } catch (error) {
+      console.error('Error creating mail template:', error);
+      res.status(500).json({ message: 'Failed to create mail template' });
+    }
+  });
+
+  app.put('/api/mail-templates/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertMailTemplateSchema.partial().parse(req.body);
+      const template = await storage.updateMailTemplate(req.params.id, validatedData);
+      res.json(template);
+    } catch (error) {
+      console.error('Error updating mail template:', error);
+      res.status(500).json({ message: 'Failed to update mail template' });
+    }
+  });
+
+  app.delete('/api/mail-templates/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteMailTemplate(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting mail template:', error);
+      res.status(500).json({ message: 'Failed to delete mail template' });
     }
   });
 

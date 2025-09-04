@@ -7,6 +7,8 @@ import {
   visits,
   appointments,
   invoices,
+  mailSettings,
+  mailTemplates,
   type User,
   type UpsertUser,
   type InsertCustomer,
@@ -28,6 +30,10 @@ import {
   type InsertInvoice,
   type Invoice,
   type InvoiceWithDetails,
+  type InsertMailSetting,
+  type MailSetting,
+  type InsertMailTemplate,
+  type MailTemplate,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, sum, gte, lte } from "drizzle-orm";
@@ -87,6 +93,17 @@ export interface IStorage {
   // Recent activities
   getRecentOrders(limit?: number): Promise<OrderWithDetails[]>;
   getTodayAppointments(salesPersonId?: string): Promise<AppointmentWithDetails[]>;
+  
+  // Mail Settings operations
+  getMailSetting(settingName: string): Promise<MailSetting | undefined>;
+  setMailSetting(setting: InsertMailSetting): Promise<MailSetting>;
+  
+  // Mail Templates operations
+  getMailTemplates(): Promise<MailTemplate[]>;
+  getMailTemplate(id: string): Promise<MailTemplate | undefined>;
+  createMailTemplate(template: InsertMailTemplate): Promise<MailTemplate>;
+  updateMailTemplate(id: string, updates: Partial<InsertMailTemplate>): Promise<MailTemplate>;
+  deleteMailTemplate(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -687,6 +704,55 @@ export class DatabaseStorage implements IStorage {
       .where(eq(invoices.id, id))
       .returning();
     return invoice;
+  }
+
+  // Mail Settings operations
+  async getMailSetting(settingName: string): Promise<MailSetting | undefined> {
+    const [setting] = await db.select().from(mailSettings).where(eq(mailSettings.settingName, settingName));
+    return setting;
+  }
+
+  async setMailSetting(settingData: InsertMailSetting): Promise<MailSetting> {
+    const [setting] = await db
+      .insert(mailSettings)
+      .values(settingData)
+      .onConflictDoUpdate({
+        target: mailSettings.settingName,
+        set: {
+          ...settingData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return setting;
+  }
+
+  // Mail Templates operations
+  async getMailTemplates(): Promise<MailTemplate[]> {
+    return await db.select().from(mailTemplates).orderBy(desc(mailTemplates.createdAt));
+  }
+
+  async getMailTemplate(id: string): Promise<MailTemplate | undefined> {
+    const [template] = await db.select().from(mailTemplates).where(eq(mailTemplates.id, id));
+    return template;
+  }
+
+  async createMailTemplate(templateData: InsertMailTemplate): Promise<MailTemplate> {
+    const [template] = await db.insert(mailTemplates).values(templateData).returning();
+    return template;
+  }
+
+  async updateMailTemplate(id: string, updates: Partial<InsertMailTemplate>): Promise<MailTemplate> {
+    const [template] = await db
+      .update(mailTemplates)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(mailTemplates.id, id))
+      .returning();
+    return template;
+  }
+
+  async deleteMailTemplate(id: string): Promise<void> {
+    await db.delete(mailTemplates).where(eq(mailTemplates.id, id));
   }
 }
 

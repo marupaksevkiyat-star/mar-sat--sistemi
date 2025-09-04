@@ -14,6 +14,7 @@ import Production from "@/pages/production";
 import Shipping from "@/pages/shipping";
 import Admin from "@/pages/admin";
 import Orders from "@/pages/orders";
+import MailSettings from "@/pages/mail-settings";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -73,6 +74,9 @@ function Router() {
           </Route>
           <Route path="/invoices">
             <ProtectedRoute component={Invoices} requiredRole="admin" />
+          </Route>
+          <Route path="/mail-settings">
+            <ProtectedRoute component={MailSettings} requiredRole="admin" />
           </Route>
           <Route path="/admin">
             <ProtectedRoute component={Admin} requiredRole="admin" />
