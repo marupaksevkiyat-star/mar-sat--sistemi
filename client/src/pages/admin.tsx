@@ -453,6 +453,27 @@ export default function Admin() {
             </CardContent>
           </Card>
 
+          {/* Product Management */}
+          <Card 
+            className="hover:shadow-md transition-all cursor-pointer hover:scale-105" 
+            onClick={() => setActiveModal('products')}
+            data-testid="card-product-management"
+          >
+            <CardContent className="p-6">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <i className="fas fa-boxes text-purple-600 text-xl"></i>
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Ürün Yönetimi</h3>
+              <p className="text-sm text-muted-foreground mb-4">Ürün katalogu ve fiyat yönetimi</p>
+              <div className="flex items-center text-sm">
+                <span className="font-medium text-foreground" data-testid="text-total-products">
+                  {productStats.totalProducts}
+                </span>
+                <span className="text-muted-foreground ml-1">ürün çeşidi</span>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Permissions Management */}
           <Card 
             className="hover:shadow-md transition-all cursor-pointer hover:scale-105" 

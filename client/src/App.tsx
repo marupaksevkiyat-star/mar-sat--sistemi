@@ -90,8 +90,14 @@ function Router() {
           <Route path="/invoices">
             <ProtectedRoute component={Invoices} requiredRole="admin" />
           </Route>
+          <Route path="/mail-settings">
+            <ProtectedRoute component={MailSettings} requiredRole="admin" />
+          </Route>
           <Route path="/admin">
             <ProtectedRoute component={Admin} requiredRole="admin" />
+          </Route>
+          <Route path="/permissions">
+            <ProtectedRoute component={Permissions} requiredRole="admin" />
           </Route>
           <Route component={NotFound} />
         </>
