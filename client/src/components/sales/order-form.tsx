@@ -119,7 +119,7 @@ export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormPro
                     <SelectValue placeholder="Ürün seçin" />
                   </SelectTrigger>
                   <SelectContent>
-                    {products && (products as any[]).map((product: any) => (
+                    {products && Array.isArray(products) && products.map((product: any) => (
                       <SelectItem key={product.id} value={product.id}>
                         {product.name} - ₺{product.price?.toLocaleString()}
                       </SelectItem>
