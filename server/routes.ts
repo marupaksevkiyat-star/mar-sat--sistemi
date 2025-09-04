@@ -442,16 +442,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         salesPersonId: userId,
       };
       
-      // Prepare items for order creation
+      // Create order first to get orderId
+      const createdOrder = await storage.createOrder(orderData, []);
+      
+      // Prepare items for order creation with orderId
       const orderItems = Array.isArray(items) ? items.map((item: any) => ({
+        orderId: createdOrder.id,
         productId: item.productId,
         quantity: parseInt(item.quantity) || 1,
         unitPrice: item.unitPrice?.toString() || '0',
         totalPrice: item.totalPrice?.toString() || '0',
       })) : [];
       
-      // Create order with items
-      const createdOrder = await storage.createOrder(orderData, orderItems);
+      // Update order with items if any exist
+      if (orderItems.length > 0) {
+        await storage.updateOrderItems(createdOrder.id, orderItems);
+      }
       
       res.json({ success: true, order: createdOrder });
     } catch (error) {

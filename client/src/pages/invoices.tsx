@@ -61,10 +61,12 @@ export default function InvoicesPage() {
     console.log("Toplu faturalaştırma:", customer);
   };
 
-  const filteredCustomers = (deliveredOrdersByCustomer || []).filter((customer: CustomerData) => {
-    const companyName = customer.customer?.companyName?.toLowerCase() || '';
-    return companyName.includes(searchTerm.toLowerCase());
-  });
+  const filteredCustomers = Array.isArray(deliveredOrdersByCustomer) 
+    ? deliveredOrdersByCustomer.filter((customer: CustomerData) => {
+        const companyName = customer.customer?.companyName?.toLowerCase() || '';
+        return companyName.includes(searchTerm.toLowerCase());
+      })
+    : [];
 
   if (isLoading) {
     return (
