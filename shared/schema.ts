@@ -430,6 +430,12 @@ export const insertPaymentSchema = createInsertSchema(payments).omit({
   updatedAt: true,
 }).extend({
   amount: z.union([z.string(), z.number()]).transform(val => String(val)),
+  paymentDate: z.union([z.string(), z.date()]).transform(val => 
+    typeof val === 'string' ? new Date(val) : val
+  ),
+  dueDate: z.union([z.string(), z.date(), z.null()]).transform(val => 
+    val === null ? null : (typeof val === 'string' ? new Date(val) : val)
+  ).optional(),
 });
 
 export const insertAccountTransactionSchema = createInsertSchema(accountTransactions).omit({

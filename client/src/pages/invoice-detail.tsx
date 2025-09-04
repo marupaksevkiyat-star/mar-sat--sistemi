@@ -95,8 +95,8 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
         amount: parseFloat(paymentForm.amount),
         paymentMethod: paymentForm.paymentMethod,
         description: paymentForm.description,
-        paymentDate: new Date(paymentForm.paymentDate),
-        dueDate: new Date(paymentForm.paymentDate),
+        paymentDate: paymentForm.paymentDate,
+        dueDate: paymentForm.paymentDate,
         status: 'completed'
       };
       return await apiRequest('POST', '/api/payments', paymentData);
