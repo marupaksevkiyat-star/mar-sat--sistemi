@@ -594,6 +594,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // İrsaliye e-posta gönderme endpoint'i (mailto: link yaklaşımı)
+  app.post('/api/orders/send-invoice', isAuthenticated, async (req: any, res) => {
+    try {
+      const { to, subject, message, orderHtml } = req.body;
+      
+      // Basit mailto: link yaklaşımı kullanacağız
+      // Frontend'de window.open ile kullanıcının varsayılan e-posta uygulamasını açacağız
+      const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message || 'İrsaliye ektedir.')}`;
+      
+      res.json({ 
+        success: true, 
+        mailtoLink,
+        message: 'E-posta linki hazırlandı' 
+      });
+    } catch (error) {
+      console.error('Mail link error:', error);
+      res.status(500).json({ message: 'E-posta linki oluşturulurken hata oluştu' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

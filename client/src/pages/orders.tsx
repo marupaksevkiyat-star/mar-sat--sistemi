@@ -5,7 +5,9 @@ import Navigation from "@/components/layout/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { OrderWithDetails } from "@shared/schema";
+import InvoiceModal from "@/components/orders/invoice-modal";
 
 type OrderStatus = "pending" | "production" | "production_ready" | "shipping" | "delivered" | "cancelled";
 
@@ -63,6 +65,8 @@ const formatDate = (dateString: string | Date | null) => {
 export default function Orders() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<string>("all");
+  const [selectedOrder, setSelectedOrder] = useState<OrderWithDetails | null>(null);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   // Fetch all orders
   const { data: allOrders = [], isLoading, error } = useQuery<OrderWithDetails[]>({
@@ -250,6 +254,23 @@ export default function Orders() {
                             <p className="text-sm">{order.notes}</p>
                           </div>
                         )}
+                        
+                        {/* İrsaliye Butonu */}
+                        <div className="mt-4 pt-3 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setIsInvoiceModalOpen(true);
+                            }}
+                            className="w-full"
+                            data-testid={`button-invoice-${order.id}`}
+                          >
+                            <i className="fas fa-file-invoice mr-2"></i>
+                            İrsaliye Görüntüle / Yazdır
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -259,6 +280,18 @@ export default function Orders() {
           ))}
         </Tabs>
       </main>
+      
+      {/* İrsaliye Modal */}
+      {selectedOrder && (
+        <InvoiceModal
+          isOpen={isInvoiceModalOpen}
+          onClose={() => {
+            setIsInvoiceModalOpen(false);
+            setSelectedOrder(null);
+          }}
+          order={selectedOrder}
+        />
+      )}
     </div>
   );
 }
