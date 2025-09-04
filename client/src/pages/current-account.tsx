@@ -11,7 +11,69 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Building2, FileText, Receipt, Eye, Calendar, ArrowLeft, CreditCard, TrendingUp, AlertTriangle, Plus, DollarSign } from "lucide-react";
+import { Search, Building2, FileText, Receipt, Eye, Calendar, ArrowLeft, CreditCard, TrendingUp, AlertTriangle, Plus, DollarSign, Package } from "lucide-react";
+
+// İrsaliye Component'i
+const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
+  const { data: deliverySlips, isLoading } = useQuery<any[]>({
+    queryKey: [`/api/invoices/${invoiceId}/delivery-slips`],
+    enabled: !!invoiceId,
+    retry: false,
+  });
+
+  console.log("🚚 Modal irsaliye debug:", { invoiceId, isLoading, deliverySlips });
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-4">
+        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mx-auto mb-2"></div>
+        <p className="text-xs text-muted-foreground">İrsaliyeler yükleniyor...</p>
+      </div>
+    );
+  }
+
+  if (!deliverySlips || deliverySlips.length === 0) {
+    return (
+      <div className="text-center py-4 text-muted-foreground">
+        <Package className="w-6 h-6 mx-auto mb-2 opacity-50" />
+        <p className="text-sm">Bu faturaya ait irsaliye bulunamadı</p>
+      </div>
+    );
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('tr-TR', {
+      day: '2-digit',
+      month: '2-digit', 
+      year: 'numeric'
+    });
+  };
+
+  return (
+    <div className="space-y-3">
+      {deliverySlips.map((slip) => (
+        <div key={slip.id} className="border rounded-lg p-3 bg-muted/20">
+          <div className="flex justify-between items-start mb-2">
+            <div>
+              <p className="font-medium text-blue-600">{slip.deliverySlipNumber}</p>
+              <p className="text-xs text-muted-foreground">
+                Teslim: {formatDate(slip.deliveredAt)}
+              </p>
+            </div>
+            <Badge variant={slip.status === 'delivered' ? 'default' : 'secondary'} className="text-xs">
+              {slip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}
+            </Badge>
+          </div>
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p><strong>Şoför:</strong> {slip.driverName}</p>
+            <p><strong>Araç:</strong> {slip.vehiclePlate}</p>
+            {slip.notes && <p><strong>Not:</strong> {slip.notes}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 interface CustomerInvoice {
   id: string;
@@ -650,10 +712,13 @@ export default function CurrentAccountPage() {
                   </div>
                 )}
 
-                {/* Gelecekte: İrsaliye detayları, ödeme geçmişi vs. */}
-                <div className="text-center py-6 text-muted-foreground">
-                  <Calendar className="w-8 h-8 mx-auto mb-2" />
-                  <p>Ödeme geçmişi ve detaylı irsaliye bilgileri yakında eklenecek...</p>
+                {/* İrsaliye Bilgileri */}
+                <div>
+                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    <Package className="w-4 h-4" />
+                    İrsaliyeler
+                  </h3>
+                  <InvoiceDeliverySlips invoiceId={selectedInvoice.id} />
                 </div>
               </div>
             )}
