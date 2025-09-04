@@ -1280,28 +1280,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
           driverName: deliverySlips.driverName,
           vehiclePlate: deliverySlips.vehiclePlate,
           notes: deliverySlips.notes,
-          items: sql<any[]>`
-            SELECT json_agg(
-              json_build_object(
-                'productName', product_name,
-                'quantity', quantity,
-                'deliveredQuantity', delivered_quantity
-              )
-            )
-            FROM delivery_slip_items 
-            WHERE delivery_slip_id = ${deliverySlips.id}
-          `
         })
         .from(deliverySlips)
         .where(eq(deliverySlips.invoiceId, invoiceId));
 
       console.log("📦 Bulunan irsaliye sayısı:", deliverySlipList.length);
 
-      // Items alanını parse et
-      const processedSlips = deliverySlipList.map((slip: any) => ({
-        ...slip,
-        items: slip.items || []
-      }));
+      // Her irsaliye için kalemlerini ayrı ayrı getir
+      const processedSlips = await Promise.all(
+        deliverySlipList.map(async (slip: any) => {
+          const items = await db
+            .select({
+              id: deliverySlipItems.id,
+              productName: deliverySlipItems.productName,
+              quantity: deliverySlipItems.quantity,
+              deliveredQuantity: deliverySlipItems.deliveredQuantity,
+              unit: deliverySlipItems.unit,
+              notes: deliverySlipItems.notes,
+            })
+            .from(deliverySlipItems)
+            .where(eq(deliverySlipItems.deliverySlipId, slip.id));
+
+          return {
+            ...slip,
+            items: items || []
+          };
+        })
+      );
       
       console.log("✅ İşlenmiş irsaliye verisi:", processedSlips);
       res.json(processedSlips);
