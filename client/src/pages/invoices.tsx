@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { FileText, Search, Building2, Package, CheckCircle, Clock, ShoppingCart, Receipt } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -27,6 +28,7 @@ export default function InvoicesPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
 
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: deliveredOrdersByCustomer, isLoading } = useQuery({
     queryKey: ["/api/orders/delivered-by-customer"],
@@ -54,11 +56,40 @@ export default function InvoicesPage() {
     setSelectedCustomer(customer);
   };
 
+  // Toplu faturalaştırma mutation
+  const bulkInvoiceMutation = useMutation({
+    mutationFn: async (customer: CustomerData) => {
+      const orderIds = customer.orders.map(order => order.id);
+      return await apiRequest('POST', '/api/invoices/bulk', {
+        customerId: customer.customerId,
+        orderIds: orderIds,
+        shippingAddress: customer.orders[0]?.deliveryAddress || 'Adres belirtilmedi',
+        notes: `Toplu fatura - ${customer.customer.companyName} - ${customer.totalOrders} sipariş`
+      });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "🎉 Toplu Fatura Oluşturuldu!",
+        description: `Fatura No: ${data.invoiceNumber} - ${data.orderCount} sipariş birleştirildi`,
+      });
+      
+      // Cache'i güncelle
+      queryClient.invalidateQueries({ queryKey: ["/api/orders/delivered-by-customer"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "❌ Faturalama Hatası",
+        description: error.message || "Toplu fatura oluşturulamadı",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Toplu faturalaştırma
   const handleBulkInvoice = (customer: CustomerData) => {
-    // Bu fonksiyon birden fazla irsaliyeyi tek faturada birleştirip
-    // fatura numarası ve fatura görseli oluşturacak
-    console.log("Toplu faturalaştırma:", customer);
+    console.log("Toplu faturalama başlatılıyor:", customer);
+    bulkInvoiceMutation.mutate(customer);
   };
 
   const filteredCustomers = Array.isArray(deliveredOrdersByCustomer) 
@@ -181,10 +212,11 @@ export default function InvoicesPage() {
                     </CardTitle>
                     <Button 
                       onClick={() => handleBulkInvoice(selectedCustomer)}
-                      className="bg-green-600 hover:bg-green-700"
+                      disabled={bulkInvoiceMutation.isPending}
+                      className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
                     >
                       <FileText className="w-4 h-4 mr-2" />
-                      Toplu Faturalaştır
+                      {bulkInvoiceMutation.isPending ? "Faturalaştırılıyor..." : "Toplu Faturalaştır"}
                     </Button>
                   </div>
                 </CardHeader>

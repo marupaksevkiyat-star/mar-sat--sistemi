@@ -2,8 +2,8 @@ import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { orders } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { orders, invoices } from "@shared/schema";
+import { eq, and, inArray } from "drizzle-orm";
 import { 
   insertCustomerSchema, 
   insertProductSchema,
@@ -701,6 +701,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating invoice:", error);
       res.status(400).json({ message: "Failed to create invoice" });
+    }
+  });
+
+  // Toplu faturalama endpoint'i
+  app.post('/api/invoices/bulk', isAuthenticated, async (req: any, res) => {
+    try {
+      const { customerId, orderIds, shippingAddress, notes } = req.body;
+      
+      console.log("🧾 Toplu faturalama başlatılıyor:", { customerId, orderIds: orderIds?.length });
+      
+      if (!customerId || !Array.isArray(orderIds) || orderIds.length === 0) {
+        return res.status(400).json({ message: "customerId ve orderIds gerekli" });
+      }
+
+      // Müşteri siparişlerini kontrol et
+      const customerOrders = await db
+        .select()
+        .from(orders)
+        .where(
+          and(
+            eq(orders.customerId, customerId),
+            eq(orders.status, 'delivered'),
+            inArray(orders.id, orderIds)
+          )
+        );
+
+      if (customerOrders.length === 0) {
+        return res.status(400).json({ message: "Bu müşteriye ait teslim edilmiş sipariş bulunamadı" });
+      }
+
+      console.log("✅ Bulundu:", customerOrders.length, "teslim edilmiş sipariş");
+
+      // Toplam tutarı hesapla
+      const totalAmount = customerOrders.reduce((sum, order) => sum + parseFloat(order.totalAmount), 0);
+
+      // Fatura numarası oluştur (toplu faturalar için özel format)
+      const timestamp = new Date();
+      const dateStr = timestamp.toISOString().slice(0, 10).replace(/-/g, '');
+      const timeStr = timestamp.toISOString().slice(11, 19).replace(/:/g, '');
+      const bulkInvoiceNumber = `BULK-${dateStr}-${timeStr}`;
+
+      console.log("💰 Toplam tutar:", totalAmount, "TL");
+      console.log("📋 Fatura numarası:", bulkInvoiceNumber);
+
+      // İlk sipariş referans olarak alınır (aslında birden fazla siparişi temsil eder)
+      const referenceOrder = customerOrders[0];
+
+      // Toplu fatura oluştur
+      const bulkInvoice = {
+        orderId: referenceOrder.id, // Referans sipariş
+        customerId: customerId,
+        status: 'generated',
+        shippingAddress: shippingAddress || referenceOrder.deliveryAddress || 'Adres belirtilmedi',
+        notes: notes || `Toplu fatura - ${customerOrders.length} sipariş birleştirildi: ${orderIds.join(', ')}`,
+        invoiceNumber: bulkInvoiceNumber
+      };
+
+      // Database'e kaydet
+      const [savedInvoice] = await db
+        .insert(invoices)
+        .values(bulkInvoice)
+        .returning();
+
+      console.log("🎉 Toplu fatura oluşturuldu:", savedInvoice.invoiceNumber);
+
+      // Response data
+      const response = {
+        ...savedInvoice,
+        orderCount: customerOrders.length,
+        totalAmount: totalAmount,
+        orderIds: orderIds,
+        orders: customerOrders
+      };
+
+      res.json(response);
+
+    } catch (error) {
+      console.error("❌ Toplu faturalama hatası:", error);
+      res.status(500).json({ message: "Toplu faturalama başarısız: " + error.message });
     }
   });
 
