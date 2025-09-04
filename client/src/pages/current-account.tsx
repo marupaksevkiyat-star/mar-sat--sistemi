@@ -382,7 +382,14 @@ export default function CurrentAccountPage() {
                       </div>
                       <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded">
                         <div className="text-2xl font-bold text-orange-600">
-                          {formatCurrency(customerInvoices[selectedCustomer]?.totalAmount || 0)}
+                          {(() => {
+                            const totalInvoices = customerInvoices[selectedCustomer]?.totalAmount || 0;
+                            const totalPayments = (customerPayments && Array.isArray(customerPayments)) 
+                              ? customerPayments.reduce((sum: number, payment: any) => sum + parseFloat(payment.amount), 0)
+                              : 0;
+                            const balance = totalInvoices - totalPayments;
+                            return formatCurrency(Math.max(0, balance)); // Negative bakiye gösterme
+                          })()}
                         </div>
                         <div className="text-sm text-muted-foreground">Borç Bakiyesi</div>
                       </div>
