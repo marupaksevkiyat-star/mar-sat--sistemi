@@ -143,7 +143,7 @@ const PAGES_WITH_ACTIONS = [
 ];
 
 // Varsayılan yetki matrisi - her sayfa için ayrı ayrı yetkiler
-const DEFAULT_PERMISSIONS = {
+const DEFAULT_PERMISSIONS: Record<string, Record<string, string[]>> = {
   admin: {
     dashboard: ['read', 'export'],
     orders: ['create', 'read', 'update', 'delete', 'approve', 'export'],
@@ -181,7 +181,7 @@ const DEFAULT_PERMISSIONS = {
 export default function Permissions() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
-  const [permissions, setPermissions] = useState(DEFAULT_PERMISSIONS);
+  const [permissions, setPermissions] = useState<Record<string, Record<string, string[]>>>(DEFAULT_PERMISSIONS);
   const [hasChanges, setHasChanges] = useState(false);
   const [expandedRoles, setExpandedRoles] = useState<string[]>([]);
 
@@ -372,7 +372,7 @@ export default function Permissions() {
                             {getPagePermissionCount(role.id)} sayfa
                           </Badge>
                           <Badge variant="secondary">
-                            {Object.values(permissions[role.id] || {}).flat().length} yetki
+                            {Object.values(permissions[role.id] || {}).reduce((acc: number, actions: string[]) => acc + actions.length, 0)} yetki
                           </Badge>
                         </div>
                       </div>
