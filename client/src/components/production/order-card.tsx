@@ -76,7 +76,7 @@ export default function OrderCard({
     updatedItems[index] = {
       ...updatedItems[index],
       quantity,
-      totalPrice: quantity * parseFloat(updatedItems[index].unitPrice),
+      totalPrice: String(quantity * parseFloat(updatedItems[index].unitPrice)),
     };
     setItems(updatedItems);
   };
@@ -92,7 +92,7 @@ export default function OrderCard({
       product: selectedProduct,
       quantity: 1,
       unitPrice: selectedProduct.price,
-      totalPrice: parseFloat(selectedProduct.price),
+      totalPrice: String(parseFloat(selectedProduct.price)),
       orderId: order.id
     };
 
