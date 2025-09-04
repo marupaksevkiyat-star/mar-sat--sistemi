@@ -13,6 +13,7 @@ import Invoices from "@/pages/invoices";
 import Production from "@/pages/production";
 import Shipping from "@/pages/shipping";
 import Admin from "@/pages/admin";
+import Orders from "@/pages/orders";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -57,6 +58,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
+          <Route path="/orders" component={Orders} />
           <Route path="/sales">
             <ProtectedRoute component={Sales} requiredRole="sales" />
           </Route>
