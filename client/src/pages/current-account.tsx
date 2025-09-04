@@ -81,6 +81,12 @@ export default function CurrentAccountPage() {
       return acc;
     }, {}) : {};
 
+  // Tüm müşterilerin ödemelerini getir
+  const { data: allPayments } = useQuery({
+    queryKey: ["/api/payments"],
+    retry: false,
+  });
+
   // Seçili müşterinin gerçek ID'sini al
   const selectedCustomerId = selectedCustomer ? customerInvoices[selectedCustomer]?.customer?.id : null;
 
@@ -166,6 +172,34 @@ export default function CurrentAccountPage() {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('tr-TR');
+  };
+
+  // Müşteri cari hesap durumlarını hesapla
+  const getCustomerAccountStatus = (companyName: string, customerData: any) => {
+    const customerId = customerData.customer?.id;
+    const totalInvoices = customerData.totalAmount || 0;
+    
+    // Bu müşterinin ödemelerini filtrele
+    const customerPayments = (allPayments && Array.isArray(allPayments)) 
+      ? allPayments.filter((payment: any) => payment.customerId === customerId)
+      : [];
+    
+    const totalPayments = customerPayments.reduce((sum: number, payment: any) => 
+      sum + parseFloat(payment.amount || '0'), 0
+    );
+    
+    const balance = totalInvoices - totalPayments;
+    const lastPayment = customerPayments.length > 0 
+      ? customerPayments.sort((a: any, b: any) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())[0]
+      : null;
+    
+    return {
+      totalInvoices,
+      totalPayments,
+      balance: Math.max(0, balance),
+      lastPayment,
+      paymentCount: customerPayments.length
+    };
   };
 
   console.log("📊 Grouped customer invoices:", customerInvoices);
@@ -256,34 +290,66 @@ export default function CurrentAccountPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {/* Firma Özeti */}
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Fatura Sayısı:</span>
-                          <div className="font-semibold text-lg">{data.invoiceCount} adet</div>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Toplam Tutar:</span>
-                          <div className="font-semibold text-lg text-green-600">
-                            {formatCurrency(data.totalAmount)}
+                    {(() => {
+                      const accountStatus = getCustomerAccountStatus(companyName, data);
+                      return (
+                        <div className="space-y-4">
+                          {/* Cari Hesap Özeti */}
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Fatura Sayısı:</span>
+                              <div className="font-semibold text-lg">{data.invoiceCount} adet</div>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Toplam Satış:</span>
+                              <div className="font-semibold text-lg text-green-600">
+                                {formatCurrency(accountStatus.totalInvoices)}
+                              </div>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Toplam Ödeme:</span>
+                              <div className="font-semibold text-lg text-blue-600">
+                                {formatCurrency(accountStatus.totalPayments)}
+                              </div>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Borç Bakiyesi:</span>
+                              <div className={`font-semibold text-lg ${
+                                accountStatus.balance > 0 ? 'text-orange-600' : 'text-green-600'
+                              }`}>
+                                {formatCurrency(accountStatus.balance)}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
 
-                      {/* Son Fatura Bilgisi */}
-                      {data.invoices.length > 0 && (
-                        <div className="pt-2 border-t">
-                          <div className="text-xs text-muted-foreground">Son Fatura:</div>
-                          <div className="font-medium text-sm">
-                            {data.invoices[data.invoices.length - 1].invoiceNumber}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {formatDate(data.invoices[data.invoices.length - 1].createdAt)}
+                          {/* Son Ödeme ve Fatura Bilgisi */}
+                          <div className="pt-2 border-t space-y-2">
+                            {accountStatus.lastPayment && (
+                              <div>
+                                <div className="text-xs text-muted-foreground">Son Ödeme:</div>
+                                <div className="font-medium text-sm text-green-600">
+                                  {formatCurrency(parseFloat(accountStatus.lastPayment.amount))} 
+                                  <span className="text-muted-foreground ml-1">
+                                    ({formatDate(accountStatus.lastPayment.paymentDate)})
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                            {data.invoices.length > 0 && (
+                              <div>
+                                <div className="text-xs text-muted-foreground">Son Fatura:</div>
+                                <div className="font-medium text-sm">
+                                  {data.invoices[data.invoices.length - 1].invoiceNumber}
+                                  <span className="text-muted-foreground ml-1">
+                                    ({formatDate(data.invoices[data.invoices.length - 1].createdAt)})
+                                  </span>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
-                      )}
-                    </div>
+                      );
+                    })()}
                   </CardContent>
                 </Card>
               ))
