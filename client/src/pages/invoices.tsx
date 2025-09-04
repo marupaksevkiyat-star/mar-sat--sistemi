@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Search, Building2, Package, CheckCircle, Clock, ShoppingCart, Receipt, ArrowLeft } from "lucide-react";
+import { FileText, Search, Building2, Package, CheckCircle, Clock, ShoppingCart, Receipt, ArrowLeft, Eye } from "lucide-react";
+import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 
 interface CustomerData {
@@ -54,6 +55,7 @@ export default function InvoicesPage() {
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const { data: deliveredOrdersByCustomer, isLoading } = useQuery({
     queryKey: ["/api/orders/delivered-by-customer"],
@@ -542,6 +544,16 @@ export default function InvoicesPage() {
                             <div className="text-right">
                               <div className="text-sm text-muted-foreground">Müşteri</div>
                               <div className="font-medium">{invoice.customer?.companyName || 'Bilinmiyor'}</div>
+                              <div className="mt-3">
+                                <Button 
+                                  size="sm" 
+                                  onClick={() => setLocation(`/invoices/${invoice.id}`)}
+                                  className="flex items-center gap-1"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                  Detay
+                                </Button>
+                              </div>
                             </div>
                           </div>
                           
