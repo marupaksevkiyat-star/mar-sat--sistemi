@@ -889,7 +889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Akıllı toplu faturalama - aynı ürünleri toplar ve KDV hesaplar
   app.post('/api/invoices/bulk-smart', isAuthenticated, async (req: any, res) => {
     try {
-      const { customerId, orderIds, selectedOrders, vatRate = 20 } = req.body;
+      const { customerId, orderIds, selectedOrders, vatRate = 20, customInvoiceNumber } = req.body;
       
       console.log("🧾 Akıllı toplu faturalama:", { customerId, orderCount: orderIds?.length });
       
@@ -946,11 +946,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         toplam: totalWithKdv.toFixed(2) 
       });
 
-      // Fatura numarası oluştur
-      const timestamp = new Date();
-      const dateStr = timestamp.toISOString().slice(0, 10).replace(/-/g, '');
-      const timeStr = timestamp.toISOString().slice(11, 19).replace(/:/g, '');
-      const smartInvoiceNumber = `SMART-${dateStr}-${timeStr}`;
+      // Fatura numarası oluştur - custom veya otomatik
+      let finalInvoiceNumber;
+      if (customInvoiceNumber && customInvoiceNumber.trim()) {
+        finalInvoiceNumber = customInvoiceNumber.trim();
+        console.log("📋 Manuel fatura numarası kullanılıyor:", finalInvoiceNumber);
+      } else {
+        const timestamp = new Date();
+        const dateStr = timestamp.toISOString().slice(0, 10).replace(/-/g, '');
+        const timeStr = timestamp.toISOString().slice(11, 19).replace(/:/g, '');
+        finalInvoiceNumber = `SMART-${dateStr}-${timeStr}`;
+        console.log("🔄 Otomatik fatura numarası oluşturuldu:", finalInvoiceNumber);
+      }
 
       // Fatura detaylarını notes'a ekle
       const invoiceDetails = {
@@ -970,7 +977,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'generated',
         shippingAddress: selectedOrders[0]?.deliveryAddress || 'Adres belirtilmedi',
         notes: `Akıllı toplu fatura - ${orderIds.length} sipariş - ${groupedProducts.length} ürün grubu - %${vatRate} KDV dahil: ${totalWithKdv.toFixed(2)} TL`,
-        invoiceNumber: smartInvoiceNumber
+        invoiceNumber: finalInvoiceNumber
       };
 
       // Database'e kaydet

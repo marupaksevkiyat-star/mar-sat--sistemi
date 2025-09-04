@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { FileText, Search, Building2, Package, CheckCircle, Clock, ShoppingCart, Receipt, ArrowLeft } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
@@ -48,6 +49,8 @@ export default function InvoicesPage() {
   const [showAccountDetails, setShowAccountDetails] = useState(false);
   const [accountDetails, setAccountDetails] = useState<any>(null);
   const [selectedVatRate, setSelectedVatRate] = useState<number>(20); // Varsayılan %20
+  const [customInvoiceNumber, setCustomInvoiceNumber] = useState<string>(''); // Manuel fatura numarası
+  const [showInvoicePreview, setShowInvoicePreview] = useState(false); // Fatura önizleme
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -119,7 +122,8 @@ export default function InvoicesPage() {
         customerId: selectedCustomer.customerId,
         orderIds: selectedInvoices,
         selectedOrders: selectedOrders,
-        vatRate: selectedVatRate
+        vatRate: selectedVatRate,
+        customInvoiceNumber: customInvoiceNumber
       });
     },
     onSuccess: (data) => {
@@ -284,15 +288,35 @@ export default function InvoicesPage() {
                         </select>
                       </div>
                       
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">Fatura No:</label>
+                        <Input 
+                          value={customInvoiceNumber}
+                          onChange={(e) => setCustomInvoiceNumber(e.target.value)}
+                          placeholder="Otomatik oluşturulacak"
+                          className="w-40 h-8 text-sm"
+                        />
+                      </div>
+                      
                       {selectedInvoices.length > 0 && (
-                        <Button 
-                          onClick={processSelectedInvoices}
-                          disabled={bulkInvoiceMutation.isPending}
-                          className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
-                        >
-                          <FileText className="w-4 h-4 mr-2" />
-                          {bulkInvoiceMutation.isPending ? "Faturalaştırılıyor..." : `${selectedInvoices.length} İrsaliyeyi Faturalaştır`}
-                        </Button>
+                        <>
+                          <Button 
+                            onClick={() => setShowInvoicePreview(true)}
+                            variant="outline"
+                            className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                          >
+                            <FileText className="w-4 h-4 mr-2" />
+                            Fatura Önizleme
+                          </Button>
+                          <Button 
+                            onClick={processSelectedInvoices}
+                            disabled={bulkInvoiceMutation.isPending}
+                            className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                          >
+                            <FileText className="w-4 h-4 mr-2" />
+                            {bulkInvoiceMutation.isPending ? "Faturalaştırılıyor..." : `${selectedInvoices.length} İrsaliyeyi Faturalaştır`}
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -539,6 +563,150 @@ export default function InvoicesPage() {
             )}
           </div>
         </div>
+        
+        {/* FATURA ÖNİZLEME MODAL */}
+        <Dialog open={showInvoicePreview} onOpenChange={setShowInvoicePreview}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Fatura Önizleme</DialogTitle>
+            </DialogHeader>
+            
+            <div className="fatura-container bg-white text-black p-8 border">
+              {/* FATURA BAŞLIGI */}
+              <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold mb-2">FATURA</h1>
+                <div className="text-lg">
+                  Fatura No: <span className="font-bold">{customInvoiceNumber || 'Otomatik oluşturulacak'}</span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  Tarih: {new Date().toLocaleDateString('tr-TR')}
+                </div>
+              </div>
+
+              {/* FİRMA BİLGİLERİ */}
+              <div className="grid grid-cols-2 gap-8 mb-8">
+                <div>
+                  <h3 className="font-bold text-lg mb-2">SATICI:</h3>
+                  <div className="text-sm">
+                    <div className="font-semibold">ŞİRKET ADI</div>
+                    <div>Adres: İş Merkezi, Kat 5</div>
+                    <div>Tel: 0212 555 0000</div>
+                    <div>Vergi No: 1234567890</div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg mb-2">ALICI:</h3>
+                  <div className="text-sm">
+                    <div className="font-semibold">{selectedCustomer?.customer?.companyName}</div>
+                    <div>Tel: {selectedCustomer?.customer?.phone || '-'}</div>
+                    <div>E-posta: {selectedCustomer?.customer?.email || '-'}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ÜRÜN LİSTESİ */}
+              <div className="mb-8">
+                <table className="w-full border-collapse border border-gray-400">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border border-gray-400 p-2 text-left">Ürün Adı</th>
+                      <th className="border border-gray-400 p-2 text-center">Miktar</th>
+                      <th className="border border-gray-400 p-2 text-center">Birim</th>
+                      <th className="border border-gray-400 p-2 text-right">Birim Fiyat</th>
+                      <th className="border border-gray-400 p-2 text-right">Toplam</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {customerAccountDetails?.pendingInvoices
+                      ?.filter((invoice: any) => selectedInvoices.includes(invoice.orderId))
+                      ?.flatMap((invoice: any) => invoice.items || [])
+                      ?.reduce((acc: any[], item: any) => {
+                        // Aynı ürünleri grupla
+                        const existing = acc.find(x => x.productId === item.productId);
+                        if (existing) {
+                          existing.quantity += item.quantity;
+                          existing.totalPrice += parseFloat(item.totalPrice);
+                        } else {
+                          acc.push({
+                            productId: item.productId,
+                            productName: item.productName,
+                            quantity: item.quantity,
+                            unit: item.unit,
+                            unitPrice: parseFloat(item.unitPrice),
+                            totalPrice: parseFloat(item.totalPrice)
+                          });
+                        }
+                        return acc;
+                      }, [])
+                      ?.map((item: any, index: number) => (
+                        <tr key={index}>
+                          <td className="border border-gray-400 p-2">{item.productName}</td>
+                          <td className="border border-gray-400 p-2 text-center">{item.quantity}</td>
+                          <td className="border border-gray-400 p-2 text-center">{item.unit}</td>
+                          <td className="border border-gray-400 p-2 text-right">{formatCurrency(item.unitPrice)}</td>
+                          <td className="border border-gray-400 p-2 text-right">{formatCurrency(item.totalPrice)}</td>
+                        </tr>
+                      ))
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              {/* TOPLAM HESAPLAMALAR */}
+              {(() => {
+                const subtotal = customerAccountDetails?.pendingInvoices
+                  ?.filter((invoice: any) => selectedInvoices.includes(invoice.orderId))
+                  ?.reduce((sum: number, invoice: any) => sum + parseFloat(invoice.totalAmount), 0) || 0;
+                const kdvAmount = subtotal * (selectedVatRate / 100);
+                const total = subtotal + kdvAmount;
+
+                return (
+                  <div className="flex justify-end">
+                    <div className="w-64">
+                      <div className="flex justify-between py-1">
+                        <span>Ara Toplam:</span>
+                        <span className="font-semibold">{formatCurrency(subtotal)}</span>
+                      </div>
+                      <div className="flex justify-between py-1">
+                        <span>KDV (%{selectedVatRate}):</span>
+                        <span className="font-semibold">{formatCurrency(kdvAmount)}</span>
+                      </div>
+                      <hr className="my-2" />
+                      <div className="flex justify-between py-2 text-lg font-bold">
+                        <span>GENEL TOPLAM:</span>
+                        <span>{formatCurrency(total)}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ALT BİLGİLER */}
+              <div className="mt-8 text-sm text-gray-600">
+                <div>• Bu fatura {selectedInvoices.length} adet irsaliyenin birleştirilmesiyle oluşturulmuştur.</div>
+                <div>• KDV oranı: %{selectedVatRate}</div>
+                <div>• Fatura tarihi: {new Date().toLocaleDateString('tr-TR')}</div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 mt-4">
+              <Button variant="outline" onClick={() => setShowInvoicePreview(false)}>
+                Kapat
+              </Button>
+              <Button 
+                onClick={() => {
+                  setShowInvoicePreview(false);
+                  processSelectedInvoices();
+                }}
+                className="bg-green-600 hover:bg-green-700"
+                disabled={bulkInvoiceMutation.isPending}
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Faturayı Oluştur
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
