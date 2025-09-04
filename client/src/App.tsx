@@ -40,6 +40,9 @@ function Router() {
     if (requiredRole === 'admin') {
       return userRole === 'admin' || userRole === 'Admin';
     }
+    if (requiredRole === 'accounting') {
+      return userRole === 'accounting' || userRole.includes('Muhasebe');
+    }
     
     return false;
   };
@@ -88,7 +91,7 @@ function Router() {
             <ProtectedRoute component={SalesReports} requiredRole="admin" />
           </Route>
           <Route path="/invoices">
-            <ProtectedRoute component={Invoices} requiredRole="admin" />
+            <ProtectedRoute component={Invoices} requiredRole="accounting" />
           </Route>
           <Route path="/mail-settings">
             <ProtectedRoute component={MailSettings} requiredRole="admin" />
