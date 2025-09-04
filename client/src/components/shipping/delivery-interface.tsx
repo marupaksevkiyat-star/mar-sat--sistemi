@@ -79,16 +79,10 @@ export default function DeliveryInterface({
                       <p className="font-medium text-sm text-foreground">
                         {item.product?.name || item.productName || 'Bilinmeyen Ürün'}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {item.product?.description || item.notes || ''}
-                      </p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-sm text-foreground">
                         {item.quantity} {item.unit || 'adet'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {item.unitPrice ? `${parseFloat(item.unitPrice).toFixed(2)} TL` : ''}
                       </p>
                     </div>
                   </div>
@@ -100,16 +94,6 @@ export default function DeliveryInterface({
                   </p>
                 </div>
               )}
-            </div>
-            <div className="mt-3 pt-3 border-t border-border">
-              <div className="flex justify-between items-center">
-                <span className="font-medium text-sm text-foreground">
-                  Toplam Tutar:
-                </span>
-                <span className="font-bold text-foreground">
-                  {activeDelivery.totalAmount ? `${parseFloat(activeDelivery.totalAmount).toFixed(2)} TL` : 'Hesaplanıyor...'}
-                </span>
-              </div>
             </div>
           </div>
           
