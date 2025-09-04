@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/layout/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,6 +42,52 @@ const getStatusBadge = (status: string) => {
   const config = statusMap[status] || { label: status, variant: "outline" as const };
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };
+
+// Mail gönderme component'i
+function SendDeliveryEmailButton({ orderId, customerEmail }: { orderId: string; customerEmail: string }) {
+  const { toast } = useToast();
+
+  const sendEmailMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/orders/${orderId}/send-delivery-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to send email');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "✅ Mail Gönderildi",
+        description: `Teslim bildirimi ${customerEmail} adresine gönderildi`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "❌ Mail Gönderilemedi", 
+        description: error.message || "Mail gönderirken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
+  return (
+    <Button
+      variant="default"
+      size="sm"
+      onClick={() => sendEmailMutation.mutate()}
+      disabled={sendEmailMutation.isPending}
+      className="w-full bg-green-600 hover:bg-green-700"
+      data-testid={`button-send-email-${orderId}`}
+    >
+      <i className={`fas ${sendEmailMutation.isPending ? 'fa-spinner fa-spin' : 'fa-envelope'} mr-2`}></i>
+      {sendEmailMutation.isPending ? 'Gönderiliyor...' : 'Teslim Maili Gönder'}
+    </Button>
+  );
+}
 
 const formatCurrency = (amount: string | number) => {
   const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -255,8 +302,8 @@ export default function Orders() {
                           </div>
                         )}
                         
-                        {/* İrsaliye Butonu */}
-                        <div className="mt-4 pt-3 border-t">
+                        {/* Aksiyon Butonları */}
+                        <div className="mt-4 pt-3 border-t space-y-2">
                           <Button
                             variant="outline"
                             size="sm"
@@ -270,6 +317,11 @@ export default function Orders() {
                             <i className="fas fa-file-invoice mr-2"></i>
                             İrsaliye Görüntüle / Yazdır
                           </Button>
+                          
+                          {/* Mail Gönderme Butonu - Sadece teslim edilmiş siparişler için */}
+                          {order.status === 'delivered' && order.customer.email && (
+                            <SendDeliveryEmailButton orderId={order.id} customerEmail={order.customer.email} />
+                          )}
                         </div>
                       </CardContent>
                     </Card>
