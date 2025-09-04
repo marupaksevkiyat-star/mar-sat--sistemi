@@ -42,169 +42,96 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       // Türkçe karakter desteği için encoding ayarı
       pdf.setFont("helvetica");
       
-      // Üst başlık bölümü - firma bilgileri
-      pdf.setLineWidth(1);
-      pdf.rect(10, 10, pageWidth - 20, 50);
+      let yPos = 20;
       
-      // Sol taraf - Logo ve firma bilgileri
-      pdf.setFontSize(18);
+      // Sol üst - Müşteri Bilgileri
+      pdf.setFontSize(12);
       pdf.setFont(undefined, 'bold');
-      pdf.text('MARUPAK', 15, 25);
+      pdf.text('Musteri Bilgileri', 20, yPos);
       
-      pdf.setFontSize(9);
+      pdf.setFontSize(10);
       pdf.setFont(undefined, 'normal');
-      pdf.text('Turkoba Mah.Eski Catalaca Yolu Cad.No:5', 15, 32);
-      pdf.text('Buyukcekmece/Istanbul', 15, 38);
-      pdf.text('Tel: 0850 345 84 90', 15, 44);
-      pdf.text('www.marupak.com', 15, 50);
+      yPos += 10;
+      pdf.text('Firma: [Musteri Firma Adi]', 20, yPos);
+      yPos += 8;
+      pdf.text('E-posta: [Musteri Email]', 20, yPos);
+      yPos += 8;
+      pdf.text('Telefon: [Musteri Telefon]', 20, yPos);
       
-      // Orta - Teslim Fişi başlığı
+      // Orta - Teslim Fişi Başlığı
       pdf.setFontSize(16);
       pdf.setFont(undefined, 'bold');
       const centerX = pageWidth / 2;
-      pdf.text('TESLIM FISI', centerX - 20, 30);
-      pdf.setFontSize(10);
-      pdf.setFont(undefined, 'normal');
-      pdf.text(`${formatDate(slip.deliveredAt)}`, centerX - 15, 40);
+      pdf.text('TESLIM FISI', centerX - 20, 25);
       
-      // Sağ taraf - Teslim edilecek firma bilgileri
-      pdf.setFontSize(10);
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(`NO:${slip.deliverySlipNumber.split('-').pop()}`, centerX - 15, 35);
+      
+      yPos = 70;
+      
+      // Ürün tablosu başlığı
+      pdf.setFontSize(14);
       pdf.setFont(undefined, 'bold');
-      pdf.text('TESLIM EDILECEK FIRMA:', pageWidth - 80, 25);
-      pdf.setFont(undefined, 'normal');
-      pdf.setFontSize(9);
-      pdf.text('[Musteri Firma Adi]', pageWidth - 80, 32);
-      pdf.text('[Musteri Adresi]', pageWidth - 80, 38);
-      pdf.text('[Telefon]', pageWidth - 80, 44);
-      pdf.text('[Email]', pageWidth - 80, 50);
+      const tableHeaderY = yPos;
+      pdf.text('Malzemenin Adi', 50, tableHeaderY);
+      pdf.text('Adet', 150, tableHeaderY);
       
-      let yPos = 75;
+      // Alt çizgi
+      pdf.setLineWidth(0.5);
+      pdf.line(20, tableHeaderY + 2, pageWidth - 20, tableHeaderY + 2);
       
-      // Ürün tablosu - header
-      const tableStartY = yPos;
-      const colWidths = [70, 30, 30, 30, 30]; // Açıklama, Miktar, Fiyat, Toplam
-      const colX = [15, 85, 115, 145, 175];
+      yPos += 15;
       
-      // Tablo başlık satırı - mavi arka plan
-      pdf.setFillColor(70, 130, 180);
-      pdf.rect(10, tableStartY, pageWidth - 20, 10, 'F');
-      
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(9);
-      pdf.setFont(undefined, 'bold');
-      pdf.text('Aciklama', colX[0], tableStartY + 7);
-      pdf.text('Miktar', colX[1], tableStartY + 7);
-      pdf.text('Birim', colX[2], tableStartY + 7);
-      pdf.text('Fiyat', colX[3], tableStartY + 7);
-      pdf.text('Toplam', colX[4], tableStartY + 7);
-      
-      // Sıfırla renkleri
-      pdf.setTextColor(0, 0, 0);
+      // Ürün listesi
+      pdf.setFontSize(11);
       pdf.setFont(undefined, 'normal');
       
-      yPos = tableStartY + 10;
-      
-      // Ürün satırları
       if (slip.items && slip.items.length > 0) {
-        slip.items.forEach((item: any, index: number) => {
-          const rowHeight = 15;
-          
-          // Satır çerçevesi
-          pdf.setLineWidth(0.3);
-          pdf.rect(10, yPos, pageWidth - 20, rowHeight);
-          
-          // Dikey çizgiler
-          pdf.line(colX[1] - 5, yPos, colX[1] - 5, yPos + rowHeight);
-          pdf.line(colX[2] - 5, yPos, colX[2] - 5, yPos + rowHeight);
-          pdf.line(colX[3] - 5, yPos, colX[3] - 5, yPos + rowHeight);
-          pdf.line(colX[4] - 5, yPos, colX[4] - 5, yPos + rowHeight);
-          
-          // Ürün bilgileri
-          pdf.setFontSize(9);
-          pdf.text(item.productName || 'Urun', colX[0], yPos + 10);
-          pdf.text(String(item.deliveredQuantity || '0'), colX[1], yPos + 10);
-          pdf.text(item.unit || 'Adet', colX[2], yPos + 10);
-          pdf.text('0.00', colX[3], yPos + 10); // Fiyat
-          pdf.text('0.00', colX[4], yPos + 10); // Toplam
-          
-          yPos += rowHeight;
+        slip.items.forEach((item: any) => {
+          const productText = `${item.productName} (${item.unit})`;
+          pdf.text(productText, 50, yPos);
+          pdf.text(String(item.deliveredQuantity || '0'), 150, yPos);
+          yPos += 12;
         });
       }
       
-      // Boş satırlar ekle (toplam 15 satır olsun)
-      const maxRows = 15;
+      // Boş satırlar ekle (estetik görünüm için)
       const currentRows = slip.items?.length || 0;
-      for (let i = currentRows; i < maxRows; i++) {
-        const rowHeight = 15;
-        pdf.setLineWidth(0.3);
-        pdf.rect(10, yPos, pageWidth - 20, rowHeight);
-        
-        // Dikey çizgiler
-        pdf.line(colX[1] - 5, yPos, colX[1] - 5, yPos + rowHeight);
-        pdf.line(colX[2] - 5, yPos, colX[2] - 5, yPos + rowHeight);
-        pdf.line(colX[3] - 5, yPos, colX[3] - 5, yPos + rowHeight);
-        pdf.line(colX[4] - 5, yPos, colX[4] - 5, yPos + rowHeight);
-        
-        yPos += rowHeight;
+      const totalRows = Math.max(6, currentRows + 2); // En az 6 satır
+      while (yPos < 70 + (totalRows * 12)) {
+        yPos += 12;
       }
       
-      // Toplam satırı
-      pdf.setFillColor(70, 130, 180);
-      pdf.rect(10, yPos, pageWidth - 20, 15, 'F');
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(10);
-      pdf.setFont(undefined, 'bold');
-      pdf.text('Toplam', colX[3], yPos + 10);
-      pdf.text('0.00 TL', colX[4], yPos + 10);
+      yPos += 30;
       
-      // KDV satırları
-      pdf.setTextColor(0, 0, 0);
-      pdf.setFont(undefined, 'normal');
-      yPos += 15;
-      
-      pdf.setLineWidth(0.3);
-      pdf.rect(10, yPos, pageWidth - 20, 12);
-      pdf.line(colX[3] - 5, yPos, colX[3] - 5, yPos + 12);
-      pdf.line(colX[4] - 5, yPos, colX[4] - 5, yPos + 12);
-      pdf.setFontSize(9);
-      pdf.text('KDV %', colX[3], yPos + 8);
-      pdf.text('0.00', colX[4], yPos + 8);
-      
-      yPos += 12;
-      pdf.rect(10, yPos, pageWidth - 20, 12);
-      pdf.line(colX[3] - 5, yPos, colX[3] - 5, yPos + 12);
-      pdf.line(colX[4] - 5, yPos, colX[4] - 5, yPos + 12);
-      pdf.text('G.Toplam', colX[3], yPos + 8);
-      pdf.text('0.00', colX[4], yPos + 8);
-      
-      yPos += 25;
-      
-      // Alt imza bölümü
-      const signatureY = Math.max(yPos, pageHeight - 60);
+      // Alt imza bölümü - basit ve temiz
+      const signatureY = Math.max(yPos, pageHeight - 80);
       
       // Sol taraf - Teslim Eden
-      pdf.setLineWidth(0.5);
-      pdf.rect(15, signatureY, 80, 40);
-      pdf.setFontSize(10);
+      pdf.setFontSize(12);
       pdf.setFont(undefined, 'bold');
-      pdf.text('Teslim Eden', 20, signatureY + 15);
-      pdf.setFont(undefined, 'normal');
-      pdf.setFontSize(9);
-      pdf.text(`${slip.driverName}`, 20, signatureY + 25);
-      pdf.text('Imza: _______________', 20, signatureY + 35);
+      pdf.text('TESLIM EDEN', 40, signatureY);
       
-      // Sağ taraf - Teslim Alan (Alıcı İmzası)
-      pdf.rect(115, signatureY, 80, 40);
       pdf.setFontSize(10);
-      pdf.setFont(undefined, 'bold');
-      pdf.text('Teslim Alan', 120, signatureY + 15);
       pdf.setFont(undefined, 'normal');
-      pdf.setFontSize(9);
-      pdf.text('Adi Soyadi: _______________', 120, signatureY + 25);
-      pdf.text('Imza: _______________', 120, signatureY + 35);
+      pdf.text('MARUPAK', 40, signatureY + 30);
+      
+      // Sağ taraf - Teslim Alan
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('TESLIM ALAN', 130, signatureY);
+      
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      pdf.text('ADI SOYADI IMZA', 130, signatureY + 15);
+      
+      // İmza çizgileri
+      pdf.setLineWidth(0.3);
+      pdf.line(130, signatureY + 25, 180, signatureY + 25);
       
       // PDF'i indir
-      pdf.save(`irsaliye-${slip.deliverySlipNumber}.pdf`);
+      pdf.save(`teslim-fisi-${slip.deliverySlipNumber}.pdf`);
     } catch (error) {
       console.error('PDF oluşturma hatası:', error);
       alert('PDF oluşturulurken bir hata oluştu.');
