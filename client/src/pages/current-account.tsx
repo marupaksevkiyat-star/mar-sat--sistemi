@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Building2, FileText, Receipt, Eye, Calendar, ArrowLeft } from "lucide-react";
+import { Search, Building2, FileText, Receipt, Eye, Calendar, ArrowLeft, CreditCard, TrendingUp, AlertTriangle, Plus, DollarSign } from "lucide-react";
 
 interface CustomerInvoice {
   id: string;
@@ -275,17 +275,17 @@ export default function CurrentAccountPage() {
                 </CardContent>
               </Card>
 
-              {/* SAĞ - Özet ve Gelecek Özellikler */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
-                    Cari Hesap Özeti
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Toplam Bilgiler */}
+              {/* SAĞ - Cari Hesap Özellikleri */}
+              <div className="space-y-6">
+                {/* Hesap Özeti */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5" />
+                      Hesap Özeti
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded">
                         <div className="text-2xl font-bold text-blue-600">
@@ -297,24 +297,107 @@ export default function CurrentAccountPage() {
                         <div className="text-2xl font-bold text-green-600">
                           {formatCurrency(customerInvoices[selectedCustomer]?.totalAmount || 0)}
                         </div>
-                        <div className="text-sm text-muted-foreground">Toplam Tutar</div>
+                        <div className="text-sm text-muted-foreground">Toplam Satış</div>
+                      </div>
+                      <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded">
+                        <div className="text-2xl font-bold text-orange-600">
+                          ₺12,450
+                        </div>
+                        <div className="text-sm text-muted-foreground">Borç Bakiyesi</div>
+                      </div>
+                      <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded">
+                        <div className="text-2xl font-bold text-red-600">
+                          2
+                        </div>
+                        <div className="text-sm text-muted-foreground">Vadesi Geçen</div>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
 
-                    {/* Gelecek Özellikler */}
-                    <div className="pt-4 border-t">
-                      <h4 className="font-medium mb-3">Yakında Eklenecek:</h4>
-                      <ul className="space-y-2 text-sm text-muted-foreground">
-                        <li>• Ödeme geçmişi</li>
-                        <li>• Tahsilat durumu</li>
-                        <li>• Vade takibi</li>
-                        <li>• Ödeme planı</li>
-                        <li>• Borç/alacak bakiyesi</li>
-                      </ul>
+                {/* Ödeme Geçmişi */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="w-5 h-5" />
+                        Ödeme Geçmişi
+                      </div>
+                      <Button size="sm" className="flex items-center gap-1">
+                        <Plus className="w-4 h-4" />
+                        Ödeme Ekle
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3 max-h-64 overflow-y-auto">
+                      {/* Örnek ödeme kayıtları */}
+                      <div className="flex justify-between items-center p-3 border rounded">
+                        <div>
+                          <div className="font-medium">Nakit Ödeme</div>
+                          <div className="text-sm text-muted-foreground">28.08.2025</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-green-600">+₺5,000</div>
+                          <Badge variant="outline" className="text-green-700">Tamamlandı</Badge>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center p-3 border rounded">
+                        <div>
+                          <div className="font-medium">Banka Havalesi</div>
+                          <div className="text-sm text-muted-foreground">25.08.2025</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-green-600">+₺8,750</div>
+                          <Badge variant="outline" className="text-green-700">Tamamlandı</Badge>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center p-3 border rounded">
+                        <div>
+                          <div className="font-medium">Çek Ödemesi</div>
+                          <div className="text-sm text-muted-foreground">20.09.2025 - Vade</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-orange-600">₺3,200</div>
+                          <Badge variant="outline" className="text-orange-700">Beklemede</Badge>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+
+                {/* Vade Takibi */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5" />
+                      Vade Takibi
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded">
+                        <div>
+                          <div className="font-medium text-red-800 dark:text-red-200">Fatura #SMART-20250815-143022</div>
+                          <div className="text-sm text-red-600 dark:text-red-300">Vade: 15.08.2025 (20 gün gecikme)</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-red-600">₺4,800</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 rounded">
+                        <div>
+                          <div className="font-medium text-yellow-800 dark:text-yellow-200">Fatura #SMART-20250820-091155</div>
+                          <div className="text-sm text-yellow-600 dark:text-yellow-300">Vade: 10.09.2025 (5 gün kaldı)</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-yellow-600">₺7,650</div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         )}
