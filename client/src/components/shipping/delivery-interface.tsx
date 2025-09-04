@@ -65,6 +65,54 @@ export default function DeliveryInterface({
             {activeDelivery.customer?.companyName} - {activeDelivery.customer?.address}
           </p>
           
+          {/* Teslim Edilecek Ürünler */}
+          <div className="bg-muted rounded-lg p-4 mb-6">
+            <h5 className="font-medium text-foreground mb-3 flex items-center">
+              <i className="fas fa-box mr-2"></i>
+              Teslim Edilecek Ürünler
+            </h5>
+            <div className="space-y-2">
+              {activeDelivery.items && activeDelivery.items.length > 0 ? (
+                activeDelivery.items.map((item: any, index: number) => (
+                  <div key={index} className="flex justify-between items-center py-2 px-3 bg-background rounded border border-border">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm text-foreground">
+                        {item.product?.name || item.productName || 'Bilinmeyen Ürün'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.product?.description || item.notes || ''}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-sm text-foreground">
+                        {item.quantity} {item.unit || 'adet'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.unitPrice ? `${parseFloat(item.unitPrice).toFixed(2)} TL` : ''}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-sm text-muted-foreground">
+                    Ürün bilgileri yüklenemedi
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="mt-3 pt-3 border-t border-border">
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-sm text-foreground">
+                  Toplam Tutar:
+                </span>
+                <span className="font-bold text-foreground">
+                  {activeDelivery.totalAmount ? `${parseFloat(activeDelivery.totalAmount).toFixed(2)} TL` : 'Hesaplanıyor...'}
+                </span>
+              </div>
+            </div>
+          </div>
+          
           {/* Navigation Progress */}
           <div className="bg-muted rounded-lg p-4 mb-6">
             <div className="flex items-center justify-between mb-2">
