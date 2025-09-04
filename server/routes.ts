@@ -470,12 +470,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const filters: any = {};
       if (status) filters.status = status;
       
-      // Admin, üretim ve sevkiyat personeli tüm siparişleri görebilir
+      // Admin, üretim, sevkiyat ve muhasebe personeli tüm siparişleri görebilir
       // Sadece satış personeli kendi siparişlerini görebilir
       if (userRole !== 'admin' && userRole !== 'Admin' && 
           userRole !== 'production' && userRole !== 'production_staff' &&
           userRole !== 'shipping' && userRole !== 'shipping_staff' &&
-          !userRole.includes('Üretim') && !userRole.includes('Sevkiyat')) {
+          userRole !== 'accounting' && userRole !== 'accounting_staff' &&
+          !userRole.includes('Üretim') && !userRole.includes('Sevkiyat') && !userRole.includes('Muhasebe')) {
         filters.salesPersonId = userId;
         console.log(`🔒 Filtering orders by salesPersonId: ${userId}`);
       } else {
