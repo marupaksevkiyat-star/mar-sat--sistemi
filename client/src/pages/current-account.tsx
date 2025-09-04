@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,6 +46,80 @@ export default function CurrentAccountPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<CustomerInvoice | null>(null);
   const [showInvoiceDetail, setShowInvoiceDetail] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    amount: '',
+    paymentMethod: '',
+    description: '',
+    paymentDate: new Date().toISOString().split('T')[0]
+  });
+  
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Ödeme ekleme mutation
+  const addPaymentMutation = useMutation({
+    mutationFn: async () => {
+      const paymentData = {
+        customerId: customerInvoices[selectedCustomer]?.customer?.id || selectedCustomer,
+        amount: parseFloat(paymentForm.amount),
+        paymentMethod: paymentForm.paymentMethod,
+        description: paymentForm.description,
+        paymentDate: paymentForm.paymentDate,
+        dueDate: paymentForm.paymentDate,
+        status: 'completed'
+      };
+      return await apiRequest('POST', '/api/payments', paymentData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Başarılı",
+        description: "Ödeme başarıyla eklendi",
+      });
+      
+      // Verileri güncelle
+      queryClient.invalidateQueries({ queryKey: ['/api/invoices'] });
+      
+      // Formu sıfırla ve modalı kapat
+      setPaymentForm({
+        amount: '',
+        paymentMethod: '',
+        description: '',
+        paymentDate: new Date().toISOString().split('T')[0]
+      });
+      setShowPaymentDialog(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Hata",
+        description: error.message || "Ödeme eklenirken bir hata oluştu",
+        variant: "destructive",
+      });
+    }
+  });
+  
+  const handleAddPayment = () => {
+    if (!paymentForm.amount || !paymentForm.paymentMethod) {
+      toast({
+        title: "Eksik Bilgi",
+        description: "Lütfen tutar ve ödeme yöntemini girin",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const amount = parseFloat(paymentForm.amount);
+    if (amount <= 0) {
+      toast({
+        title: "Geçersiz Tutar",
+        description: "Lütfen geçerli bir tutar girin",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    addPaymentMutation.mutate();
+  };
 
   // Tüm faturaları getir
   const { data: allInvoices, isLoading } = useQuery({
@@ -64,8 +143,8 @@ export default function CurrentAccountPage() {
   console.log("🔍 All invoices data:", allInvoices);
   
   // Müşteri bazında faturaları grupla
-  const customerInvoices = allInvoices ? 
-    allInvoices.reduce((acc: any, invoice: CustomerInvoice) => {
+  const customerInvoices = (allInvoices && Array.isArray(allInvoices)) ? 
+    (allInvoices as CustomerInvoice[]).reduce((acc: any, invoice: CustomerInvoice) => {
       console.log("🔍 Processing invoice:", {
         invoiceNumber: invoice.invoiceNumber,
         hasCustomer: !!invoice.customer,
@@ -323,7 +402,11 @@ export default function CurrentAccountPage() {
                         <CreditCard className="w-5 h-5" />
                         Ödeme Geçmişi
                       </div>
-                      <Button size="sm" className="flex items-center gap-1">
+                      <Button 
+                        size="sm" 
+                        className="flex items-center gap-1"
+                        onClick={() => setShowPaymentDialog(true)}
+                      >
                         <Plus className="w-4 h-4" />
                         Ödeme Ekle
                       </Button>
@@ -461,6 +544,81 @@ export default function CurrentAccountPage() {
               <Button variant="outline" onClick={() => setShowInvoiceDetail(false)}>
                 Kapat
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* ÖDEME EKLEME MODAL */}
+        <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Ödeme Ekle - {selectedCustomer}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="amount">Tutar (TL) *</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={paymentForm.amount}
+                    onChange={(e) => setPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="paymentDate">Tarih *</Label>
+                  <Input
+                    id="paymentDate"
+                    type="date"
+                    value={paymentForm.paymentDate}
+                    onChange={(e) => setPaymentForm(prev => ({ ...prev, paymentDate: e.target.value }))}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="paymentMethod">Ödeme Yöntemi *</Label>
+                <Select value={paymentForm.paymentMethod} onValueChange={(value) => setPaymentForm(prev => ({ ...prev, paymentMethod: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Ödeme yöntemi seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="nakit">Nakit</SelectItem>
+                    <SelectItem value="havale">Havale/EFT</SelectItem>
+                    <SelectItem value="kredi_karti">Kredi Kartı</SelectItem>
+                    <SelectItem value="cek">Çek</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="description">Açıklama</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Ödeme hakkında not..."
+                  value={paymentForm.description}
+                  onChange={(e) => setPaymentForm(prev => ({ ...prev, description: e.target.value }))}
+                />
+              </div>
+              
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setShowPaymentDialog(false)}
+                >
+                  İptal
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={handleAddPayment}
+                  disabled={addPaymentMutation.isPending}
+                >
+                  {addPaymentMutation.isPending ? "Ekleniyor..." : "Ödeme Ekle"}
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
