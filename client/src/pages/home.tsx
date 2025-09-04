@@ -249,7 +249,8 @@ export default function Home() {
         title: "Genel Durum",
         value: "Aktif",
         icon: "fas fa-chart-pie",
-        color: "blue"
+        color: "blue",
+        onClick: () => setLocation('/admin')
       }
     ];
   };
@@ -277,10 +278,10 @@ export default function Home() {
               title={card.title}
               value={card.value}
               change={card.change}
-              changeType={card.changeType}
+              changeType={card.changeType as "positive" | "negative" | undefined}
               subtitle={card.subtitle}
               icon={card.icon}
-              color={card.color}
+              color={card.color as "blue" | "green" | "yellow" | "purple" | "red" | "cyan" | "orange" | "emerald"}
               isLoading={statsLoading}
               onClick={card.onClick}
               data-testid={`card-${card.title.toLowerCase().replace(/\s+/g, '-')}`}
