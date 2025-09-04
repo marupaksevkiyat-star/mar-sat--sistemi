@@ -889,7 +889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Akıllı toplu faturalama - aynı ürünleri toplar ve KDV hesaplar
   app.post('/api/invoices/bulk-smart', isAuthenticated, async (req: any, res) => {
     try {
-      const { customerId, orderIds, selectedOrders } = req.body;
+      const { customerId, orderIds, selectedOrders, vatRate = 20 } = req.body;
       
       console.log("🧾 Akıllı toplu faturalama:", { customerId, orderCount: orderIds?.length });
       
@@ -933,14 +933,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const groupedProducts = Array.from(productGroups.values());
       console.log("📊 Gruplandırılmış ürünler:", groupedProducts.length);
 
-      // Toplam tutarları hesapla
+      // Toplam tutarları hesapla - dinamik KDV oranı
       const subtotal = groupedProducts.reduce((sum, product) => sum + product.totalAmount, 0);
-      const kdvRate = 0.20; // %20 KDV
+      const kdvRate = vatRate / 100; // Frontend'den %20 olarak gelirse 0.20'ye çevir
       const kdvAmount = subtotal * kdvRate;
       const totalWithKdv = subtotal + kdvAmount;
 
       console.log("💰 Fatura özeti:", { 
         subtotal: subtotal.toFixed(2), 
+        kdvOrani: `%${vatRate}`,
         kdv: kdvAmount.toFixed(2), 
         toplam: totalWithKdv.toFixed(2) 
       });
@@ -968,7 +969,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customerId: customerId,
         status: 'generated',
         shippingAddress: selectedOrders[0]?.deliveryAddress || 'Adres belirtilmedi',
-        notes: `Akıllı toplu fatura - ${orderIds.length} sipariş - ${groupedProducts.length} ürün grubu - KDV dahil: ${totalWithKdv.toFixed(2)} TL`,
+        notes: `Akıllı toplu fatura - ${orderIds.length} sipariş - ${groupedProducts.length} ürün grubu - %${vatRate} KDV dahil: ${totalWithKdv.toFixed(2)} TL`,
         invoiceNumber: smartInvoiceNumber
       };
 
