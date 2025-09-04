@@ -422,7 +422,7 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
                     <Package className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p>İrsaliye bilgileri bulunamadı</p>
+                    <p>{invoiceDetails.description || "İrsaliye bilgileri bulunamadı"}</p>
                   </div>
                 )}
               </CardContent>
@@ -496,8 +496,10 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
                 )}
 
                 {/* Ödeme Ekleme Butonu */}
-                {remainingBalance > 0 && (
-                  <div className="mt-6 pt-4 border-t">
+                <div className="mt-6 pt-4 border-t">
+                  <p className="text-xs text-muted-foreground mb-2">Debug: Kalan bakiye: {remainingBalance} TL</p>
+                  {remainingBalance >= 0 && (
+                  <div>
                     <Button 
                       className="w-full" 
                       size="sm"
@@ -588,6 +590,7 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
                     </Dialog>
                   </div>
                 )}
+                </div>
               </CardContent>
             </Card>
           </div>
