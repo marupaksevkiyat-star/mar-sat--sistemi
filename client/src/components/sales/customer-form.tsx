@@ -50,9 +50,14 @@ export default function CustomerForm({
       setIsCustomerSaved(true);
       toast({
         title: "Başarılı",
-        description: "Müşteri başarıyla kaydedildi. Şimdi satış yapabilirsiniz.",
+        description: "Müşteri başarıyla kaydedildi. Sağ taraftaki 'Yeni Satış' kartından sipariş verebilirsiniz.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
+      
+      // Close the form after 2 seconds to let user see the success message
+      setTimeout(() => {
+        onCancel();
+      }, 2000);
     },
     onError: (error) => {
       console.error("Müşteri kaydetme hatası:", error);
@@ -106,10 +111,7 @@ export default function CustomerForm({
       return;
     }
 
-    if (outcome === 'sale') {
-      setShowOrderForm(true);
-      return;
-    }
+    // Sale işlemi kaldırıldı - kullanıcı sağ taraftaki karttan sipariş verecek
 
     if (outcome === 'follow_up') {
       setShowAppointmentForm(true);
@@ -318,17 +320,8 @@ export default function CustomerForm({
             </div>
           )}
 
+          {/* Ziyaret Sonucu Butonları - Sadece takip ve ilgilenmiyor */}
           <div className="flex space-x-3 pt-4">
-            <Button
-              type="button"
-              onClick={() => handleCompleteVisit("sale")}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-              data-testid="button-complete-sale"
-            >
-              <Check className="w-4 h-4 mr-2" />
-              Satış Yap
-            </Button>
-            
             <Button
               type="button"
               onClick={() => handleCompleteVisit("follow_up")}
