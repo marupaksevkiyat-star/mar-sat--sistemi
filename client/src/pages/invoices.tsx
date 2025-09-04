@@ -5,27 +5,48 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Search, Building2, Package, CheckCircle, Clock, ShoppingCart, Receipt } from "lucide-react";
+import { FileText, Search, Building2, Package, CheckCircle, Clock, ShoppingCart, Receipt, ArrowLeft } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 interface CustomerData {
   customerId: string;
   customer: {
     companyName: string;
-    name?: string;
     email?: string;
     phone?: string;
   };
-  orders: any[];
+  pendingInvoices: any[];
   totalOrders: number;
   totalAmount: number;
-  products: Record<string, any>;
+}
+
+interface InvoiceItem {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: string;
+  totalPrice: string;
+  unit: string;
+}
+
+interface PendingInvoice {
+  orderId: string;
+  orderNumber: string;
+  totalAmount: string;
+  deliveredAt: string;
+  notes?: string;
+  items: InvoiceItem[];
 }
 
 export default function InvoicesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
+  const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
+  const [showAccountDetails, setShowAccountDetails] = useState(false);
+  const [accountDetails, setAccountDetails] = useState<any>(null);
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -37,6 +58,13 @@ export default function InvoicesPage() {
 
   const { data: invoices } = useQuery({
     queryKey: ["/api/invoices", "all"],
+    retry: false,
+  });
+
+  // Cari hesap detaylarını getir
+  const { data: customerAccountDetails, isLoading: accountLoading } = useQuery({
+    queryKey: ["/api/customers", selectedCustomer?.customerId, "account-details"],
+    enabled: showAccountDetails && !!selectedCustomer?.customerId,
     retry: false,
   });
 
@@ -54,17 +82,42 @@ export default function InvoicesPage() {
   // Müşteri tıklandığında cari hesap detaylarını göster
   const handleCustomerClick = (customer: CustomerData) => {
     setSelectedCustomer(customer);
+    setShowAccountDetails(false); // İlk önce özet görünümü
   };
 
-  // Toplu faturalaştırma mutation
+  // Toplu faturalaştır butonuna tıklandığında cari hesap sayfasını aç
+  const openAccountDetails = (customer: CustomerData) => {
+    setSelectedCustomer(customer);
+    setShowAccountDetails(true);
+    setSelectedInvoices([]);
+  };
+
+  // İrsaliye seçimi toggle
+  const toggleInvoiceSelection = (invoiceId: string) => {
+    setSelectedInvoices(prev => 
+      prev.includes(invoiceId) 
+        ? prev.filter(id => id !== invoiceId)
+        : [...prev, invoiceId]
+    );
+  };
+
+  // Toplu faturalaştırma mutation - seçilen irsaliyeler için
   const bulkInvoiceMutation = useMutation({
-    mutationFn: async (customer: CustomerData) => {
-      const orderIds = customer.orders.map(order => order.id);
-      return await apiRequest('POST', '/api/invoices/bulk', {
-        customerId: customer.customerId,
-        orderIds: orderIds,
-        shippingAddress: customer.orders[0]?.deliveryAddress || 'Adres belirtilmedi',
-        notes: `Toplu fatura - ${customer.customer.companyName} - ${customer.totalOrders} sipariş`
+    mutationFn: async () => {
+      if (!selectedCustomer || selectedInvoices.length === 0) {
+        throw new Error('Lütfen en az bir irsaliye seçin');
+      }
+      
+      // Seçilen irsaliyelerdeki ürünleri grupla
+      const selectedOrders = customerAccountDetails?.pendingInvoices?.filter(
+        (invoice: any) => selectedInvoices.includes(invoice.orderId)
+      ) || [];
+      
+      // Ürün bazında gruplama yapmak için API'ye gönder
+      return await apiRequest('POST', '/api/invoices/bulk-smart', {
+        customerId: selectedCustomer.customerId,
+        orderIds: selectedInvoices,
+        selectedOrders: selectedOrders
       });
     },
     onSuccess: (data) => {
@@ -86,10 +139,16 @@ export default function InvoicesPage() {
     }
   });
 
-  // Toplu faturalaştırma
+  // Toplu faturalaştır butonuna tıklama - cari hesap sayfasını aç
   const handleBulkInvoice = (customer: CustomerData) => {
-    console.log("Toplu faturalama başlatılıyor:", customer);
-    bulkInvoiceMutation.mutate(customer);
+    console.log("Cari hesap sayfası açılıyor:", customer.customer.companyName);
+    openAccountDetails(customer);
+  };
+
+  // Seçilen irsaliyeleri faturala
+  const processSelectedInvoices = () => {
+    console.log("Seçilen irsaliyeler faturalaştırılıyor:", selectedInvoices);
+    bulkInvoiceMutation.mutate();
   };
 
   const filteredCustomers = Array.isArray(deliveredOrdersByCustomer) 
@@ -166,29 +225,16 @@ export default function InvoicesPage() {
                         <div className="space-y-2">
                           <h3 className="font-semibold text-sm">{customer.customer?.companyName}</h3>
                           
-                          {/* Teslim Edilmiş İrsaliyeler */}
-                          <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded text-xs">
-                            <div className="flex items-center gap-1 text-green-700 dark:text-green-300">
-                              <CheckCircle className="w-3 h-3" />
-                              <span className="font-medium">Teslim Edilmiş İrsaliyeler</span>
-                            </div>
-                            <div className="mt-1">
-                              <span className="font-semibold">{customer.totalOrders} adet</span>
-                              <span className="text-muted-foreground mx-2">•</span>
-                              <span className="font-semibold">{formatCurrency(customer.totalAmount)}</span>
-                            </div>
-                          </div>
-
-                          {/* Bekleyen İrsaliyeler - Şimdilik placeholder */}
+                          {/* Bekleyen İrsaliyeler (Faturalanmamış) */}
                           <div className="bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded text-xs">
                             <div className="flex items-center gap-1 text-yellow-700 dark:text-yellow-300">
                               <Clock className="w-3 h-3" />
                               <span className="font-medium">Bekleyen İrsaliyeler</span>
                             </div>
                             <div className="mt-1">
-                              <span className="font-semibold">0 adet</span>
+                              <span className="font-semibold">{customer.pendingInvoices?.length || customer.totalOrders} adet</span>
                               <span className="text-muted-foreground mx-2">•</span>
-                              <span className="font-semibold">{formatCurrency(0)}</span>
+                              <span className="font-semibold">{formatCurrency(customer.totalAmount)}</span>
                             </div>
                           </div>
                         </div>
@@ -200,9 +246,100 @@ export default function InvoicesPage() {
             </Card>
           </div>
 
-          {/* Sağ Panel - Seçili Firma Detayları */}
+          {/* Sağ Panel - Cari Hesap veya Özet */}
           <div className="lg:col-span-2">
-            {selectedCustomer ? (
+            {showAccountDetails && selectedCustomer ? (
+              /* CARİ HESAP DETAY SAYFASI */
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowAccountDetails(false)}
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                      </Button>
+                      <CardTitle className="flex items-center gap-2">
+                        <Receipt className="w-5 h-5" />
+                        {selectedCustomer.customer?.companyName} - Cari Hesap
+                      </CardTitle>
+                    </div>
+                    {selectedInvoices.length > 0 && (
+                      <Button 
+                        onClick={processSelectedInvoices}
+                        disabled={bulkInvoiceMutation.isPending}
+                        className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        {bulkInvoiceMutation.isPending ? "Faturalaştırılıyor..." : `${selectedInvoices.length} İrsaliyeyi Faturalaştır`}
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                
+                <CardContent>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* SOL - Bekleyen İrsaliyeler */}
+                    <div>
+                      <h3 className="font-semibold mb-4 text-yellow-700">Bekleyen İrsaliyeler</h3>
+                      {accountLoading ? (
+                        <div className="text-center py-8">Yükleniyor...</div>
+                      ) : (
+                        <div className="space-y-3 max-h-96 overflow-y-auto">
+                          {customerAccountDetails?.pendingInvoices?.map((invoice: any) => (
+                            <div key={invoice.orderId} className="border rounded p-3 hover:bg-muted/50">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Checkbox 
+                                  checked={selectedInvoices.includes(invoice.orderId)}
+                                  onCheckedChange={() => toggleInvoiceSelection(invoice.orderId)}
+                                />
+                                <div className="flex-1">
+                                  <div className="font-medium">{invoice.orderNumber}</div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {formatDate(invoice.deliveredAt)} • {formatCurrency(parseFloat(invoice.totalAmount))}
+                                  </div>
+                                </div>
+                              </div>
+                              {/* Ürün Listesi */}
+                              <div className="ml-6 space-y-1">
+                                {invoice.items?.map((item: InvoiceItem) => (
+                                  <div key={item.id} className="text-xs text-muted-foreground">
+                                    {item.quantity} {item.unit} {item.productName} - {formatCurrency(parseFloat(item.totalPrice))}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* SAĞ - Kesilmiş Faturalar */}
+                    <div>
+                      <h3 className="font-semibold mb-4 text-green-700">Kesilmiş Faturalar</h3>
+                      <div className="space-y-3 max-h-96 overflow-y-auto">
+                        {customerAccountDetails?.existingInvoices?.map((invoice: any) => (
+                          <div key={invoice.id} className="border rounded p-3 bg-green-50 dark:bg-green-900/20">
+                            <div className="font-medium">{invoice.invoiceNumber}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {formatDate(invoice.createdAt)}
+                            </div>
+                            <div className="text-sm mt-1">
+                              <Badge variant="outline" className="text-green-700">
+                                {invoice.status}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : selectedCustomer ? (
+              /* ÖZET SAYFASI */
               <Card>
                 <CardHeader>
                   <div className="flex justify-between items-center">

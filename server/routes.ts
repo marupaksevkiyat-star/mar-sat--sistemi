@@ -2,7 +2,7 @@ import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { orders, invoices } from "@shared/schema";
+import { orders, invoices, customers, orderItems, products } from "@shared/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { 
   insertCustomerSchema, 
@@ -488,6 +488,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Müşteri cari hesap detayları - bekleyen irsaliyeler ve kesilmiş faturalar
+  app.get('/api/customers/:customerId/account-details', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      console.log("📋 Cari hesap detayları istendi:", customerId);
+
+      // Bekleyen irsaliyeler (delivered ama henüz faturalanmamış)
+      const pendingInvoices = await db
+        .select({
+          orderId: orders.id,
+          orderNumber: orders.orderNumber,
+          totalAmount: orders.totalAmount,
+          deliveredAt: orders.deliveredAt,
+          notes: orders.notes
+        })
+        .from(orders)
+        .where(
+          and(
+            eq(orders.customerId, customerId),
+            eq(orders.status, 'delivered')
+          )
+        );
+
+      // Her irsaliye için ürün detaylarını getir
+      const pendingWithDetails = await Promise.all(
+        pendingInvoices.map(async (invoice) => {
+          const items = await db
+            .select({
+              id: orderItems.id,
+              productId: orderItems.productId,
+              productName: products.name,
+              quantity: orderItems.quantity,
+              unitPrice: orderItems.unitPrice,
+              totalPrice: orderItems.totalPrice,
+              unit: products.unit
+            })
+            .from(orderItems)
+            .innerJoin(products, eq(orderItems.productId, products.id))
+            .where(eq(orderItems.orderId, invoice.orderId));
+
+          return {
+            ...invoice,
+            items
+          };
+        })
+      );
+
+      // Kesilmiş faturalar
+      const existingInvoices = await db
+        .select()
+        .from(invoices)
+        .where(eq(invoices.customerId, customerId));
+
+      console.log("✅ Cari hesap:", {
+        pendingCount: pendingWithDetails.length,
+        existingCount: existingInvoices.length
+      });
+
+      res.json({
+        customerId,
+        pendingInvoices: pendingWithDetails,
+        existingInvoices
+      });
+
+    } catch (error) {
+      console.error("❌ Cari hesap detay hatası:", error);
+      res.status(500).json({ message: "Cari hesap detayları alınamadı" });
+    }
+  });
+
   // Order routes
   app.post('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
@@ -813,6 +883,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("❌ Toplu faturalama hatası:", error);
       res.status(500).json({ message: "Toplu faturalama başarısız: " + error.message });
+    }
+  });
+
+  // Akıllı toplu faturalama - aynı ürünleri toplar ve KDV hesaplar
+  app.post('/api/invoices/bulk-smart', isAuthenticated, async (req: any, res) => {
+    try {
+      const { customerId, orderIds, selectedOrders } = req.body;
+      
+      console.log("🧾 Akıllı toplu faturalama:", { customerId, orderCount: orderIds?.length });
+      
+      // Seçilen siparişlerdeki tüm ürünleri getir
+      const allItems = await db
+        .select({
+          productId: orderItems.productId,
+          productName: products.name,
+          quantity: orderItems.quantity,
+          unitPrice: orderItems.unitPrice,
+          totalPrice: orderItems.totalPrice,
+          unit: products.unit
+        })
+        .from(orderItems)
+        .innerJoin(products, eq(orderItems.productId, products.id))
+        .where(inArray(orderItems.orderId, orderIds));
+
+      console.log("📦 Toplam ürün satırı:", allItems.length);
+
+      // Aynı ürünleri grupla ve topla
+      const productGroups = new Map();
+      
+      for (const item of allItems) {
+        const key = item.productId;
+        if (!productGroups.has(key)) {
+          productGroups.set(key, {
+            productId: item.productId,
+            productName: item.productName,
+            unit: item.unit,
+            unitPrice: parseFloat(item.unitPrice),
+            totalQuantity: 0,
+            totalAmount: 0
+          });
+        }
+        
+        const group = productGroups.get(key);
+        group.totalQuantity += item.quantity;
+        group.totalAmount += parseFloat(item.totalPrice);
+      }
+
+      const groupedProducts = Array.from(productGroups.values());
+      console.log("📊 Gruplandırılmış ürünler:", groupedProducts.length);
+
+      // Toplam tutarları hesapla
+      const subtotal = groupedProducts.reduce((sum, product) => sum + product.totalAmount, 0);
+      const kdvRate = 0.20; // %20 KDV
+      const kdvAmount = subtotal * kdvRate;
+      const totalWithKdv = subtotal + kdvAmount;
+
+      console.log("💰 Fatura özeti:", { 
+        subtotal: subtotal.toFixed(2), 
+        kdv: kdvAmount.toFixed(2), 
+        toplam: totalWithKdv.toFixed(2) 
+      });
+
+      // Fatura numarası oluştur
+      const timestamp = new Date();
+      const dateStr = timestamp.toISOString().slice(0, 10).replace(/-/g, '');
+      const timeStr = timestamp.toISOString().slice(11, 19).replace(/:/g, '');
+      const smartInvoiceNumber = `SMART-${dateStr}-${timeStr}`;
+
+      // Fatura detaylarını notes'a ekle
+      const invoiceDetails = {
+        orderIds: orderIds,
+        orderCount: orderIds.length,
+        groupedProducts: groupedProducts,
+        subtotal: subtotal,
+        kdvRate: kdvRate,
+        kdvAmount: kdvAmount,
+        totalWithKdv: totalWithKdv
+      };
+
+      // Toplu fatura oluştur
+      const bulkInvoice = {
+        orderId: orderIds[0], // Referans sipariş
+        customerId: customerId,
+        status: 'generated',
+        shippingAddress: selectedOrders[0]?.deliveryAddress || 'Adres belirtilmedi',
+        notes: `Akıllı toplu fatura - ${orderIds.length} sipariş - ${groupedProducts.length} ürün grubu - KDV dahil: ${totalWithKdv.toFixed(2)} TL`,
+        invoiceNumber: smartInvoiceNumber
+      };
+
+      // Database'e kaydet
+      const [savedInvoice] = await db
+        .insert(invoices)
+        .values(bulkInvoice)
+        .returning();
+
+      console.log("🎉 Akıllı toplu fatura oluşturuldu:", savedInvoice.invoiceNumber);
+
+      // Response
+      const response = {
+        ...savedInvoice,
+        invoiceDetails: invoiceDetails,
+        success: true
+      };
+
+      res.json(response);
+
+    } catch (error) {
+      console.error("❌ Akıllı toplu faturalama hatası:", error);
+      res.status(500).json({ message: "Akıllı faturalama başarısız: " + error.message });
     }
   });
 
