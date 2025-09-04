@@ -213,11 +213,18 @@ export default function Navigation() {
             </DropdownMenu>
 
             {/* Mobile Menu */}
-            <div className="md:hidden">
+            <div className="block md:hidden">
               <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" data-testid="button-mobile-menu">
-                    <i className="fas fa-bars"></i>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="p-2 hover:bg-accent"
+                    data-testid="button-mobile-menu"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-64">
