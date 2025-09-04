@@ -62,6 +62,9 @@ export default function InvoicesPage() {
     mutationFn: (data: any) => apiRequest("POST", "/api/invoices", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+      // Dashboard verilerini de güncelle
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/recent-orders"] });
       setShowCreateDialog(false);
       setSelectedOrder("");
       setShippingAddress("");
@@ -74,6 +77,9 @@ export default function InvoicesPage() {
       apiRequest("PATCH", `/api/invoices/${id}/status`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+      // Dashboard verilerini de güncelle
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/recent-orders"] });
     },
   });
 
