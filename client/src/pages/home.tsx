@@ -66,7 +66,7 @@ export default function Home() {
     const userRole = user?.role || '';
     
     if (userRole === 'admin' || userRole === 'Admin') return "Yönetici Dashboard";
-    if (userRole === 'sales' || userRole.includes('Satış')) return "Satış Dashboard";
+    if (userRole === 'sales' || userRole === 'sales_staff' || userRole.includes('Satış')) return "Satış Dashboard";
     if (userRole === 'production' || userRole.includes('Üretim')) return "Üretim Dashboard";
     if (userRole === 'shipping' || userRole.includes('Sevkiyat')) return "Sevkiyat Dashboard";
     if (userRole === 'accounting' || userRole.includes('Muhasebe')) return "Muhasebe Dashboard";
@@ -134,7 +134,7 @@ export default function Home() {
     }
     
     // Satış personeli - satış odaklı kartlar
-    if (userRole === 'sales' || userRole.includes('Satış')) {
+    if (userRole === 'sales' || userRole === 'sales_staff' || userRole.includes('Satış')) {
       return [
         {
           title: "Bugünkü Ziyaretler",
@@ -263,7 +263,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-foreground">{getDashboardTitle()}</h2>
           <p className="text-muted-foreground mt-1">
             {user?.firstName} {user?.lastName} - {user?.role === 'admin' || user?.role === 'Admin' ? 'Yönetici' : 
-             user?.role === 'sales' ? 'Satış Personeli' :
+             user?.role === 'sales' || user?.role === 'sales_staff' ? 'Satış Personeli' :
              user?.role === 'production' ? 'Üretim Personeli' :
              user?.role === 'shipping' ? 'Sevkiyat Personeli' : user?.role}
           </p>
