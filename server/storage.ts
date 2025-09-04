@@ -387,7 +387,7 @@ export class DatabaseStorage implements IStorage {
           salesPerson: orderData.users!,
           items: items.map((item: any) => ({
             ...item.order_items,
-            product: item.products!,
+            product: item.products,
           })),
         };
       })
@@ -690,7 +690,7 @@ export class DatabaseStorage implements IStorage {
           salesPerson: orderData.users!,
           items: items.map((item: any) => ({
             ...item.order_items,
-            product: item.products!,
+            product: item.products,
           })),
         };
       })
