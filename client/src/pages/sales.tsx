@@ -223,7 +223,70 @@ export default function Sales() {
 
     createVisitMutation.mutate(visitData);
 
-    // If creating new customer, handle customer creation first
+    // Handle order creation - check if customer is already saved (new workflow)
+    if (orderData) {
+      let customerId;
+      
+      // Check if customerId is already provided in orderData (new workflow)
+      if (orderData.customerId) {
+        customerId = orderData.customerId;
+      } else if (selectedCustomer?.id) {
+        customerId = selectedCustomer.id;
+      } else {
+        console.error('❌ Customer ID is missing for order creation');
+        toast({
+          title: "Hata",
+          description: "Müşteri bilgisi bulunamadı. Önce müşteriyi kaydedin.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const orderItemsData = orderData.items?.map((item: any) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.price || item.unitPrice
+      })) || [];
+      
+      const orderPayload = {
+        customerId,
+        notes: orderData.notes || '',
+        totalAmount: orderData.totalAmount?.toString() || '0',
+        status: orderData.status || 'pending',
+        items: orderItemsData
+      };
+      
+      console.log('✅ Creating order with payload:', orderPayload);
+      createOrderMutation.mutate(orderPayload);
+    }
+
+    // Handle appointment creation - check if customer is already saved (new workflow) 
+    if (appointmentData) {
+      let customerId;
+      
+      if (appointmentData.customerId) {
+        customerId = appointmentData.customerId;
+      } else if (selectedCustomer?.id) {
+        customerId = selectedCustomer.id;
+      } else {
+        console.error('❌ Customer ID is missing for appointment creation');
+        toast({
+          title: "Hata",
+          description: "Müşteri bilgisi bulunamadı. Önce müşteriyi kaydedin.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const appointmentPayload = {
+        ...appointmentData,
+        customerId,
+      };
+      
+      createAppointmentMutation.mutate(appointmentPayload);
+    }
+
+    // Legacy fallback - If creating new customer, handle customer creation first
     if (!selectedCustomer && customerData) {
       const newCustomerData = {
         ...customerData,
@@ -232,64 +295,7 @@ export default function Sales() {
         status: outcome === 'not_interested' ? 'not_interested' : 'active',
       };
       
-      // If there's order data, we need to create customer first, then order
-      if (orderData) {
-        createCustomerMutation.mutate(newCustomerData, {
-          onSuccess: (newCustomer) => {
-            // Create order items first
-            const orderItemsData = orderData.items.map((item: any) => ({
-              productId: item.productId,
-              quantity: item.quantity,
-              unitPrice: item.price
-            }));
-            
-            const orderPayload = {
-              customerId: newCustomer.id,
-              notes: orderData.notes || '',
-              totalAmount: orderData.totalAmount.toString(),
-              status: orderData.status || 'pending',
-              items: orderItemsData
-            };
-            createOrderMutation.mutate(orderPayload);
-          }
-        });
-      } else if (appointmentData) {
-        // If there's appointment data, create customer first, then appointment
-        createCustomerMutation.mutate(newCustomerData, {
-          onSuccess: (newCustomer) => {
-            const appointmentWithCustomer = {
-              ...appointmentData,
-              customerId: newCustomer.id,
-            };
-            createAppointmentMutation.mutate(appointmentWithCustomer);
-          }
-        });
-      } else {
-        createCustomerMutation.mutate(newCustomerData);
-      }
-    } else if (orderData && selectedCustomer) {
-      // Existing customer - just create the order
-      const orderItemsData = orderData.items.map((item: any) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        unitPrice: item.price
-      }));
-      
-      const orderPayload = {
-        customerId: selectedCustomer.id,
-        notes: orderData.notes || '',
-        totalAmount: orderData.totalAmount.toString(),
-        status: orderData.status || 'pending',
-        items: orderItemsData
-      };
-      createOrderMutation.mutate(orderPayload);
-    } else if (appointmentData && selectedCustomer) {
-      // Existing customer - just create the appointment
-      const appointmentWithCustomer = {
-        ...appointmentData,
-        customerId: selectedCustomer.id,
-      };
-      createAppointmentMutation.mutate(appointmentWithCustomer);
+      createCustomerMutation.mutate(newCustomerData);
     }
 
     setShowCustomerForm(false);
@@ -323,7 +329,7 @@ export default function Sales() {
           {/* Yeni Ziyaret */}
           <LocationTracker 
             onLocationUpdate={setCurrentLocation}
-            nearbyCustomers={nearbyCustomers}
+            nearbyCustomers={nearbyCustomers || []}
             onSelectCustomer={handleSelectCustomer}
             onNewCustomer={handleNewCustomer}
             isLoading={nearbyLoading}
