@@ -352,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete customer
+  // Delete customer (cascade delete - removes all related data)
   app.delete('/api/customers/:id', isAuthenticated, async (req: any, res) => {
     try {
       const userRole = req.session.user.role;
@@ -368,10 +368,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       await storage.deleteCustomer(customerId);
-      res.json({ message: "Müşteri başarıyla silindi" });
+      res.json({ message: "Müşteri ve tüm ilişkili verileri başarıyla silindi" });
     } catch (error) {
       console.error("Error deleting customer:", error);
       res.status(500).json({ message: "Müşteri silinirken bir hata oluştu" });
+    }
+  });
+
+  // Deactivate customer (soft delete - keeps all related data)
+  app.patch('/api/customers/:id/deactivate', isAuthenticated, async (req: any, res) => {
+    try {
+      const userRole = req.session.user.role;
+      const customerId = req.params.id;
+      
+      // Check permissions - only admin or the customer's sales person can deactivate
+      if (userRole !== 'admin' && userRole !== 'Admin') {
+        // For non-admin users, check if they own this customer
+        const customer = await storage.getCustomer(customerId);
+        if (!customer || customer.salesPersonId !== req.session.user.id) {
+          return res.status(403).json({ message: "Bu müşteriyi pasife alma yetkiniz yok" });
+        }
+      }
+      
+      const customer = await storage.deactivateCustomer(customerId);
+      res.json({ message: "Müşteri başarıyla pasife alındı", customer });
+    } catch (error) {
+      console.error("Error deactivating customer:", error);
+      res.status(500).json({ message: "Müşteri pasife alınırken bir hata oluştu" });
     }
   });
 

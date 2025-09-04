@@ -49,6 +49,7 @@ export interface IStorage {
   getCustomers(salesPersonId?: string): Promise<CustomerWithSalesPerson[]>;
   updateCustomer(id: string, updates: Partial<InsertCustomer>): Promise<Customer>;
   deleteCustomer(id: string): Promise<void>;
+  deactivateCustomer(id: string): Promise<Customer>;
   getNearbyCustomers(lat: number, lng: number, radiusKm?: number): Promise<CustomerWithSalesPerson[]>;
   
   // Product operations
@@ -151,7 +152,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCustomers(salesPersonId?: string): Promise<CustomerWithSalesPerson[]> {
-    let whereConditions = [sql`${customers.status} != 'deleted'`];
+    let whereConditions = [
+      sql`${customers.status} != 'deleted'`,
+      sql`${customers.status} != 'inactive'`
+    ];
     
     if (salesPersonId) {
       whereConditions.push(eq(customers.salesPersonId, salesPersonId));
@@ -180,11 +184,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCustomer(id: string): Promise<void> {
-    // Soft delete - set status to 'deleted' instead of physically removing
-    await db
+    // Cascade delete - remove all related data first, then the customer
+    
+    // Delete order items for orders belonging to this customer
+    await db.delete(orderItems).where(
+      sql`${orderItems.orderId} IN (SELECT id FROM ${orders} WHERE ${orders.customerId} = ${id})`
+    );
+    
+    // Delete orders
+    await db.delete(orders).where(eq(orders.customerId, id));
+    
+    // Delete visits
+    await db.delete(visits).where(eq(visits.customerId, id));
+    
+    // Delete appointments
+    await db.delete(appointments).where(eq(appointments.customerId, id));
+    
+    // Finally delete the customer
+    await db.delete(customers).where(eq(customers.id, id));
+  }
+
+  async deactivateCustomer(id: string): Promise<Customer> {
+    // Soft delete - just mark as inactive, keep all related data
+    const [updated] = await db
       .update(customers)
-      .set({ status: 'deleted', updatedAt: new Date() })
-      .where(eq(customers.id, id));
+      .set({ status: 'inactive', updatedAt: new Date() })
+      .where(eq(customers.id, id))
+      .returning();
+    return updated;
   }
 
   async getNearbyCustomers(lat: number, lng: number, radiusKm: number = 5): Promise<CustomerWithSalesPerson[]> {
