@@ -358,7 +358,7 @@ export default function Customers() {
 
         {/* Müşteri Düzenleme Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-[95vw] sm:max-w-lg lg:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Müşteri Bilgilerini Düzenle</DialogTitle>
             </DialogHeader>
