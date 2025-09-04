@@ -44,7 +44,7 @@ export default function CurrentAccountPage() {
 
   // Tüm faturaları getir
   const { data: allInvoices, isLoading } = useQuery({
-    queryKey: ["/api/invoices", "all"],
+    queryKey: ["/api/invoices"],
     retry: false,
   });
 
