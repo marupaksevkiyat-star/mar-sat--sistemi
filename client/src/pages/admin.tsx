@@ -432,44 +432,44 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          {/* Customer Management */}
+          {/* Mail Settings */}
           <Card 
             className="hover:shadow-md transition-all cursor-pointer hover:scale-105" 
-            onClick={() => setActiveModal('customers')}
-            data-testid="card-customer-management"
+            onClick={() => window.location.href = '/mail-settings'}
+            data-testid="card-mail-settings"
           >
             <CardContent className="p-6">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <i className="fas fa-building text-green-600 text-xl"></i>
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <i className="fas fa-envelope-open-text text-orange-600 text-xl"></i>
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">Müşteri Yönetimi</h3>
-              <p className="text-sm text-muted-foreground mb-4">Müşteri kayıtları ve iletişim bilgileri</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Mail Ayarları</h3>
+              <p className="text-sm text-muted-foreground mb-4">E-posta yapılandırmaları ve bildirim ayarları</p>
               <div className="flex items-center text-sm">
-                <span className="font-medium text-foreground" data-testid="text-total-customers">
-                  {customerStats.totalCustomers}
+                <span className="font-medium text-foreground">
+                  Yapılandır
                 </span>
-                <span className="text-muted-foreground ml-1">kayıtlı müşteri</span>
+                <i className="fas fa-arrow-right text-muted-foreground ml-2"></i>
               </div>
             </CardContent>
           </Card>
 
-          {/* Product Management */}
+          {/* Permissions Management */}
           <Card 
             className="hover:shadow-md transition-all cursor-pointer hover:scale-105" 
-            onClick={() => setActiveModal('products')}
-            data-testid="card-product-management"
+            onClick={() => window.location.href = '/permissions'}
+            data-testid="card-permissions"
           >
             <CardContent className="p-6">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <i className="fas fa-boxes text-purple-600 text-xl"></i>
+              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                <i className="fas fa-user-shield text-indigo-600 text-xl"></i>
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">Ürün Yönetimi</h3>
-              <p className="text-sm text-muted-foreground mb-4">Ürün katalogu ve fiyat yönetimi</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Yetki Yönetimi</h3>
+              <p className="text-sm text-muted-foreground mb-4">Kullanıcı rolleri ve sayfa erişim yetkileri</p>
               <div className="flex items-center text-sm">
-                <span className="font-medium text-foreground" data-testid="text-total-products">
-                  {productStats.totalProducts}
+                <span className="font-medium text-foreground">
+                  Yönet
                 </span>
-                <span className="text-muted-foreground ml-1">ürün çeşidi</span>
+                <i className="fas fa-arrow-right text-muted-foreground ml-2"></i>
               </div>
             </CardContent>
           </Card>
