@@ -69,6 +69,21 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
             <p><strong>Araç:</strong> {slip.vehiclePlate}</p>
             {slip.notes && <p><strong>Not:</strong> {slip.notes}</p>}
           </div>
+          
+          {/* İrsaliye İçerikleri */}
+          {slip.items && slip.items.length > 0 && (
+            <div className="mt-3 pt-3 border-t">
+              <p className="text-xs font-medium text-muted-foreground mb-2">İrsaliye İçeriği:</p>
+              <div className="space-y-1">
+                {slip.items.map((item: any, index: number) => (
+                  <div key={index} className="text-xs text-muted-foreground flex justify-between">
+                    <span>{item.productName}</span>
+                    <span>{item.deliveredQuantity}/{item.quantity} {item.unit}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       ))}
     </div>
