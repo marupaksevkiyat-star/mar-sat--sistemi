@@ -36,7 +36,7 @@ function Router() {
       return userRole === 'production' || userRole === 'production_staff' || userRole.includes('Üretim');
     }
     if (requiredRole === 'shipping') {
-      const hasAccess = userRole === 'shipping' || userRole === 'shipping_staff' || userRole.includes('Sevkiyat');
+      const hasAccess = userRole === 'shipping' || userRole === 'shipping_staff' || userRole.includes('Sevkiyat') || userRole === 'Sevkiyat Personeli';
       console.log("🚚 Shipping access check:", { userRole, hasAccess });
       return hasAccess;
     }
