@@ -43,10 +43,9 @@ export default function CustomerForm({
       const response = await apiRequest("POST", "/api/customers", customerData);
       return response;
     },
-    onSuccess: (response: any) => {
-      console.log('✅ Customer saved response:', response);
-      const newCustomer = response.customer || response;
-      console.log('✅ Processed customer data:', newCustomer);
+    onSuccess: (newCustomer: any) => {
+      console.log('✅ Customer saved response:', newCustomer);
+      // Server direkt customer objesi döndürüyor, wrapper objesi değil
       setSavedCustomer(newCustomer);
       setIsCustomerSaved(true);
       toast({
@@ -128,38 +127,40 @@ export default function CustomerForm({
   };
 
   const handleOrderSubmit = (orderData: any) => {
-    const customerToUse = customer || savedCustomer;
+    const customerToUse = savedCustomer || customer;
+    console.log('📤 HandleOrderSubmit - customerToUse:', customerToUse);
     
     // Use the saved customer data instead of creating new one
     if (customerToUse && customerToUse.id && customerToUse.id !== 'new') {
       // We have a real saved customer, just create the order
+      console.log('📤 Submitting order with customerId:', customerToUse.id);
       onComplete('sale', null, { ...orderData, customerId: customerToUse.id });
     } else {
-      // Fallback - shouldn't happen if customer is properly saved
-      const customerData = {
-        ...formData,
-        latitude: currentLocation?.lat?.toString(),
-        longitude: currentLocation?.lng?.toString(),
-      };
-      onComplete('sale', customerData, orderData);
+      console.error('❌ No valid customer found for order');
+      toast({
+        title: "Hata",
+        description: "Müşteri bilgisi bulunamadı. Lütfen sayfayı yenileyin.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleAppointmentSubmit = (appointmentData: any) => {
-    const customerToUse = customer || savedCustomer;
+    const customerToUse = savedCustomer || customer;
+    console.log('📅 HandleAppointmentSubmit - customerToUse:', customerToUse);
     
     // Use the saved customer data instead of creating new one
     if (customerToUse && customerToUse.id && customerToUse.id !== 'new') {
       // We have a real saved customer, just create the appointment
+      console.log('📅 Submitting appointment with customerId:', customerToUse.id);
       onComplete('follow_up', null, null, { ...appointmentData, customerId: customerToUse.id });
     } else {
-      // Fallback - shouldn't happen if customer is properly saved
-      const customerData = {
-        ...formData,
-        latitude: currentLocation?.lat?.toString(),
-        longitude: currentLocation?.lng?.toString(),
-      };
-      onComplete('follow_up', customerData, null, appointmentData);
+      console.error('❌ No valid customer found for appointment');
+      toast({
+        title: "Hata",
+        description: "Müşteri bilgisi bulunamadı. Lütfen sayfayı yenileyin.",
+        variant: "destructive",
+      });
     }
   };
 
