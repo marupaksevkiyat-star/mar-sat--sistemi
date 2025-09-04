@@ -27,13 +27,13 @@ function Router() {
     
     // Specific role checks
     if (requiredRole === 'sales') {
-      return userRole === 'sales' || userRole.includes('Satış');
+      return userRole === 'sales' || userRole === 'sales_staff' || userRole.includes('Satış');
     }
     if (requiredRole === 'production') {
-      return userRole === 'production' || userRole.includes('Üretim');
+      return userRole === 'production' || userRole === 'production_staff' || userRole.includes('Üretim');
     }
     if (requiredRole === 'shipping') {
-      return userRole === 'shipping' || userRole.includes('Sevkiyat');
+      return userRole === 'shipping' || userRole === 'shipping_staff' || userRole.includes('Sevkiyat');
     }
     if (requiredRole === 'admin') {
       return userRole === 'admin' || userRole === 'Admin';

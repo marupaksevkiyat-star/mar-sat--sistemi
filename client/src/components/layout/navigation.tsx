@@ -52,7 +52,7 @@ export default function Navigation() {
     }
     
     // Satış personeli - sadece satış sayfalarını görebilir
-    if (userRole === 'sales' || userRole.includes('Satış')) {
+    if (userRole === 'sales' || userRole === 'sales_staff' || userRole.includes('Satış')) {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
         { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
@@ -61,7 +61,7 @@ export default function Navigation() {
     }
     
     // Üretim personeli - sadece üretim sayfalarını görebilir
-    if (userRole === 'production' || userRole.includes('Üretim')) {
+    if (userRole === 'production' || userRole === 'production_staff' || userRole.includes('Üretim')) {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
         { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
@@ -70,7 +70,7 @@ export default function Navigation() {
     }
     
     // Sevkiyat personeli - sadece sevkiyat sayfalarını görebilir
-    if (userRole === 'shipping' || userRole.includes('Sevkiyat')) {
+    if (userRole === 'shipping' || userRole === 'shipping_staff' || userRole.includes('Sevkiyat')) {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
         { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
