@@ -45,12 +45,14 @@ export default function Customers() {
     enabled: isAuthenticated,
   });
 
+  const customersArray = Array.isArray(customers) ? customers : [];
+
   // Müşteri silme mutation
   const deleteCustomerMutation = useMutation({
     mutationFn: (customerId: string) => 
-      apiRequest(`/api/customers/${customerId}`, {
+      fetch(`/api/customers/${customerId}`, {
         method: 'DELETE',
-      }),
+      }).then(res => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/customers'] });
       toast({
@@ -70,10 +72,11 @@ export default function Customers() {
   // Müşteri güncelleme mutation
   const updateCustomerMutation = useMutation({
     mutationFn: (data: { id: string } & Partial<Customer>) =>
-      apiRequest(`/api/customers/${data.id}`, {
+      fetch(`/api/customers/${data.id}`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-      }),
+      }).then(res => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/customers'] });
       setIsDialogOpen(false);
@@ -108,7 +111,7 @@ export default function Customers() {
   }
 
   // Filtreleme
-  const filteredCustomers = customers.filter((customer: Customer) => {
+  const filteredCustomers = customersArray.filter((customer: Customer) => {
     const matchesSearch = 
       customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.contactPerson.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -205,7 +208,7 @@ export default function Customers() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Toplam</p>
-                  <p className="text-2xl font-bold">{customers.length}</p>
+                  <p className="text-2xl font-bold">{customersArray.length}</p>
                 </div>
                 <Building className="h-8 w-8 text-muted-foreground" />
               </div>
@@ -218,7 +221,7 @@ export default function Customers() {
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Aktif</p>
                   <p className="text-2xl font-bold text-green-600">
-                    {customers.filter((c: Customer) => c.status === 'active').length}
+                    {customersArray.filter((c: Customer) => c.status === 'active').length}
                   </p>
                 </div>
                 <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
@@ -234,7 +237,7 @@ export default function Customers() {
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Potansiyel</p>
                   <p className="text-2xl font-bold text-blue-600">
-                    {customers.filter((c: Customer) => c.status === 'potential').length}
+                    {customersArray.filter((c: Customer) => c.status === 'potential').length}
                   </p>
                 </div>
                 <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -250,7 +253,7 @@ export default function Customers() {
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Pasif</p>
                   <p className="text-2xl font-bold text-gray-600">
-                    {customers.filter((c: Customer) => c.status === 'inactive').length}
+                    {customersArray.filter((c: Customer) => c.status === 'inactive').length}
                   </p>
                 </div>
                 <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
