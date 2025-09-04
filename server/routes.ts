@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { orders, invoices, customers, orderItems, products } from "@shared/schema";
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, inArray, notInArray } from "drizzle-orm";
 import { 
   insertCustomerSchema, 
   insertProductSchema,
@@ -428,7 +428,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/orders/delivered-by-customer', isAuthenticated, async (req, res) => {
     console.log("🚀 ÇALIŞTI: delivered-by-customer endpoint");
     try {
-      // Müşteriyi de dahil ederek delivered orderları getir
+      // Önce faturalaşmış siparişleri tespit et
+      const invoicedOrderIds = await db
+        .select({ orderId: invoices.orderId })
+        .from(invoices);
+      
+      const invoicedIds = invoicedOrderIds.map(inv => inv.orderId);
+      console.log("📋 Toplam faturalaşmış sipariş sayısı:", invoicedIds.length);
+
+      // Müşteriyi de dahil ederek delivered ama faturalaşmamış orderları getir
       const result = await db
         .select({
           orderId: orders.id,
@@ -442,7 +450,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .from(orders)
         .innerJoin(customers, eq(orders.customerId, customers.id))
-        .where(eq(orders.status, 'delivered'));
+        .where(
+          and(
+            eq(orders.status, 'delivered'),
+            // Faturalaşmamış siparişleri getir
+            invoicedIds.length > 0 ? notInArray(orders.id, invoicedIds) : undefined
+          )
+        );
       
       console.log("📦 Raw delivered orders:", result.length);
       

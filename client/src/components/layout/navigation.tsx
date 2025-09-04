@@ -45,6 +45,7 @@ export default function Navigation() {
         { path: "/sales", label: "Satış", icon: "fas fa-users" },
         { path: "/sales-reports", label: "Satış Raporları", icon: "fas fa-chart-bar" },
         { path: "/invoices", label: "İrsaliyeler", icon: "fas fa-file-invoice" },
+        { path: "/current-account", label: "Cari Hesap", icon: "fas fa-file-text" },
         { path: "/production", label: "Üretim", icon: "fas fa-cogs" },
         { path: "/shipping", label: "Sevkiyat", icon: "fas fa-truck" },
         { path: "/admin", label: "Yönetim", icon: "fas fa-shield-alt" },
@@ -84,6 +85,7 @@ export default function Navigation() {
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
         { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
         { path: "/invoices", label: "Muhasebe", icon: "fas fa-calculator" },
+        { path: "/current-account", label: "Cari Hesap", icon: "fas fa-file-text" },
       ];
     }
     

@@ -10,6 +10,7 @@ import Home from "@/pages/home";
 import Sales from "@/pages/sales";
 import SalesReports from "@/pages/sales-reports";
 import Invoices from "@/pages/invoices";
+import CurrentAccount from "@/pages/current-account";
 import Production from "@/pages/production";
 import Shipping from "@/pages/shipping";
 import Admin from "@/pages/admin";
@@ -90,6 +91,9 @@ function Router() {
           </Route>
           <Route path="/invoices">
             <ProtectedRoute component={Invoices} requiredRole="accounting" />
+          </Route>
+          <Route path="/current-account">
+            <ProtectedRoute component={CurrentAccount} requiredRole="accounting" />
           </Route>
           <Route path="/mail-settings">
             <ProtectedRoute component={MailSettings} requiredRole="admin" />
