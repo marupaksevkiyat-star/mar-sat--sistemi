@@ -839,8 +839,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/orders/delivered-by-customer', isAuthenticated, async (req, res) => {
     try {
       console.log("🔍 API called: /api/orders/delivered-by-customer");
+      console.log("🔍 About to call storage.getOrders with status: delivered");
       const deliveredOrders = await storage.getOrders({ status: 'delivered' });
       console.log("📦 Delivered orders found:", deliveredOrders.length);
+      console.log("📦 First order structure:", deliveredOrders.length > 0 ? JSON.stringify(deliveredOrders[0], null, 2) : "No orders");
       
       // Group orders by customer
       const groupedOrders: Record<string, any> = {};
@@ -890,7 +892,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(Object.values(groupedOrders));
     } catch (error) {
       console.error("Error fetching delivered orders by customer:", error);
-      res.status(404).json({ message: "Order not found" });
+      res.status(500).json({ message: "Failed to fetch delivered orders by customer" });
     }
   });
 
@@ -901,7 +903,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(readyOrders);
     } catch (error) {
       console.error("Error fetching ready-for-shipping orders:", error);
-      res.status(404).json({ message: "Order not found" });
+      res.status(500).json({ message: "Failed to fetch ready-for-shipping orders" });
     }
   });
 
