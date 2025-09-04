@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertCircle, Plus, Search, Edit, Trash2, Building, MapPin, Phone, Mail, User } from "lucide-react";
+import { AlertCircle, Plus, Search, Edit, Trash2, Building, MapPin, Phone, Mail, User, Pause } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 interface Customer {
@@ -111,6 +111,36 @@ export default function Customers() {
     },
   });
 
+  // Müşteri pasife alma mutation
+  const deactivateCustomerMutation = useMutation({
+    mutationFn: async (customerId: string) => {
+      const response = await fetch(`/api/customers/${customerId}/deactivate`, {
+        method: 'PATCH',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/customers'] });
+      toast({
+        title: "Başarılı",
+        description: "Müşteri pasife alındı",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Deactivate customer error:', error);
+      toast({
+        title: "Hata",
+        description: "Müşteri pasife alınırken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -158,8 +188,14 @@ export default function Customers() {
   };
 
   const handleDeleteCustomer = (customerId: string) => {
-    if (window.confirm('Bu müşteriyi silmek istediğinizden emin misiniz?')) {
+    if (window.confirm('Bu müşteriyi ve TÜM ilişkili verilerini (siparişler, ziyaretler, randevular) kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
       deleteCustomerMutation.mutate(customerId);
+    }
+  };
+
+  const handleDeactivateCustomer = (customerId: string) => {
+    if (window.confirm('Bu müşteriyi pasife almak istediğinizden emin misiniz? Müşteri verileriniz korunacak ancak müşteri listesinde görünmeyecek.')) {
+      deactivateCustomerMutation.mutate(customerId);
     }
   };
 
@@ -357,9 +393,21 @@ export default function Customers() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => handleDeactivateCustomer(customer.id)}
+                          className="text-orange-600 hover:text-orange-700"
+                          data-testid={`button-deactivate-${customer.id}`}
+                          title="Pasife Al"
+                        >
+                          <Pause className="w-4 h-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => handleDeleteCustomer(customer.id)}
                           className="text-destructive hover:text-destructive"
                           data-testid={`button-delete-${customer.id}`}
+                          title="Kalıcı Sil"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
