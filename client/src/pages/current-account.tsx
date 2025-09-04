@@ -57,11 +57,38 @@ export default function CurrentAccountPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // Tüm faturaları getir
+  const { data: allInvoices, isLoading } = useQuery({
+    queryKey: ["/api/invoices"],
+    retry: false,
+  });
+
+  // Müşteri bazında faturaları grupla
+  const customerInvoices = (allInvoices && Array.isArray(allInvoices)) ? 
+    (allInvoices as CustomerInvoice[]).reduce((acc: any, invoice: CustomerInvoice) => {
+      const companyName = invoice.customer?.companyName || 'Bilinmeyen Müşteri';
+      if (!acc[companyName]) {
+        acc[companyName] = {
+          customer: invoice.customer || { companyName: 'Bilinmeyen Müşteri' },
+          invoices: [],
+          totalAmount: 0,
+          invoiceCount: 0
+        };
+      }
+      acc[companyName].invoices.push(invoice);
+      acc[companyName].totalAmount += parseFloat(invoice.totalAmount || '0');
+      acc[companyName].invoiceCount++;
+      return acc;
+    }, {}) : {};
+
+  // Seçili müşterinin gerçek ID'sini al
+  const selectedCustomerId = selectedCustomer ? customerInvoices[selectedCustomer]?.customer?.id : null;
+
   // Ödeme ekleme mutation
   const addPaymentMutation = useMutation({
     mutationFn: async () => {
       const paymentData = {
-        customerId: customerInvoices[selectedCustomer]?.customer?.id || selectedCustomer,
+        customerId: selectedCustomerId || selectedCustomer,
         amount: parseFloat(paymentForm.amount),
         paymentMethod: paymentForm.paymentMethod,
         description: paymentForm.description,
@@ -79,6 +106,7 @@ export default function CurrentAccountPage() {
       
       // Verileri güncelle
       queryClient.invalidateQueries({ queryKey: ['/api/invoices'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/customers/${selectedCustomerId}/payments`] });
       
       // Formu sıfırla ve modalı kapat
       setPaymentForm({
@@ -121,16 +149,10 @@ export default function CurrentAccountPage() {
     addPaymentMutation.mutate();
   };
 
-  // Tüm faturaları getir
-  const { data: allInvoices, isLoading } = useQuery({
-    queryKey: ["/api/invoices"],
-    retry: false,
-  });
-
   // Seçili müşterinin ödemelerini getir
   const { data: customerPayments } = useQuery({
-    queryKey: [`/api/customers/${selectedCustomer}/payments`],
-    enabled: !!selectedCustomer,
+    queryKey: [`/api/customers/${selectedCustomerId}/payments`],
+    enabled: !!selectedCustomerId,
     retry: false,
   });
 
@@ -146,33 +168,6 @@ export default function CurrentAccountPage() {
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
 
-  // Debug log - fatura verilerini kontrol et
-  console.log("🔍 All invoices data:", allInvoices);
-  
-  // Müşteri bazında faturaları grupla
-  const customerInvoices = (allInvoices && Array.isArray(allInvoices)) ? 
-    (allInvoices as CustomerInvoice[]).reduce((acc: any, invoice: CustomerInvoice) => {
-      console.log("🔍 Processing invoice:", {
-        invoiceNumber: invoice.invoiceNumber,
-        hasCustomer: !!invoice.customer,
-        customer: invoice.customer
-      });
-      
-      const companyName = invoice.customer?.companyName || 'Bilinmeyen Müşteri';
-      if (!acc[companyName]) {
-        acc[companyName] = {
-          customer: invoice.customer || { companyName: 'Bilinmeyen Müşteri' },
-          invoices: [],
-          totalAmount: 0,
-          invoiceCount: 0
-        };
-      }
-      acc[companyName].invoices.push(invoice);
-      acc[companyName].totalAmount += parseFloat(invoice.totalAmount || '0');
-      acc[companyName].invoiceCount++;
-      return acc;
-    }, {}) : {};
-    
   console.log("📊 Grouped customer invoices:", customerInvoices);
 
   const filteredCustomers = Object.entries(customerInvoices).filter(([companyName]) => 
