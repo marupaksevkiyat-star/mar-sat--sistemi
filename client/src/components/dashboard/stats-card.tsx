@@ -8,7 +8,7 @@ interface StatsCardProps {
   changeType?: "positive" | "negative";
   subtitle?: string;
   icon: string;
-  color: "blue" | "green" | "yellow" | "purple" | "red";
+  color: "blue" | "green" | "yellow" | "purple" | "red" | "cyan" | "orange" | "emerald";
   isLoading?: boolean;
   "data-testid"?: string;
   onClick?: () => void;
@@ -32,6 +32,9 @@ export default function StatsCard({
     yellow: "bg-yellow-100 text-yellow-600",
     purple: "bg-purple-100 text-purple-600",
     red: "bg-red-100 text-red-600",
+    cyan: "bg-cyan-100 text-cyan-600",
+    orange: "bg-orange-100 text-orange-600",
+    emerald: "bg-emerald-100 text-emerald-600",
   };
 
   if (isLoading) {
