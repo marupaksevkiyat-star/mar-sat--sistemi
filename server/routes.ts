@@ -402,8 +402,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const filters: any = {};
       if (status) filters.status = status;
       
-      // Admin tüm siparileri görebilir, diğerleri sadece kendi siparislerini
-      if (userRole !== 'admin' && userRole !== 'Admin') {
+      // Admin, üretim ve sevkiyat personeli tüm siparişleri görebilir
+      // Sadece satış personeli kendi siparişlerini görebilir
+      if (userRole !== 'admin' && userRole !== 'Admin' && 
+          userRole !== 'production' && userRole !== 'production_staff' &&
+          userRole !== 'shipping' && userRole !== 'shipping_staff') {
         filters.salesPersonId = userId;
       }
       
