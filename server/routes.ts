@@ -984,6 +984,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Response
       const response = {
         ...savedInvoice,
+        orderCount: orderIds.length,
         invoiceDetails: invoiceDetails,
         success: true
       };

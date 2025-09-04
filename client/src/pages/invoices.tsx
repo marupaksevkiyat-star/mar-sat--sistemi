@@ -339,19 +339,31 @@ export default function InvoicesPage() {
                     <div>
                       <h3 className="font-semibold mb-4 text-green-700">Kesilmiş Faturalar</h3>
                       <div className="space-y-3 max-h-96 overflow-y-auto">
-                        {customerAccountDetails?.existingInvoices?.map((invoice: any) => (
-                          <div key={invoice.id} className="border rounded p-3 bg-green-50 dark:bg-green-900/20">
-                            <div className="font-medium">{invoice.invoiceNumber}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {formatDate(invoice.createdAt)}
+                        {customerAccountDetails?.existingInvoices?.length > 0 ? (
+                          customerAccountDetails.existingInvoices.map((invoice: any) => (
+                            <div key={invoice.id} className="border rounded p-3 bg-green-50 dark:bg-green-900/20">
+                              <div className="font-medium">{invoice.invoiceNumber}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {formatDate(invoice.createdAt)}
+                              </div>
+                              <div className="text-sm mt-2">
+                                <Badge variant="outline" className="text-green-700">
+                                  {invoice.status}
+                                </Badge>
+                              </div>
+                              {invoice.notes && (
+                                <div className="text-xs text-muted-foreground mt-2 p-2 bg-white dark:bg-gray-800 rounded">
+                                  {invoice.notes}
+                                </div>
+                              )}
                             </div>
-                            <div className="text-sm mt-1">
-                              <Badge variant="outline" className="text-green-700">
-                                {invoice.status}
-                              </Badge>
-                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-8 text-muted-foreground">
+                            <Receipt className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                            <p>Henüz kesilmiş fatura yok</p>
                           </div>
-                        ))}
+                        )}
                       </div>
                     </div>
                   </div>
@@ -467,13 +479,60 @@ export default function InvoicesPage() {
                 </CardContent>
               </Card>
             ) : (
+              /* TÜM FATURALAR LİSTESİ */
               <Card>
-                <CardContent className="flex items-center justify-center h-96">
-                  <div className="text-center">
-                    <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Cari hesap detaylarını görmek için soldan bir firma seçin
-                    </p>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Tüm Faturalar
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {invoices && invoices.length > 0 ? (
+                      invoices.map((invoice: any) => (
+                        <div key={invoice.id} className="border rounded p-4 hover:bg-muted/50">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="font-semibold text-lg">{invoice.invoiceNumber}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {formatDate(invoice.createdAt)}
+                              </div>
+                              <div className="mt-2">
+                                <Badge variant="outline" className={
+                                  invoice.status === 'generated' ? 'text-green-700' : 'text-blue-700'
+                                }>
+                                  {invoice.status === 'generated' ? 'Oluşturuldu' : invoice.status}
+                                </Badge>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm text-muted-foreground">Müşteri</div>
+                              <div className="font-medium">{invoice.customer?.companyName || 'Bilinmiyor'}</div>
+                            </div>
+                          </div>
+                          
+                          {invoice.notes && (
+                            <div className="mt-3 p-3 bg-muted/30 rounded text-sm">
+                              <div className="font-medium mb-1">Detaylar:</div>
+                              {invoice.notes}
+                            </div>
+                          )}
+                          
+                          {invoice.shippingAddress && (
+                            <div className="mt-2 text-xs text-muted-foreground">
+                              <strong>Teslimat:</strong> {invoice.shippingAddress}
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg font-medium mb-2">Henüz fatura oluşturulmamış</p>
+                        <p>Sol panelden firma seçip "Toplu Faturalaştır" butonuna tıklayarak fatura oluşturabilirsiniz.</p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
