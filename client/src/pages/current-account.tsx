@@ -15,6 +15,9 @@ import { Search, Building2, FileText, Receipt, Eye, Calendar, ArrowLeft, CreditC
 
 // İrsaliye Component'i
 const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
+  const [showDeliverySlipDetail, setShowDeliverySlipDetail] = useState(false);
+  const [selectedSlip, setSelectedSlip] = useState<any>(null);
+  
   const { data: deliverySlips, isLoading } = useQuery<any[]>({
     queryKey: [`/api/invoices/${invoiceId}/delivery-slips`],
     enabled: !!invoiceId,
@@ -22,6 +25,11 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
   });
 
   console.log("🚚 Modal irsaliye debug:", { invoiceId, isLoading, deliverySlips });
+
+  const handleSlipClick = (slip: any) => {
+    setSelectedSlip(slip);
+    setShowDeliverySlipDetail(true);
+  };
 
   if (isLoading) {
     return (
@@ -50,43 +58,148 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
   };
 
   return (
-    <div className="space-y-3">
-      {deliverySlips.map((slip) => (
-        <div key={slip.id} className="border rounded-lg p-3 bg-muted/20">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <p className="font-medium text-blue-600">{slip.deliverySlipNumber}</p>
-              <p className="text-xs text-muted-foreground">
-                Teslim: {formatDate(slip.deliveredAt)}
-              </p>
+    <>
+      <div className="space-y-3">
+        {deliverySlips.map((slip) => (
+          <div key={slip.id} className="border rounded-lg p-3 bg-muted/20">
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <p 
+                  className="font-medium text-blue-600 hover:text-blue-800 cursor-pointer underline"
+                  onClick={() => handleSlipClick(slip)}
+                >
+                  {slip.deliverySlipNumber}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Teslim: {formatDate(slip.deliveredAt)}
+                </p>
+              </div>
+              <Badge variant={slip.status === 'delivered' ? 'default' : 'secondary'} className="text-xs">
+                {slip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}
+              </Badge>
             </div>
-            <Badge variant={slip.status === 'delivered' ? 'default' : 'secondary'} className="text-xs">
-              {slip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}
-            </Badge>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p><strong>Şoför:</strong> {slip.driverName}</p>
+              <p><strong>Araç:</strong> {slip.vehiclePlate}</p>
+              {slip.notes && <p><strong>Not:</strong> {slip.notes}</p>}
+            </div>
+            
+            {/* İrsaliye İçerikleri */}
+            {slip.items && slip.items.length > 0 && (
+              <div className="mt-3 pt-3 border-t">
+                <p className="text-xs font-medium text-muted-foreground mb-2">İrsaliye İçeriği:</p>
+                <div className="space-y-1">
+                  {slip.items.map((item: any, index: number) => (
+                    <div key={index} className="text-xs text-muted-foreground flex justify-between">
+                      <span>{item.productName}</span>
+                      <span>{item.deliveredQuantity}/{item.quantity} {item.unit}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-          <div className="text-xs text-muted-foreground space-y-1">
-            <p><strong>Şoför:</strong> {slip.driverName}</p>
-            <p><strong>Araç:</strong> {slip.vehiclePlate}</p>
-            {slip.notes && <p><strong>Not:</strong> {slip.notes}</p>}
-          </div>
+        ))}
+      </div>
+    
+    {/* İrsaliye Detay Modal */}
+    {showDeliverySlipDetail && selectedSlip && (
+      <Dialog open={showDeliverySlipDetail} onOpenChange={setShowDeliverySlipDetail}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Package className="w-5 h-5" />
+              İmzalı İrsaliye: {selectedSlip.deliverySlipNumber}
+            </DialogTitle>
+          </DialogHeader>
           
-          {/* İrsaliye İçerikleri */}
-          {slip.items && slip.items.length > 0 && (
-            <div className="mt-3 pt-3 border-t">
-              <p className="text-xs font-medium text-muted-foreground mb-2">İrsaliye İçeriği:</p>
-              <div className="space-y-1">
-                {slip.items.map((item: any, index: number) => (
-                  <div key={index} className="text-xs text-muted-foreground flex justify-between">
-                    <span>{item.productName}</span>
-                    <span>{item.deliveredQuantity}/{item.quantity} {item.unit}</span>
+          <div className="space-y-6">
+            {/* İrsaliye Bilgileri */}
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-semibold mb-3">Teslimat Bilgileri</h3>
+                <div className="space-y-2 text-sm">
+                  <div><strong>İrsaliye No:</strong> {selectedSlip.deliverySlipNumber}</div>
+                  <div><strong>Teslimat Tarihi:</strong> {formatDate(selectedSlip.deliveredAt)}</div>
+                  <div><strong>Durum:</strong> 
+                    <Badge variant="default" className="ml-2">
+                      {selectedSlip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}
+                    </Badge>
                   </div>
-                ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3">Nakliye Bilgileri</h3>
+                <div className="space-y-2 text-sm">
+                  <div><strong>Şoför:</strong> {selectedSlip.driverName}</div>
+                  <div><strong>Araç Plakası:</strong> {selectedSlip.vehiclePlate}</div>
+                  <div><strong>Not:</strong> {selectedSlip.notes || 'Yok'}</div>
+                </div>
               </div>
             </div>
-          )}
-        </div>
-      ))}
-    </div>
+
+            {/* İrsaliye Kalemleri */}
+            <div>
+              <h3 className="font-semibold mb-3">İrsaliye Kalemleri</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      <th className="text-left p-3">Ürün</th>
+                      <th className="text-center p-3">Miktar</th>
+                      <th className="text-center p-3">Birim</th>
+                      <th className="text-left p-3">Notlar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedSlip.items?.map((item: any, index: number) => (
+                      <tr key={index} className="border-b">
+                        <td className="p-3 font-medium">{item.productName}</td>
+                        <td className="text-center p-3">{item.deliveredQuantity}</td>
+                        <td className="text-center p-3">{item.unit}</td>
+                        <td className="p-3">{item.notes || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* İmza Alanı */}
+            <div className="bg-muted/30 p-6 rounded-lg">
+              <h3 className="font-semibold mb-4">Teslimat Onayı</h3>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <div><strong>Teslim Eden:</strong> {selectedSlip.driverName}</div>
+                  <div className="h-20 border-2 border-dashed border-muted-foreground/30 rounded flex items-center justify-center text-muted-foreground">
+                    Şoför İmzası
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div><strong>Teslim Alan:</strong> [Müşteri Adı]</div>
+                  <div className="h-20 border-2 border-dashed border-muted-foreground/30 rounded flex items-center justify-center text-muted-foreground">
+                    Alıcı İmzası
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 text-xs text-muted-foreground">
+                Tarih: {formatDate(selectedSlip.deliveredAt)}
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setShowDeliverySlipDetail(false)}>
+              Kapat
+            </Button>
+            <Button>
+              PDF İndir
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    )}
+    </>
   );
 };
 
