@@ -193,21 +193,6 @@ export default function CurrentAccountPage() {
       ? customerPayments.sort((a: any, b: any) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())[0]
       : null;
     
-    // Debug bilgileri - özellikle Bab Cafe için
-    if (companyName.toLowerCase().includes('bab')) {
-      console.log(`🚨 BAB CAFE DEBUG:`, {
-        companyName,
-        customerId,
-        totalInvoices,
-        allPayments: allPayments,
-        customerPayments,
-        totalPayments,
-        balance,
-        lastPayment,
-        allPaymentsCount: allPayments?.length || 0,
-        paymentAmounts: customerPayments.map((p: any) => ({ amount: p.amount, customerId: p.customerId }))
-      });
-    }
     
     return {
       totalInvoices,
