@@ -399,6 +399,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userRole = req.session.user.role;
       const { status } = req.query;
       
+      console.log(`📋 Orders request - User: ${userId}, Role: ${userRole}, Status filter: ${status}`);
+      
       const filters: any = {};
       if (status) filters.status = status;
       
@@ -406,11 +408,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Sadece satış personeli kendi siparişlerini görebilir
       if (userRole !== 'admin' && userRole !== 'Admin' && 
           userRole !== 'production' && userRole !== 'production_staff' &&
-          userRole !== 'shipping' && userRole !== 'shipping_staff') {
+          userRole !== 'shipping' && userRole !== 'shipping_staff' &&
+          !userRole.includes('Üretim') && !userRole.includes('Sevkiyat')) {
         filters.salesPersonId = userId;
+        console.log(`🔒 Filtering orders by salesPersonId: ${userId}`);
+      } else {
+        console.log(`👤 User can see all orders - Role: ${userRole}`);
       }
       
       const orders = await storage.getOrders(filters);
+      console.log(`📊 Found ${orders.length} orders for user ${userId}`);
       res.json(orders);
     } catch (error) {
       console.error("Error fetching orders:", error);
