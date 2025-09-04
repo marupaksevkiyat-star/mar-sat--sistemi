@@ -83,7 +83,7 @@ export default function Navigation() {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
         { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
-        { path: "/accounting", label: "Muhasebe", icon: "fas fa-calculator" },
+        { path: "/invoices", label: "Muhasebe", icon: "fas fa-calculator" },
       ];
     }
     
