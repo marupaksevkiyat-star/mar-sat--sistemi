@@ -227,6 +227,40 @@ export const invoiceItems = pgTable("invoice_items", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Delivery Slips (İrsaliye) table
+export const deliverySlips = pgTable("delivery_slips", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  deliverySlipNumber: varchar("delivery_slip_number").notNull().unique(), // İrsaliye numarası
+  invoiceId: varchar("invoice_id").references(() => invoices.id, { onDelete: "set null" }), // Hangi faturaya ait (nullable - henüz faturalanmamış olabilir)
+  orderId: varchar("order_id").notNull().references(() => orders.id), // Hangi siparişten
+  customerId: varchar("customer_id").notNull().references(() => customers.id),
+  status: varchar("status").notNull().default("prepared"), // prepared, delivered, returned
+  deliveryAddress: text("delivery_address"),
+  recipientName: varchar("recipient_name"),
+  recipientPhone: varchar("recipient_phone"),
+  driverName: varchar("driver_name"),
+  driverPhone: varchar("driver_phone"),
+  vehiclePlate: varchar("vehicle_plate"),
+  deliveredAt: timestamp("delivered_at"),
+  notes: text("notes"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Delivery Slip Items (İrsaliye Kalemleri) table
+export const deliverySlipItems = pgTable("delivery_slip_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  deliverySlipId: varchar("delivery_slip_id").notNull().references(() => deliverySlips.id, { onDelete: "cascade" }),
+  productId: varchar("product_id").notNull().references(() => products.id),
+  productName: varchar("product_name").notNull(), // Ürün adının kopyası
+  quantity: integer("quantity").notNull(),
+  unit: varchar("unit").notNull(),
+  deliveredQuantity: integer("delivered_quantity").notNull().default(0), // Gerçekte teslim edilen miktar
+  notes: text("notes"), // Kalem notları
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   customers: many(customers),
@@ -480,6 +514,23 @@ export type InsertAccountTransaction = z.infer<typeof insertAccountTransactionSc
 export type AccountTransaction = typeof accountTransactions.$inferSelect;
 export type InsertInvoiceItem = z.infer<typeof insertInvoiceItemSchema>;
 export type InvoiceItem = typeof invoiceItems.$inferSelect;
+
+// Delivery Slip schemas
+export const insertDeliverySlipSchema = createInsertSchema(deliverySlips).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertDeliverySlipItemSchema = createInsertSchema(deliverySlipItems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertDeliverySlip = z.infer<typeof insertDeliverySlipSchema>;
+export type DeliverySlip = typeof deliverySlips.$inferSelect;
+export type InsertDeliverySlipItem = z.infer<typeof insertDeliverySlipItemSchema>;
+export type DeliverySlipItem = typeof deliverySlipItems.$inferSelect;
 
 // Extended types for API responses
 export type OrderWithDetails = Order & {
