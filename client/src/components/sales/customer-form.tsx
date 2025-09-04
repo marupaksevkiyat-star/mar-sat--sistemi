@@ -44,7 +44,9 @@ export default function CustomerForm({
       return response;
     },
     onSuccess: (response: any) => {
+      console.log('✅ Customer saved response:', response);
       const newCustomer = response.customer || response;
+      console.log('✅ Processed customer data:', newCustomer);
       setSavedCustomer(newCustomer);
       setIsCustomerSaved(true);
       toast({
@@ -165,11 +167,14 @@ export default function CustomerForm({
 
   // Show order form if sale is selected
   if (showOrderForm) {
-    const customerForOrder = customer || savedCustomer || { 
+    // Use saved customer if available, otherwise the passed customer
+    const customerForOrder = savedCustomer || customer || { 
       id: 'new', 
       name: formData.companyName,
       companyName: formData.companyName 
     };
+
+    console.log('🏷️ CustomerForm - Customer for order:', customerForOrder);
     
     return (
       <OrderForm

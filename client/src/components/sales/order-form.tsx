@@ -69,6 +69,15 @@ export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormPro
       return;
     }
 
+    // Check if customer ID is valid (not 'new')
+    if (!customer.id || customer.id === 'new') {
+      alert("Müşteri bilgisi eksik. Lütfen önce müşteriyi kaydedin.");
+      return;
+    }
+
+    console.log('📋 OrderForm - Customer ID:', customer.id);
+    console.log('📋 OrderForm - Customer data:', customer);
+
     // Basit format
     const orderData = {
       customerId: customer.id,
@@ -83,6 +92,7 @@ export default function OrderForm({ customer, onSubmit, onCancel }: OrderFormPro
       status: 'pending'
     };
 
+    console.log('📋 OrderForm - Submitting orderData:', orderData);
     onSubmit(orderData);
   };
 
