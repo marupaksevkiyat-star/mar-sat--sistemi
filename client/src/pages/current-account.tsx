@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Search, Building2, FileText, Receipt, Eye, Calendar, ArrowLeft, CreditCard, TrendingUp, AlertTriangle, Plus, DollarSign, Package } from "lucide-react";
 import jsPDF from 'jspdf';
-import marupakLogo from "@assets/MARUPAK-LOGO_1757026981432.png";
+import marupakLogo from "@assets/MARUPAK_LOGO_1757030221412.png";
 
 // İrsaliye Component'i
 const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
@@ -22,6 +22,13 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
   
   const { data: deliverySlips, isLoading } = useQuery<any[]>({
     queryKey: [`/api/invoices/${invoiceId}/delivery-slips`],
+    enabled: !!invoiceId,
+    retry: false,
+  });
+
+  // Fatura bilgilerini çek (müşteri bilgileri için)
+  const { data: invoiceData } = useQuery<any>({
+    queryKey: [`/api/invoices/${invoiceId}`],
     enabled: !!invoiceId,
     retry: false,
   });
@@ -49,14 +56,17 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFont(undefined, 'bold');
       pdf.text('Musteri Bilgileri', 20, yPos);
       
+      // Gerçek müşteri bilgilerini kullan
+      const customerInfo = invoiceData?.customer;
+      
       pdf.setFontSize(10);
       pdf.setFont(undefined, 'normal');
       yPos += 10;
-      pdf.text('Firma: [Musteri Firma Adi]', 20, yPos);
+      pdf.text(`Firma: ${customerInfo?.companyName || '[Musteri Firma Adi]'}`, 20, yPos);
       yPos += 8;
-      pdf.text('E-posta: [Musteri Email]', 20, yPos);
+      pdf.text(`E-posta: ${customerInfo?.email || 'info@marupak.com'}`, 20, yPos);
       yPos += 8;
-      pdf.text('Telefon: [Musteri Telefon]', 20, yPos);
+      pdf.text(`Telefon: ${customerInfo?.phone || '[Musteri Telefon]'}`, 20, yPos);
       
       // Orta - Teslim Fişi Başlığı
       pdf.setFontSize(16);
@@ -67,6 +77,14 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFontSize(12);
       pdf.setFont(undefined, 'normal');
       pdf.text(`NO:${slip.deliverySlipNumber.split('-').pop()}`, centerX - 15, 35);
+      
+      // Sağ üst - MARUPAK Logo alanı (metin olarak)
+      pdf.setFontSize(18);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('MARUPAK', pageWidth - 50, 30);
+      pdf.setFontSize(8);
+      pdf.setFont(undefined, 'normal');
+      pdf.text('www.marupak.com', pageWidth - 50, 38);
       
       yPos = 70;
       
