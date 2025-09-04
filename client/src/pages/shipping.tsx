@@ -189,7 +189,7 @@ export default function Shipping() {
           <p className="text-muted-foreground mt-1">Teslimat ve sevkiyat süreçleri</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Ready for Shipping */}
           <Card>
             <CardHeader>
@@ -242,6 +242,73 @@ export default function Shipping() {
                           variant="secondary"
                           size="sm"
                           data-testid={`button-view-details-${order.id}`}
+                        >
+                          <i className="fas fa-eye"></i>
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Shipping Orders - Yolda Olanlar */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Yolda Olan Siparişler</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {shippingLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : !shippingOrders || shippingOrders.length === 0 ? (
+                <div className="text-center py-8">
+                  <i className="fas fa-truck text-4xl text-muted-foreground mb-4"></i>
+                  <p className="text-muted-foreground">Yolda olan sipariş bulunmamaktadır</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {shippingOrders.map((order: any) => (
+                    <div
+                      key={order.id}
+                      className="border border-border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                      data-testid={`order-shipping-${order.id}`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <h4 className="font-medium text-foreground">{order.orderNumber}</h4>
+                          <p className="text-sm text-muted-foreground">{order.customer.companyName}</p>
+                        </div>
+                        {getStatusBadge(order.status)}
+                      </div>
+                      
+                      <div className="text-sm text-muted-foreground mb-4">
+                        <p>
+                          <i className="fas fa-map-marker-alt mr-2"></i>
+                          {order.deliveryAddress || order.customer.address}
+                        </p>
+                        <p className="mt-1">
+                          <i className="fas fa-clock mr-2"></i>
+                          Sevk: {order.shippedAt ? new Date(order.shippedAt).toLocaleDateString('tr-TR') : 'Belirtilmedi'}
+                        </p>
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={() => setActiveDelivery(order)}
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          size="sm"
+                          data-testid={`button-start-delivery-${order.id}`}
+                        >
+                          <i className="fas fa-play mr-2"></i>
+                          Teslimat Başlat
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          data-testid={`button-view-shipping-details-${order.id}`}
                         >
                           <i className="fas fa-eye"></i>
                         </Button>
