@@ -244,12 +244,10 @@ export default function Sales() {
             }));
             
             const orderPayload = {
-              order: {
-                customerId: newCustomer.id,
-                notes: orderData.notes || '',
-                totalAmount: orderData.totalAmount.toString(),
-                status: orderData.status || 'pending'
-              },
+              customerId: newCustomer.id,
+              notes: orderData.notes || '',
+              totalAmount: orderData.totalAmount.toString(),
+              status: orderData.status || 'pending',
               items: orderItemsData
             };
             createOrderMutation.mutate(orderPayload);
@@ -278,12 +276,10 @@ export default function Sales() {
       }));
       
       const orderPayload = {
-        order: {
-          customerId: selectedCustomer.id,
-          notes: orderData.notes || '',
-          totalAmount: orderData.totalAmount.toString(),
-          status: orderData.status || 'pending'
-        },
+        customerId: selectedCustomer.id,
+        notes: orderData.notes || '',
+        totalAmount: orderData.totalAmount.toString(),
+        status: orderData.status || 'pending',
         items: orderItemsData
       };
       createOrderMutation.mutate(orderPayload);
