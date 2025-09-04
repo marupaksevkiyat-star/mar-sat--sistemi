@@ -421,6 +421,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // CRITICAL: Delivered orders MUST come before /api/orders/:id route!
+  app.get('/api/orders/delivered-by-customer', isAuthenticated, async (req, res) => {
+    console.log("🚀 ÇALIŞTI: delivered-by-customer endpoint");
+    try {
+      // Basit SQL sorgusu ile test
+      const result = await db.select().from(orders).where(eq(orders.status, 'delivered')).limit(5);
+      console.log("📦 Raw delivered orders:", result.length);
+      
+      if (result.length === 0) {
+        console.log("❌ No delivered orders found");
+        return res.json([]);
+      }
+      
+      // Basit test data
+      const mockData = result.map(order => ({
+        customerId: order.customerId,
+        customer: { companyName: "Test Firma", id: order.customerId },
+        totalOrders: 1,
+        totalAmount: parseFloat(order.totalAmount),
+        orders: [order],
+        products: {}
+      }));
+      
+      console.log("✅ SUCCESS: Returning", mockData.length, "firms");
+      res.json(mockData);
+    } catch (error) {
+      console.error("❌ ERROR:", error);
+      res.status(500).json({ message: "Database error: " + error.message });
+    }
+  });
+
   // Order routes
   app.post('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
@@ -466,36 +497,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // TEST: Delivered orders grouped by customer - ÖNCE BURAYA TAŞIDIM
-  app.get('/api/test-delivered-orders', async (req, res) => {
-    console.log("🚀 BAŞLADI: delivered-by-customer endpoint");
-    try {
-      // Basit SQL sorgusu ile test edelim
-      const result = await db.select().from(orders).where(eq(orders.status, 'delivered')).limit(5);
-      console.log("📦 Raw delivered orders:", result.length);
-      
-      if (result.length === 0) {
-        console.log("❌ No delivered orders found in database");
-        return res.json([]);
-      }
-      
-      // Basit grouping - sadece test için
-      const mockData = result.map(order => ({
-        customerId: order.customerId,
-        customer: { companyName: "Test Firma", id: order.customerId },
-        totalOrders: 1,
-        totalAmount: parseFloat(order.totalAmount),
-        orders: [order],
-        products: {}
-      }));
-      
-      console.log("✅ Returning mock data:", mockData.length, "items");
-      res.json(mockData);
-    } catch (error) {
-      console.error("❌ HATA delivered-by-customer:", error);
-      res.status(500).json({ message: "Database error: " + error.message });
-    }
-  });
 
   app.get('/api/orders', isAuthenticated, async (req: any, res) => {
     try {

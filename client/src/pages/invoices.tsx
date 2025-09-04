@@ -29,7 +29,7 @@ export default function InvoicesPage() {
   const queryClient = useQueryClient();
 
   const { data: deliveredOrdersByCustomer, isLoading } = useQuery({
-    queryKey: ["/api/test-delivered-orders"],
+    queryKey: ["/api/orders/delivered-by-customer"],
     retry: false,
   });
 
