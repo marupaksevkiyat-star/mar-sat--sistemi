@@ -180,6 +180,35 @@ export const mailTemplates = pgTable("mail_templates", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Ödemeler tablosu
+export const payments = pgTable("payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
+  invoiceId: varchar("invoice_id").references(() => invoices.id, { onDelete: "set null" }),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: varchar("payment_method", { length: 50 }).notNull(), // nakit, havale, kredi_karti, cek
+  description: text("description"),
+  paymentDate: timestamp("payment_date").notNull(),
+  dueDate: timestamp("due_date"), // vade tarihi
+  status: varchar("status", { length: 20 }).notNull().default("completed"), // completed, pending, overdue
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Cari hesap hareketleri tablosu
+export const accountTransactions = pgTable("account_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
+  invoiceId: varchar("invoice_id").references(() => invoices.id, { onDelete: "set null" }),
+  paymentId: varchar("payment_id").references(() => payments.id, { onDelete: "set null" }),
+  type: varchar("type", { length: 20 }).notNull(), // "debit" (borç), "credit" (alacak)
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  description: text("description").notNull(),
+  transactionDate: timestamp("transaction_date").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   customers: many(customers),
@@ -198,6 +227,8 @@ export const customersRelations = relations(customers, ({ one, many }) => ({
   visits: many(visits),
   appointments: many(appointments),
   invoices: many(invoices),
+  payments: many(payments),
+  accountTransactions: many(accountTransactions),
 }));
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
@@ -255,7 +286,7 @@ export const appointmentsRelations = relations(appointments, ({ one }) => ({
   }),
 }));
 
-export const invoicesRelations = relations(invoices, ({ one }) => ({
+export const invoicesRelations = relations(invoices, ({ one, many }) => ({
   order: one(orders, {
     fields: [invoices.orderId],
     references: [orders.id],
@@ -263,6 +294,38 @@ export const invoicesRelations = relations(invoices, ({ one }) => ({
   customer: one(customers, {
     fields: [invoices.customerId],
     references: [customers.id],
+  }),
+  payments: many(payments),
+  accountTransactions: many(accountTransactions),
+}));
+
+export const paymentsRelations = relations(payments, ({ one }) => ({
+  customer: one(customers, {
+    fields: [payments.customerId],
+    references: [customers.id],
+  }),
+  invoice: one(invoices, {
+    fields: [payments.invoiceId],
+    references: [invoices.id],
+  }),
+  createdBy: one(users, {
+    fields: [payments.createdBy],
+    references: [users.id],
+  }),
+}));
+
+export const accountTransactionsRelations = relations(accountTransactions, ({ one }) => ({
+  customer: one(customers, {
+    fields: [accountTransactions.customerId],
+    references: [customers.id],
+  }),
+  invoice: one(invoices, {
+    fields: [accountTransactions.invoiceId],
+    references: [invoices.id],
+  }),
+  payment: one(payments, {
+    fields: [accountTransactions.paymentId],
+    references: [payments.id],
   }),
 }));
 
@@ -331,6 +394,21 @@ export const insertMailTemplateSchema = createInsertSchema(mailTemplates).omit({
   updatedAt: true,
 });
 
+export const insertPaymentSchema = createInsertSchema(payments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  amount: z.union([z.string(), z.number()]).transform(val => String(val)),
+});
+
+export const insertAccountTransactionSchema = createInsertSchema(accountTransactions).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  amount: z.union([z.string(), z.number()]).transform(val => String(val)),
+});
+
 // Types
 export type UpsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -352,6 +430,10 @@ export type InsertMailSetting = z.infer<typeof insertMailSettingSchema>;
 export type MailSetting = typeof mailSettings.$inferSelect;
 export type InsertMailTemplate = z.infer<typeof insertMailTemplateSchema>;
 export type MailTemplate = typeof mailTemplates.$inferSelect;
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+export type Payment = typeof payments.$inferSelect;
+export type InsertAccountTransaction = z.infer<typeof insertAccountTransactionSchema>;
+export type AccountTransaction = typeof accountTransactions.$inferSelect;
 
 // Extended types for API responses
 export type OrderWithDetails = Order & {

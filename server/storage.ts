@@ -9,6 +9,8 @@ import {
   invoices,
   mailSettings,
   mailTemplates,
+  payments,
+  accountTransactions,
   type User,
   type UpsertUser,
   type InsertCustomer,
@@ -34,6 +36,10 @@ import {
   type MailSetting,
   type InsertMailTemplate,
   type MailTemplate,
+  type InsertPayment,
+  type Payment,
+  type InsertAccountTransaction,
+  type AccountTransaction,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, sum, gte, lte } from "drizzle-orm";
@@ -794,6 +800,106 @@ export class DatabaseStorage implements IStorage {
 
   async deleteMailTemplate(id: string): Promise<void> {
     await db.delete(mailTemplates).where(eq(mailTemplates.id, id));
+  }
+
+  // Ödeme yönetimi
+  async getPayments(customerId?: string): Promise<Payment[]> {
+    let query = db.select().from(payments);
+    if (customerId) {
+      query = query.where(eq(payments.customerId, customerId)) as any;
+    }
+    return query.orderBy(desc(payments.paymentDate));
+  }
+
+  async createPayment(paymentData: InsertPayment): Promise<Payment> {
+    const [payment] = await db.insert(payments).values(paymentData).returning();
+    
+    // Ödeme kaydı için cari hesap hareketini oluştur
+    await this.createAccountTransaction({
+      customerId: payment.customerId,
+      paymentId: payment.id,
+      type: "credit", // Ödeme = Alacak
+      amount: payment.amount,
+      description: `Ödeme: ${payment.paymentMethod} - ${payment.description || 'Ödeme'}`,
+      transactionDate: payment.paymentDate
+    });
+
+    return payment;
+  }
+
+  async updatePayment(id: string, updates: Partial<InsertPayment>): Promise<Payment> {
+    const [payment] = await db
+      .update(payments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(payments.id, id))
+      .returning();
+    return payment;
+  }
+
+  // Cari hesap hareketleri
+  async getAccountTransactions(customerId: string): Promise<AccountTransaction[]> {
+    return db
+      .select()
+      .from(accountTransactions)
+      .where(eq(accountTransactions.customerId, customerId))
+      .orderBy(desc(accountTransactions.transactionDate));
+  }
+
+  async createAccountTransaction(transactionData: InsertAccountTransaction): Promise<AccountTransaction> {
+    const [transaction] = await db.insert(accountTransactions).values(transactionData).returning();
+    return transaction;
+  }
+
+  // Müşteri cari hesap özeti
+  async getCustomerAccountSummary(customerId: string) {
+    // Toplam borç (faturalar)
+    const totalDebit = await db
+      .select({ total: sql<number>`COALESCE(SUM(CAST(${accountTransactions.amount} AS DECIMAL)), 0)` })
+      .from(accountTransactions)
+      .where(and(
+        eq(accountTransactions.customerId, customerId),
+        eq(accountTransactions.type, "debit")
+      ));
+
+    // Toplam alacak (ödemeler)
+    const totalCredit = await db
+      .select({ total: sql<number>`COALESCE(SUM(CAST(${accountTransactions.amount} AS DECIMAL)), 0)` })
+      .from(accountTransactions)
+      .where(and(
+        eq(accountTransactions.customerId, customerId),
+        eq(accountTransactions.type, "credit")
+      ));
+
+    // Vadesi geçmiş ödemeler
+    const overdue = await db
+      .select()
+      .from(payments)
+      .where(and(
+        eq(payments.customerId, customerId),
+        eq(payments.status, "overdue")
+      ));
+
+    const balance = Number(totalDebit[0]?.total || 0) - Number(totalCredit[0]?.total || 0);
+
+    return {
+      totalDebit: Number(totalDebit[0]?.total || 0),
+      totalCredit: Number(totalCredit[0]?.total || 0),
+      balance, // Pozitif = borçlu, Negatif = alacaklı
+      overdueCount: overdue.length,
+      overduePayments: overdue
+    };
+  }
+
+  // Vadesi geçmiş ödemeleri güncelle
+  async updateOverduePayments(): Promise<void> {
+    const today = new Date();
+    await db
+      .update(payments)
+      .set({ status: "overdue" })
+      .where(and(
+        eq(payments.status, "pending"),
+        sql`${payments.dueDate} < ${today}`
+      ));
   }
 }
 

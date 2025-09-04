@@ -1233,6 +1233,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // CARİ HESAP API'LERİ
+
+  // Müşteri ödemelerini getir
+  app.get('/api/customers/:customerId/payments', isAuthenticated, async (req, res) => {
+    try {
+      const payments = await storage.getPayments(req.params.customerId);
+      res.json(payments);
+    } catch (error) {
+      console.error("Error fetching payments:", error);
+      res.status(500).json({ message: "Failed to fetch payments" });
+    }
+  });
+
+  // Yeni ödeme ekle
+  app.post('/api/customers/:customerId/payments', isAuthenticated, async (req: any, res) => {
+    try {
+      const paymentData = {
+        ...req.body,
+        customerId: req.params.customerId,
+        createdBy: req.session.user.id
+      };
+      const payment = await storage.createPayment(paymentData);
+      res.json(payment);
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      res.status(400).json({ message: "Failed to create payment" });
+    }
+  });
+
+  // Müşteri cari hesap hareketlerini getir
+  app.get('/api/customers/:customerId/transactions', isAuthenticated, async (req, res) => {
+    try {
+      const transactions = await storage.getAccountTransactions(req.params.customerId);
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      res.status(500).json({ message: "Failed to fetch transactions" });
+    }
+  });
+
+  // Müşteri cari hesap özeti
+  app.get('/api/customers/:customerId/account-summary', isAuthenticated, async (req, res) => {
+    try {
+      const summary = await storage.getCustomerAccountSummary(req.params.customerId);
+      res.json(summary);
+    } catch (error) {
+      console.error("Error fetching account summary:", error);
+      res.status(500).json({ message: "Failed to fetch account summary" });
+    }
+  });
+
+  // Vadesi geçmiş ödemeleri güncelle (admin)
+  app.post('/api/payments/update-overdue', isAuthenticated, async (req: any, res) => {
+    try {
+      const userRole = req.session.user.role;
+      if (userRole !== 'admin' && userRole !== 'Admin') {
+        return res.status(403).json({ message: "Bu işlem için admin yetkisi gerekli" });
+      }
+      
+      await storage.updateOverduePayments();
+      res.json({ message: "Vadesi geçmiş ödemeler güncellendi" });
+    } catch (error) {
+      console.error("Error updating overdue payments:", error);
+      res.status(500).json({ message: "Failed to update overdue payments" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
