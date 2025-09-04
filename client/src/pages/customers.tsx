@@ -54,22 +54,11 @@ export default function Customers() {
         method: 'DELETE',
       });
       
-      console.log('Delete response status:', response.status);
-      console.log('Delete response headers:', response.headers.get('content-type'));
-      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const responseText = await response.text();
-      console.log('Delete response text:', responseText);
-      
-      try {
-        return JSON.parse(responseText);
-      } catch (e) {
-        console.error('Failed to parse JSON:', e, 'Raw response:', responseText);
-        throw new Error('Invalid JSON response from server');
-      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/customers'] });

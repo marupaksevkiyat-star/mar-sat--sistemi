@@ -151,17 +151,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCustomers(salesPersonId?: string): Promise<CustomerWithSalesPerson[]> {
-    const query = db
+    let whereConditions = [sql`${customers.status} != 'deleted'`];
+    
+    if (salesPersonId) {
+      whereConditions.push(eq(customers.salesPersonId, salesPersonId));
+    }
+
+    const results = await db
       .select()
       .from(customers)
       .leftJoin(users, eq(customers.salesPersonId, users.id))
+      .where(and(...whereConditions))
       .orderBy(desc(customers.createdAt));
 
-    if (salesPersonId) {
-      query.where(eq(customers.salesPersonId, salesPersonId));
-    }
-
-    const results = await query;
     return results.map(row => ({
       ...row.customers,
       salesPerson: row.users || undefined,
@@ -178,7 +180,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCustomer(id: string): Promise<void> {
-    await db.delete(customers).where(eq(customers.id, id));
+    // Soft delete - set status to 'deleted' instead of physically removing
+    await db
+      .update(customers)
+      .set({ status: 'deleted', updatedAt: new Date() })
+      .where(eq(customers.id, id));
   }
 
   async getNearbyCustomers(lat: number, lng: number, radiusKm: number = 5): Promise<CustomerWithSalesPerson[]> {
@@ -190,7 +196,8 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           sql`${customers.latitude} IS NOT NULL`,
-          sql`${customers.longitude} IS NOT NULL`
+          sql`${customers.longitude} IS NOT NULL`,
+          sql`${customers.status} != 'deleted'`
         )
       );
 
