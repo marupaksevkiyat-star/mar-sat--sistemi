@@ -40,6 +40,7 @@ export default function Navigation() {
     if (userRole === 'admin' || userRole === 'Admin') {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+        { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
         { path: "/sales", label: "Satış", icon: "fas fa-users" },
         { path: "/sales-reports", label: "Satış Raporları", icon: "fas fa-chart-bar" },
         { path: "/invoices", label: "İrsaliyeler", icon: "fas fa-file-invoice" },
@@ -53,6 +54,7 @@ export default function Navigation() {
     if (userRole === 'sales' || userRole.includes('Satış')) {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+        { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
         { path: "/sales", label: "Satış", icon: "fas fa-users" },
       ];
     }
@@ -61,6 +63,7 @@ export default function Navigation() {
     if (userRole === 'production' || userRole.includes('Üretim')) {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+        { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
         { path: "/production", label: "Üretim", icon: "fas fa-cogs" },
       ];
     }
@@ -69,6 +72,7 @@ export default function Navigation() {
     if (userRole === 'shipping' || userRole.includes('Sevkiyat')) {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+        { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
         { path: "/shipping", label: "Sevkiyat", icon: "fas fa-truck" },
       ];
     }
@@ -77,13 +81,15 @@ export default function Navigation() {
     if (userRole === 'accounting' || userRole.includes('Muhasebe')) {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+        { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
         { path: "/accounting", label: "Muhasebe", icon: "fas fa-calculator" },
       ];
     }
     
-    // Varsayılan - sadece dashboard
+    // Varsayılan - sadece dashboard ve siparişler
     return [
       { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
+      { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
     ];
   };
 
