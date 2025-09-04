@@ -15,6 +15,7 @@ import Shipping from "@/pages/shipping";
 import Admin from "@/pages/admin";
 import Orders from "@/pages/orders";
 import MailSettings from "@/pages/mail-settings";
+import Permissions from "@/pages/permissions";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -92,6 +93,9 @@ function Router() {
           </Route>
           <Route path="/admin">
             <ProtectedRoute component={Admin} requiredRole="admin" />
+          </Route>
+          <Route path="/permissions">
+            <ProtectedRoute component={Permissions} requiredRole="admin" />
           </Route>
           <Route component={NotFound} />
         </>

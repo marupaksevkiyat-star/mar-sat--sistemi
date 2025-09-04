@@ -48,6 +48,7 @@ export default function Navigation() {
         { path: "/shipping", label: "Sevkiyat", icon: "fas fa-truck" },
         { path: "/mail-settings", label: "Mail Ayarları", icon: "fas fa-envelope-open-text" },
         { path: "/admin", label: "Yönetim", icon: "fas fa-shield-alt" },
+        { path: "/permissions", label: "Yetkiler", icon: "fas fa-user-shield" },
       ];
     }
     
