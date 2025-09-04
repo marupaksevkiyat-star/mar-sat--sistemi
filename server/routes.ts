@@ -832,9 +832,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delivered orders grouped by customer - for bulk invoicing
   app.get('/api/orders/delivered-by-customer', isAuthenticated, async (req, res) => {
     try {
-      console.log("🚚 Fetching delivered orders by customer...");
       const deliveredOrders = await storage.getOrders({ status: 'delivered' });
-      console.log(`📦 Found ${deliveredOrders.length} delivered orders`);
       
       // Group orders by customer
       const groupedOrders: Record<string, any> = {};
@@ -884,7 +882,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(Object.values(groupedOrders));
     } catch (error) {
       console.error("Error fetching delivered orders by customer:", error);
-      res.status(500).json({ message: "Failed to fetch delivered orders" });
+      res.status(404).json({ message: "Order not found" });
     }
   });
 
@@ -895,7 +893,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(readyOrders);
     } catch (error) {
       console.error("Error fetching ready-for-shipping orders:", error);
-      res.status(500).json({ message: "Failed to fetch ready orders" });
+      res.status(404).json({ message: "Order not found" });
     }
   });
 
