@@ -42,7 +42,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       // Türkçe karakter desteği için encoding ayarı
       pdf.setFont("helvetica");
       
-      // Üst başlık bölümü - firna bilgileri
+      // Üst başlık bölümü - firma bilgileri
       pdf.setLineWidth(1);
       pdf.rect(10, 10, pageWidth - 20, 50);
       
@@ -58,30 +58,27 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.text('Tel: 0850 345 84 90', 15, 44);
       pdf.text('www.marupak.com', 15, 50);
       
-      // Sağ taraf - İrsaliye başlığı ve detayları
+      // Orta - Teslim Fişi başlığı
       pdf.setFontSize(16);
       pdf.setFont(undefined, 'bold');
-      pdf.text('IRSALIYELI FATURA', pageWidth - 70, 25);
-      
+      const centerX = pageWidth / 2;
+      pdf.text('TESLIM FISI', centerX - 20, 30);
       pdf.setFontSize(10);
       pdf.setFont(undefined, 'normal');
-      pdf.text('Seri: A', pageWidth - 70, 35);
-      pdf.text('Sira: 001', pageWidth - 70, 42);
-      pdf.text(`Duzenleme Saati: ${new Date().toLocaleTimeString('tr-TR')}`, pageWidth - 70, 49);
-      pdf.text(`Duzenleme Tarihi: ${formatDate(slip.deliveredAt)}`, pageWidth - 70, 56);
+      pdf.text(`${formatDate(slip.deliveredAt)}`, centerX - 15, 40);
+      
+      // Sağ taraf - Teslim edilecek firma bilgileri
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('TESLIM EDILECEK FIRMA:', pageWidth - 80, 25);
+      pdf.setFont(undefined, 'normal');
+      pdf.setFontSize(9);
+      pdf.text('[Musteri Firma Adi]', pageWidth - 80, 32);
+      pdf.text('[Musteri Adresi]', pageWidth - 80, 38);
+      pdf.text('[Telefon]', pageWidth - 80, 44);
+      pdf.text('[Email]', pageWidth - 80, 50);
       
       let yPos = 75;
-      
-      // Müşteri bilgileri bölümü
-      pdf.setLineWidth(0.5);
-      pdf.rect(10, yPos, (pageWidth - 20) * 0.6, 30);
-      pdf.setFontSize(10);
-      pdf.setFont(undefined, 'normal');
-      pdf.text('Musteri V.D.: ............................', 15, yPos + 8);
-      pdf.text('No: ............................', 15, yPos + 15);
-      pdf.text('Musteri Adi: [Musteri Firma Adi]', 15, yPos + 22);
-      
-      yPos += 40;
       
       // Ürün tablosu - header
       const tableStartY = yPos;
@@ -183,26 +180,28 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       yPos += 25;
       
       // Alt imza bölümü
-      const signatureY = Math.max(yPos, pageHeight - 50);
+      const signatureY = Math.max(yPos, pageHeight - 60);
       
       // Sol taraf - Teslim Eden
       pdf.setLineWidth(0.5);
-      pdf.rect(15, signatureY, 80, 30);
+      pdf.rect(15, signatureY, 80, 40);
       pdf.setFontSize(10);
       pdf.setFont(undefined, 'bold');
-      pdf.text('Teslim Eden', 20, signatureY + 20);
+      pdf.text('Teslim Eden', 20, signatureY + 15);
       pdf.setFont(undefined, 'normal');
-      pdf.setFontSize(8);
-      pdf.text(`${slip.driverName}`, 20, signatureY + 26);
+      pdf.setFontSize(9);
+      pdf.text(`${slip.driverName}`, 20, signatureY + 25);
+      pdf.text('Imza: _______________', 20, signatureY + 35);
       
       // Sağ taraf - Teslim Alan (Alıcı İmzası)
-      pdf.rect(115, signatureY, 80, 30);
+      pdf.rect(115, signatureY, 80, 40);
       pdf.setFontSize(10);
       pdf.setFont(undefined, 'bold');
-      pdf.text('Teslim Alan', 120, signatureY + 20);
+      pdf.text('Teslim Alan', 120, signatureY + 15);
       pdf.setFont(undefined, 'normal');
-      pdf.setFontSize(8);
-      pdf.text('(Alici Imzasi)', 120, signatureY + 26);
+      pdf.setFontSize(9);
+      pdf.text('Adi Soyadi: _______________', 120, signatureY + 25);
+      pdf.text('Imza: _______________', 120, signatureY + 35);
       
       // PDF'i indir
       pdf.save(`irsaliye-${slip.deliverySlipNumber}.pdf`);
