@@ -1238,6 +1238,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Tüm ödemeleri getir
+  app.get('/api/payments', isAuthenticated, async (req: any, res) => {
+    try {
+      const payments = await storage.getPayments(); // parametresiz = tüm ödemeler
+      res.json(payments);
+    } catch (error) {
+      console.error("Error fetching all payments:", error);
+      res.status(500).json({ message: "Failed to fetch payments" });
+    }
+  });
+
   // Müşteri ödemelerini getir
   app.get('/api/customers/:customerId/payments', isAuthenticated, async (req: any, res) => {
     try {
