@@ -372,11 +372,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.user.id;
       const { customerId, totalAmount, status, notes, items } = req.body;
       
-      // Debug log - request body'yi kontrol et
-      console.log('🔍 Order creation request body:', JSON.stringify(req.body, null, 2));
-      console.log('🆔 Customer ID received:', customerId);
-      console.log('🧾 Items received:', items);
-      
       // customerId kontrolü
       if (!customerId) {
         console.error('❌ Customer ID is missing!');
