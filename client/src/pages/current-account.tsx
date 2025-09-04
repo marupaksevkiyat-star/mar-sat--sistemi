@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Building2, FileText, Receipt, Eye, Calendar } from "lucide-react";
+import { Search, Building2, FileText, Receipt, Eye, Calendar, ArrowLeft } from "lucide-react";
 
 interface CustomerInvoice {
   id: string;
@@ -38,6 +38,7 @@ interface InvoiceDetail {
 
 export default function CurrentAccountPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<CustomerInvoice | null>(null);
   const [showInvoiceDetail, setShowInvoiceDetail] = useState(false);
 
@@ -152,75 +153,171 @@ export default function CurrentAccountPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCustomers.length > 0 ? (
-            filteredCustomers.map(([companyName, data]: [string, any]) => (
-              <Card key={companyName} className="hover:shadow-lg transition-shadow">
+        {!selectedCustomer ? (
+          /* FİRMA LİSTESİ */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCustomers.length > 0 ? (
+              filteredCustomers.map(([companyName, data]: [string, any]) => (
+                <Card 
+                  key={companyName} 
+                  className="hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => setSelectedCustomer(companyName)}
+                >
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="w-5 h-5" />
+                        {companyName}
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Firma Özeti */}
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Fatura Sayısı:</span>
+                          <div className="font-semibold text-lg">{data.invoiceCount} adet</div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Toplam Tutar:</span>
+                          <div className="font-semibold text-lg text-green-600">
+                            {formatCurrency(data.totalAmount)}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Son Fatura Bilgisi */}
+                      {data.invoices.length > 0 && (
+                        <div className="pt-2 border-t">
+                          <div className="text-xs text-muted-foreground">Son Fatura:</div>
+                          <div className="font-medium text-sm">
+                            {data.invoices[data.invoices.length - 1].invoiceNumber}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {formatDate(data.invoices[data.invoices.length - 1].createdAt)}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-lg font-medium">Henüz fatura bulunamadı</p>
+                <p className="text-muted-foreground">
+                  {searchTerm ? 'Arama kriterlerinize uygun fatura yok' : 'Sistemde hiç fatura oluşturulmamış'}
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* FİRMA CARİ HESAP DETAYLARI */
+          <div className="space-y-6">
+            {/* Geri Dönüş ve Başlık */}
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setSelectedCustomer(null)}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Firma Listesine Dön
+              </Button>
+              <h2 className="text-xl font-semibold">
+                {selectedCustomer} - Cari Hesap
+              </h2>
+            </div>
+
+            {/* Firma Cari Hesap İçeriği */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* SOL - Fatura Listesi */}
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Building2 className="w-5 h-5" />
-                    {companyName}
+                    <Receipt className="w-5 h-5" />
+                    Faturalar ({customerInvoices[selectedCustomer]?.invoiceCount || 0})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {customerInvoices[selectedCustomer]?.invoices.map((invoice: CustomerInvoice) => (
+                      <div 
+                        key={invoice.id} 
+                        className="flex justify-between items-center p-3 border rounded hover:bg-muted/50 cursor-pointer"
+                        onClick={() => handleInvoiceClick(invoice)}
+                      >
+                        <div className="flex-1">
+                          <div className="font-medium">{invoice.invoiceNumber}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {formatDate(invoice.createdAt)}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="outline" className="text-green-700 mb-1">
+                            {invoice.status === 'generated' ? 'Oluşturuldu' : invoice.status}
+                          </Badge>
+                          <div className="text-sm font-semibold">
+                            {formatCurrency(parseFloat(invoice.totalAmount || '0'))}
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" className="ml-2">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* SAĞ - Özet ve Gelecek Özellikler */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5" />
+                    Cari Hesap Özeti
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Müşteri Özeti */}
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Fatura Sayısı:</span>
-                        <div className="font-semibold">{data.invoiceCount} adet</div>
+                    {/* Toplam Bilgiler */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {customerInvoices[selectedCustomer]?.invoiceCount || 0}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Toplam Fatura</div>
                       </div>
-                      <div>
-                        <span className="text-muted-foreground">Toplam Tutar:</span>
-                        <div className="font-semibold">{formatCurrency(data.totalAmount)}</div>
+                      <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded">
+                        <div className="text-2xl font-bold text-green-600">
+                          {formatCurrency(customerInvoices[selectedCustomer]?.totalAmount || 0)}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Toplam Tutar</div>
                       </div>
                     </div>
 
-                    {/* Son Faturalar */}
-                    <div>
-                      <h4 className="font-medium mb-2">Faturalar:</h4>
-                      <div className="space-y-2 max-h-48 overflow-y-auto">
-                        {data.invoices.map((invoice: CustomerInvoice) => (
-                          <div 
-                            key={invoice.id} 
-                            className="flex justify-between items-center p-2 border rounded hover:bg-muted/50 cursor-pointer"
-                            onClick={() => handleInvoiceClick(invoice)}
-                          >
-                            <div className="flex-1">
-                              <div className="font-medium text-sm">{invoice.invoiceNumber}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {formatDate(invoice.createdAt)}
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <Badge variant="outline" className="text-green-700 mb-1">
-                                {invoice.status === 'generated' ? 'Oluşturuldu' : invoice.status}
-                              </Badge>
-                              <div className="text-sm font-semibold">
-                                {formatCurrency(parseFloat(invoice.totalAmount || '0'))}
-                              </div>
-                            </div>
-                            <Button variant="ghost" size="sm" className="ml-2">
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
+                    {/* Gelecek Özellikler */}
+                    <div className="pt-4 border-t">
+                      <h4 className="font-medium mb-3">Yakında Eklenecek:</h4>
+                      <ul className="space-y-2 text-sm text-muted-foreground">
+                        <li>• Ödeme geçmişi</li>
+                        <li>• Tahsilat durumu</li>
+                        <li>• Vade takibi</li>
+                        <li>• Ödeme planı</li>
+                        <li>• Borç/alacak bakiyesi</li>
+                      </ul>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-lg font-medium">Henüz fatura bulunamadı</p>
-              <p className="text-muted-foreground">
-                {searchTerm ? 'Arama kriterlerinize uygun fatura yok' : 'Sistende hiç fatura oluşturulmamış'}
-              </p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* FATURA DETAY MODAL */}
         <Dialog open={showInvoiceDetail} onOpenChange={setShowInvoiceDetail}>
