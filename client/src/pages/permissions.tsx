@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Save, Users, Shield, Settings } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { AlertCircle, Save, Users, Shield, ChevronDown, ChevronRight } from "lucide-react";
 
 // Rol tanımları
 const USER_ROLES = [
@@ -18,51 +18,163 @@ const USER_ROLES = [
   { id: 'accounting', name: 'Muhasebe Personeli', description: 'Mali işlemler ve raporlar' }
 ];
 
-// Sayfa ve işlem tanımları
-const PAGES_AND_ACTIONS = {
-  pages: [
-    { id: 'dashboard', name: 'Dashboard', description: 'Ana sayfa ve genel istatistikler' },
-    { id: 'orders', name: 'Siparişler', description: 'Sipariş listesi ve yönetimi' },
-    { id: 'sales', name: 'Satış', description: 'Satış işlemleri ve müşteri ziyaretleri' },
-    { id: 'sales-reports', name: 'Satış Raporları', description: 'Satış performansı ve analizler' },
-    { id: 'invoices', name: 'İrsaliyeler', description: 'İrsaliye yönetimi' },
-    { id: 'production', name: 'Üretim', description: 'Üretim süreçleri ve planlama' },
-    { id: 'shipping', name: 'Sevkiyat', description: 'Sevkiyat ve teslimat yönetimi' },
-    { id: 'mail-settings', name: 'Mail Ayarları', description: 'E-posta yapılandırmaları' },
-    { id: 'admin', name: 'Yönetim', description: 'Sistem yönetimi ve kullanıcılar' },
-    { id: 'permissions', name: 'Yetkiler', description: 'Rol ve yetki yönetimi' }
-  ],
-  actions: [
-    { id: 'create', name: 'Oluştur', description: 'Yeni kayıt ekleme' },
-    { id: 'read', name: 'Görüntüle', description: 'Verileri görüntüleme' },
-    { id: 'update', name: 'Düzenle', description: 'Mevcut kayıtları düzenleme' },
-    { id: 'delete', name: 'Sil', description: 'Kayıtları silme' },
-    { id: 'export', name: 'Dışa Aktar', description: 'Rapor ve veri dışa aktarma' },
-    { id: 'approve', name: 'Onayla', description: 'İşlemleri onaylama' }
-  ]
-};
+// Sayfa ve her sayfaya özel işlem tanımları
+const PAGES_WITH_ACTIONS = [
+  { 
+    id: 'dashboard', 
+    name: 'Dashboard', 
+    description: 'Ana sayfa ve genel istatistikler',
+    icon: 'fas fa-chart-pie',
+    actions: [
+      { id: 'read', name: 'Görüntüle', description: 'Dashboard verilerini görüntüleme' },
+      { id: 'export', name: 'Dışa Aktar', description: 'Dashboard raporlarını dışa aktarma' }
+    ]
+  },
+  { 
+    id: 'orders', 
+    name: 'Siparişler', 
+    description: 'Sipariş listesi ve yönetimi',
+    icon: 'fas fa-clipboard-list',
+    actions: [
+      { id: 'create', name: 'Oluştur', description: 'Yeni sipariş ekleme' },
+      { id: 'read', name: 'Görüntüle', description: 'Siparişleri görüntüleme' },
+      { id: 'update', name: 'Düzenle', description: 'Sipariş bilgilerini düzenleme' },
+      { id: 'delete', name: 'Sil', description: 'Siparişleri silme' },
+      { id: 'approve', name: 'Onayla', description: 'Siparişleri onaylama' },
+      { id: 'export', name: 'Dışa Aktar', description: 'Sipariş raporları dışa aktarma' }
+    ]
+  },
+  { 
+    id: 'sales', 
+    name: 'Satış', 
+    description: 'Satış işlemleri ve müşteri ziyaretleri',
+    icon: 'fas fa-users',
+    actions: [
+      { id: 'create', name: 'Oluştur', description: 'Yeni müşteri ve ziyaret ekleme' },
+      { id: 'read', name: 'Görüntüle', description: 'Müşteri ve satış verilerini görüntüleme' },
+      { id: 'update', name: 'Düzenle', description: 'Müşteri bilgilerini düzenleme' },
+      { id: 'delete', name: 'Sil', description: 'Müşteri kayıtlarını silme' },
+      { id: 'export', name: 'Dışa Aktar', description: 'Müşteri ve satış raporları' }
+    ]
+  },
+  { 
+    id: 'sales-reports', 
+    name: 'Satış Raporları', 
+    description: 'Satış performansı ve analizler',
+    icon: 'fas fa-chart-bar',
+    actions: [
+      { id: 'read', name: 'Görüntüle', description: 'Satış raporlarını görüntüleme' },
+      { id: 'export', name: 'Dışa Aktar', description: 'Detaylı satış analiz raporları' }
+    ]
+  },
+  { 
+    id: 'invoices', 
+    name: 'İrsaliyeler', 
+    description: 'İrsaliye yönetimi',
+    icon: 'fas fa-file-invoice',
+    actions: [
+      { id: 'create', name: 'Oluştur', description: 'Yeni irsaliye oluşturma' },
+      { id: 'read', name: 'Görüntüle', description: 'İrsaliyeleri görüntüleme' },
+      { id: 'update', name: 'Düzenle', description: 'İrsaliye bilgilerini düzenleme' },
+      { id: 'delete', name: 'Sil', description: 'İrsaliyeleri silme' },
+      { id: 'approve', name: 'Onayla', description: 'İrsaliyeleri onaylama' },
+      { id: 'export', name: 'Dışa Aktar', description: 'İrsaliye raporları dışa aktarma' }
+    ]
+  },
+  { 
+    id: 'production', 
+    name: 'Üretim', 
+    description: 'Üretim süreçleri ve planlama',
+    icon: 'fas fa-cogs',
+    actions: [
+      { id: 'create', name: 'Oluştur', description: 'Yeni üretim planı oluşturma' },
+      { id: 'read', name: 'Görüntüle', description: 'Üretim verilerini görüntüleme' },
+      { id: 'update', name: 'Düzenle', description: 'Üretim planlarını düzenleme' },
+      { id: 'approve', name: 'Onayla', description: 'Üretim işlemlerini onaylama' },
+      { id: 'export', name: 'Dışa Aktar', description: 'Üretim raporları dışa aktarma' }
+    ]
+  },
+  { 
+    id: 'shipping', 
+    name: 'Sevkiyat', 
+    description: 'Sevkiyat ve teslimat yönetimi',
+    icon: 'fas fa-truck',
+    actions: [
+      { id: 'create', name: 'Oluştur', description: 'Yeni sevkiyat kaydı oluşturma' },
+      { id: 'read', name: 'Görüntüle', description: 'Sevkiyat bilgilerini görüntüleme' },
+      { id: 'update', name: 'Düzenle', description: 'Sevkiyat durumunu güncelleme' },
+      { id: 'approve', name: 'Onayla', description: 'Sevkiyatları onaylama' },
+      { id: 'export', name: 'Dışa Aktar', description: 'Sevkiyat raporları dışa aktarma' }
+    ]
+  },
+  { 
+    id: 'mail-settings', 
+    name: 'Mail Ayarları', 
+    description: 'E-posta yapılandırmaları',
+    icon: 'fas fa-envelope-open-text',
+    actions: [
+      { id: 'read', name: 'Görüntüle', description: 'Mail ayarlarını görüntüleme' },
+      { id: 'update', name: 'Düzenle', description: 'Mail yapılandırmalarını düzenleme' }
+    ]
+  },
+  { 
+    id: 'admin', 
+    name: 'Yönetim', 
+    description: 'Sistem yönetimi ve kullanıcılar',
+    icon: 'fas fa-shield-alt',
+    actions: [
+      { id: 'create', name: 'Oluştur', description: 'Yeni kullanıcı ekleme' },
+      { id: 'read', name: 'Görüntüle', description: 'Sistem bilgilerini görüntüleme' },
+      { id: 'update', name: 'Düzenle', description: 'Sistem ayarlarını düzenleme' },
+      { id: 'delete', name: 'Sil', description: 'Kullanıcıları silme' },
+      { id: 'export', name: 'Dışa Aktar', description: 'Sistem raporları dışa aktarma' }
+    ]
+  },
+  { 
+    id: 'permissions', 
+    name: 'Yetkiler', 
+    description: 'Rol ve yetki yönetimi',
+    icon: 'fas fa-user-shield',
+    actions: [
+      { id: 'read', name: 'Görüntüle', description: 'Yetki ayarlarını görüntüleme' },
+      { id: 'update', name: 'Düzenle', description: 'Rol yetkilerini düzenleme' }
+    ]
+  }
+];
 
-// Varsayılan yetki matrisi
+// Varsayılan yetki matrisi - her sayfa için ayrı ayrı yetkiler
 const DEFAULT_PERMISSIONS = {
   admin: {
-    pages: ['dashboard', 'orders', 'sales', 'sales-reports', 'invoices', 'production', 'shipping', 'mail-settings', 'admin', 'permissions'],
-    actions: ['create', 'read', 'update', 'delete', 'export', 'approve']
+    dashboard: ['read', 'export'],
+    orders: ['create', 'read', 'update', 'delete', 'approve', 'export'],
+    sales: ['create', 'read', 'update', 'delete', 'export'],
+    'sales-reports': ['read', 'export'],
+    invoices: ['create', 'read', 'update', 'delete', 'approve', 'export'],
+    production: ['create', 'read', 'update', 'approve', 'export'],
+    shipping: ['create', 'read', 'update', 'approve', 'export'],
+    'mail-settings': ['read', 'update'],
+    admin: ['create', 'read', 'update', 'delete', 'export'],
+    permissions: ['read', 'update']
   },
   sales: {
-    pages: ['dashboard', 'orders', 'sales'],
-    actions: ['create', 'read', 'update']
+    dashboard: ['read'],
+    orders: ['create', 'read', 'update'],
+    sales: ['create', 'read', 'update', 'export']
   },
   production: {
-    pages: ['dashboard', 'orders', 'production'],
-    actions: ['read', 'update', 'approve']
+    dashboard: ['read'],
+    orders: ['read', 'update'],
+    production: ['create', 'read', 'update', 'approve', 'export']
   },
   shipping: {
-    pages: ['dashboard', 'shipping', 'invoices'],
-    actions: ['read', 'update', 'export']
+    dashboard: ['read'],
+    shipping: ['create', 'read', 'update', 'approve', 'export'],
+    invoices: ['read', 'update', 'export']
   },
   accounting: {
-    pages: ['dashboard', 'orders', 'sales-reports'],
-    actions: ['read', 'export']
+    dashboard: ['read', 'export'],
+    orders: ['read', 'export'],
+    'sales-reports': ['read', 'export']
   }
 };
 
@@ -71,6 +183,7 @@ export default function Permissions() {
   const { toast } = useToast();
   const [permissions, setPermissions] = useState(DEFAULT_PERMISSIONS);
   const [hasChanges, setHasChanges] = useState(false);
+  const [expandedRoles, setExpandedRoles] = useState<string[]>([]);
 
   if (isLoading) {
     return (
@@ -107,20 +220,19 @@ export default function Permissions() {
     );
   }
 
-  const togglePagePermission = (roleId: string, pageId: string) => {
+  const togglePageAccess = (roleId: string, pageId: string) => {
     setPermissions(prev => {
       const newPermissions = { ...prev };
-      const rolePages = [...(newPermissions[roleId]?.pages || [])];
       
-      if (rolePages.includes(pageId)) {
-        newPermissions[roleId] = {
-          ...newPermissions[roleId],
-          pages: rolePages.filter(p => p !== pageId)
-        };
+      if (newPermissions[roleId]?.[pageId]) {
+        // Sayfa erişimi var, kaldır
+        const { [pageId]: removed, ...rest } = newPermissions[roleId];
+        newPermissions[roleId] = rest;
       } else {
+        // Sayfa erişimi yok, sadece 'read' yetkisi ile ekle
         newPermissions[roleId] = {
           ...newPermissions[roleId],
-          pages: [...rolePages, pageId]
+          [pageId]: ['read']
         };
       }
       
@@ -129,26 +241,36 @@ export default function Permissions() {
     });
   };
 
-  const toggleActionPermission = (roleId: string, actionId: string) => {
+  const toggleActionPermission = (roleId: string, pageId: string, actionId: string) => {
     setPermissions(prev => {
       const newPermissions = { ...prev };
-      const roleActions = [...(newPermissions[roleId]?.actions || [])];
+      const currentActions = newPermissions[roleId]?.[pageId] || [];
       
-      if (roleActions.includes(actionId)) {
+      if (currentActions.includes(actionId)) {
+        // Aksiyonu kaldır
         newPermissions[roleId] = {
           ...newPermissions[roleId],
-          actions: roleActions.filter(a => a !== actionId)
+          [pageId]: currentActions.filter(a => a !== actionId)
         };
       } else {
+        // Aksiyonu ekle
         newPermissions[roleId] = {
           ...newPermissions[roleId],
-          actions: [...roleActions, actionId]
+          [pageId]: [...currentActions, actionId]
         };
       }
       
       setHasChanges(true);
       return newPermissions;
     });
+  };
+
+  const toggleRoleExpansion = (roleId: string) => {
+    setExpandedRoles(prev => 
+      prev.includes(roleId) 
+        ? prev.filter(r => r !== roleId)
+        : [...prev, roleId]
+    );
   };
 
   const savePermissions = () => {
@@ -163,10 +285,23 @@ export default function Permissions() {
   const resetPermissions = () => {
     setPermissions(DEFAULT_PERMISSIONS);
     setHasChanges(false);
+    setExpandedRoles([]);
     toast({
       title: "Sıfırlandı",
       description: "Yetki ayarları varsayılan değerlere döndürüldü",
     });
+  };
+
+  const hasPageAccess = (roleId: string, pageId: string) => {
+    return Boolean(permissions[roleId]?.[pageId]);
+  };
+
+  const hasActionPermission = (roleId: string, pageId: string, actionId: string) => {
+    return permissions[roleId]?.[pageId]?.includes(actionId) || false;
+  };
+
+  const getPagePermissionCount = (roleId: string) => {
+    return Object.keys(permissions[roleId] || {}).length;
   };
 
   return (
@@ -199,114 +334,102 @@ export default function Permissions() {
           </div>
         )}
 
-        <Tabs defaultValue="pages" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="pages" className="flex items-center">
-              <Shield className="w-4 h-4 mr-2" />
-              Sayfa Yetkileri
-            </TabsTrigger>
-            <TabsTrigger value="actions" className="flex items-center">
-              <Settings className="w-4 h-4 mr-2" />
-              İşlem Yetkileri
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="pages">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Shield className="w-5 h-5 mr-2" />
-                  Sayfa Erişim Yetkileri
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Her rol için hangi sayfalara erişim sağlanacağını belirleyin
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {USER_ROLES.map(role => (
-                    <div key={role.id} className="border rounded-lg p-4">
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between">
-                          <div>
+        {/* Ana Yetki Yönetimi - Rol Bazlı Collapsible Kartlar */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Shield className="w-5 h-5 mr-2" />
+              Rol Bazlı Sayfa ve İşlem Yetkileri
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Her rol için sayfa erişimi ve o sayfalarda yapılabilecek işlemleri yönetin
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {USER_ROLES.map(role => (
+                <div key={role.id} className="border rounded-lg">
+                  <Collapsible 
+                    open={expandedRoles.includes(role.id)}
+                    onOpenChange={() => toggleRoleExpansion(role.id)}
+                  >
+                    <CollapsibleTrigger className="w-full">
+                      <div className="flex items-center justify-between p-4 hover:bg-accent/50 transition-colors rounded-t-lg">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center">
+                            {expandedRoles.includes(role.id) ? 
+                              <ChevronDown className="w-4 h-4 text-muted-foreground" /> :
+                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                            }
+                          </div>
+                          <div className="text-left">
                             <h4 className="font-semibold text-foreground">{role.name}</h4>
                             <p className="text-sm text-muted-foreground">{role.description}</p>
                           </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
                           <Badge variant="outline">
-                            {permissions[role.id]?.pages?.length || 0} sayfa
+                            {getPagePermissionCount(role.id)} sayfa
+                          </Badge>
+                          <Badge variant="secondary">
+                            {Object.values(permissions[role.id] || {}).flat().length} yetki
                           </Badge>
                         </div>
                       </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {PAGES_AND_ACTIONS.pages.map(page => (
-                          <div key={page.id} className="flex items-center justify-between p-2 border rounded">
-                            <div className="flex-1">
-                              <div className="font-medium text-sm">{page.name}</div>
-                              <div className="text-xs text-muted-foreground">{page.description}</div>
-                            </div>
-                            <Switch
-                              checked={permissions[role.id]?.pages?.includes(page.id) || false}
-                              onCheckedChange={() => togglePagePermission(role.id, page.id)}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="actions">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Settings className="w-5 h-5 mr-2" />
-                  İşlem Yetkileri
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Her rol için hangi işlemlerin gerçekleştirilebileceğini belirleyin
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {USER_ROLES.map(role => (
-                    <div key={role.id} className="border rounded-lg p-4">
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-semibold text-foreground">{role.name}</h4>
-                            <p className="text-sm text-muted-foreground">{role.description}</p>
-                          </div>
-                          <Badge variant="outline">
-                            {permissions[role.id]?.actions?.length || 0} işlem
-                          </Badge>
+                    </CollapsibleTrigger>
+                    
+                    <CollapsibleContent>
+                      <div className="px-4 pb-4">
+                        <div className="grid gap-4">
+                          {PAGES_WITH_ACTIONS.map(page => {
+                            const hasAccess = hasPageAccess(role.id, page.id);
+                            return (
+                              <div key={page.id} className="border rounded-lg p-3 bg-card/50">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center space-x-3">
+                                    <i className={`${page.icon} text-lg ${hasAccess ? 'text-primary' : 'text-muted-foreground'}`}></i>
+                                    <div>
+                                      <h5 className="font-medium text-foreground">{page.name}</h5>
+                                      <p className="text-xs text-muted-foreground">{page.description}</p>
+                                    </div>
+                                  </div>
+                                  <Switch
+                                    checked={hasAccess}
+                                    onCheckedChange={() => togglePageAccess(role.id, page.id)}
+                                  />
+                                </div>
+                                
+                                {hasAccess && (
+                                  <div className="ml-8 space-y-2 border-t pt-3">
+                                    <p className="text-xs font-medium text-muted-foreground mb-2">Bu sayfada yapılabilecek işlemler:</p>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                      {page.actions.map(action => (
+                                        <div key={action.id} className="flex items-center justify-between p-2 bg-background/50 rounded border">
+                                          <div className="flex-1">
+                                            <div className="text-xs font-medium">{action.name}</div>
+                                            <div className="text-xs text-muted-foreground">{action.description}</div>
+                                          </div>
+                                          <Switch
+                                            checked={hasActionPermission(role.id, page.id, action.id)}
+                                            onCheckedChange={() => toggleActionPermission(role.id, page.id, action.id)}
+                                          />
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {PAGES_AND_ACTIONS.actions.map(action => (
-                          <div key={action.id} className="flex items-center justify-between p-2 border rounded">
-                            <div className="flex-1">
-                              <div className="font-medium text-sm">{action.name}</div>
-                              <div className="text-xs text-muted-foreground">{action.description}</div>
-                            </div>
-                            <Switch
-                              checked={permissions[role.id]?.actions?.includes(action.id) || false}
-                              onCheckedChange={() => toggleActionPermission(role.id, action.id)}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Yetki Matrisi Özeti */}
         <Card className="mt-6">
@@ -315,33 +438,55 @@ export default function Permissions() {
               <Users className="w-5 h-5 mr-2" />
               Yetki Matrisi Özeti
             </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Tüm roller için sayfa erişim yetkilerinin genel görünümü
+            </p>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="text-left p-2 border-b font-semibold">Rol</th>
-                    {PAGES_AND_ACTIONS.pages.map(page => (
-                      <th key={page.id} className="text-center p-2 border-b text-xs font-medium">
-                        {page.name}
+                    <th className="text-left p-3 border-b font-semibold">Rol</th>
+                    {PAGES_WITH_ACTIONS.map(page => (
+                      <th key={page.id} className="text-center p-3 border-b text-xs font-medium">
+                        <div className="flex flex-col items-center">
+                          <i className={`${page.icon} text-sm mb-1`}></i>
+                          <span>{page.name}</span>
+                        </div>
                       </th>
                     ))}
+                    <th className="text-center p-3 border-b text-xs font-medium">Toplam</th>
                   </tr>
                 </thead>
                 <tbody>
                   {USER_ROLES.map(role => (
-                    <tr key={role.id}>
-                      <td className="p-2 border-b font-medium">{role.name}</td>
-                      {PAGES_AND_ACTIONS.pages.map(page => (
-                        <td key={page.id} className="text-center p-2 border-b">
-                          {permissions[role.id]?.pages?.includes(page.id) ? (
-                            <Badge variant="default" className="w-2 h-2 p-0 rounded-full bg-green-500"></Badge>
+                    <tr key={role.id} className="hover:bg-accent/30">
+                      <td className="p-3 border-b font-medium">
+                        <div>
+                          <div className="font-semibold">{role.name}</div>
+                          <div className="text-xs text-muted-foreground">{role.description}</div>
+                        </div>
+                      </td>
+                      {PAGES_WITH_ACTIONS.map(page => (
+                        <td key={page.id} className="text-center p-3 border-b">
+                          {hasPageAccess(role.id, page.id) ? (
+                            <div className="flex flex-col items-center">
+                              <div className="w-3 h-3 rounded-full bg-green-500 mb-1"></div>
+                              <span className="text-xs text-green-700 dark:text-green-300">
+                                {permissions[role.id]?.[page.id]?.length || 0}
+                              </span>
+                            </div>
                           ) : (
-                            <Badge variant="secondary" className="w-2 h-2 p-0 rounded-full bg-gray-300"></Badge>
+                            <div className="w-3 h-3 rounded-full bg-gray-300 mx-auto"></div>
                           )}
                         </td>
                       ))}
+                      <td className="text-center p-3 border-b">
+                        <Badge variant="outline">
+                          {getPagePermissionCount(role.id)} sayfa
+                        </Badge>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
