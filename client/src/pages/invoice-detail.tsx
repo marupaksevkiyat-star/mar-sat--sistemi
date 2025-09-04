@@ -244,7 +244,7 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
   }
 
   const invoiceDetails = invoice as InvoiceDetails;
-  const totalPaid = payments?.reduce((sum: number, payment: InvoicePayment) => sum + parseFloat(payment.amount), 0) || 0;
+  const totalPaid = (payments && Array.isArray(payments)) ? payments.reduce((sum: number, payment: InvoicePayment) => sum + parseFloat(payment.amount), 0) : 0;
   const remainingBalance = parseFloat(invoiceDetails.totalAmount) - totalPaid;
 
   return (
@@ -465,10 +465,10 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
                     <p className="text-sm text-muted-foreground">Ödeme geçmişi yükleniyor...</p>
                   </div>
-                ) : payments && payments.length > 0 ? (
+                ) : (payments && Array.isArray(payments) && payments.length > 0) ? (
                   <div className="space-y-3">
                     <h4 className="font-medium text-sm text-muted-foreground mb-3">Ödeme Detayları</h4>
-                    {payments.map((payment: InvoicePayment) => (
+                    {(payments as InvoicePayment[]).map((payment: InvoicePayment) => (
                       <div key={payment.id} className="border rounded-lg p-3 space-y-2">
                         <div className="flex justify-between items-start">
                           <div>
