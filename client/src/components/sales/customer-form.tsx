@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Check, Clock, X, Plus } from "lucide-react";
+import { Check, Clock, X, Plus, Save } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import AppointmentForm from "./appointment-form";
 import OrderForm from "./order-form";
 
@@ -21,6 +24,8 @@ export default function CustomerForm({
   onCancel,
   currentLocation,
 }: CustomerFormProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     companyName: customer?.companyName || "",
     contactPerson: customer?.contactPerson || "",
@@ -30,17 +35,73 @@ export default function CustomerForm({
   });
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
+  const [savedCustomer, setSavedCustomer] = useState(customer);
+  const [isCustomerSaved, setIsCustomerSaved] = useState(!!customer);
+
+  const createCustomerMutation = useMutation({
+    mutationFn: async (customerData: any) => {
+      const response = await apiRequest("POST", "/api/customers", customerData);
+      return response;
+    },
+    onSuccess: (response: any) => {
+      const newCustomer = response.customer || response;
+      setSavedCustomer(newCustomer);
+      setIsCustomerSaved(true);
+      toast({
+        title: "Başarılı",
+        description: "Müşteri başarıyla kaydedildi. Şimdi satış yapabilirsiniz.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
+    },
+    onError: (error) => {
+      console.error("Müşteri kaydetme hatası:", error);
+      toast({
+        title: "Hata",
+        description: "Müşteri kaydedilirken bir hata oluştu",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
+    // If user changes data after saving, mark as not saved
+    if (isCustomerSaved && !customer) {
+      setIsCustomerSaved(false);
+    }
+  };
+
+  const handleSaveCustomer = () => {
+    if (!formData.companyName || !formData.contactPerson) {
+      toast({
+        title: "Eksik Bilgi",
+        description: "Lütfen en az firma adı ve yetkili kişi bilgilerini girin",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const customerData = {
+      ...formData,
+      latitude: currentLocation?.lat?.toString(),
+      longitude: currentLocation?.lng?.toString(),
+      status: 'active',
+    };
+
+    createCustomerMutation.mutate(customerData);
   };
 
   const handleCompleteVisit = (outcome: string) => {
-    if (!customer && (!formData.companyName || !formData.contactPerson)) {
-      alert("Lütfen en az firma adı ve yetkili kişi bilgilerini girin");
+    // Check if customer is saved for new customers
+    if (!customer && !isCustomerSaved) {
+      toast({
+        title: "Müşteri Kaydı Gerekli",
+        description: "Önce müşteriyi kaydedin, sonra işlem yapabilirsiniz",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -54,8 +115,8 @@ export default function CustomerForm({
       return;
     }
 
-    // For not_interested, complete directly
-    const customerData = customer ? null : {
+    // For not_interested, use saved customer if available
+    const customerData = (customer || savedCustomer) ? null : {
       ...formData,
       latitude: currentLocation?.lat?.toString(),
       longitude: currentLocation?.lng?.toString(),
@@ -65,30 +126,46 @@ export default function CustomerForm({
   };
 
   const handleOrderSubmit = (orderData: any) => {
-    const customerData = customer ? null : {
-      ...formData,
-      latitude: currentLocation?.lat?.toString(),
-      longitude: currentLocation?.lng?.toString(),
-    };
-
-    onComplete('sale', customerData, orderData);
+    const customerToUse = customer || savedCustomer;
+    
+    // Use the saved customer data instead of creating new one
+    if (customerToUse && customerToUse.id && customerToUse.id !== 'new') {
+      // We have a real saved customer, just create the order
+      onComplete('sale', null, { ...orderData, customerId: customerToUse.id });
+    } else {
+      // Fallback - shouldn't happen if customer is properly saved
+      const customerData = {
+        ...formData,
+        latitude: currentLocation?.lat?.toString(),
+        longitude: currentLocation?.lng?.toString(),
+      };
+      onComplete('sale', customerData, orderData);
+    }
   };
 
   const handleAppointmentSubmit = (appointmentData: any) => {
-    const customerData = customer ? null : {
-      ...formData,
-      latitude: currentLocation?.lat?.toString(),
-      longitude: currentLocation?.lng?.toString(),
-    };
-
-    onComplete('follow_up', customerData, null, appointmentData);
+    const customerToUse = customer || savedCustomer;
+    
+    // Use the saved customer data instead of creating new one
+    if (customerToUse && customerToUse.id && customerToUse.id !== 'new') {
+      // We have a real saved customer, just create the appointment
+      onComplete('follow_up', null, null, { ...appointmentData, customerId: customerToUse.id });
+    } else {
+      // Fallback - shouldn't happen if customer is properly saved
+      const customerData = {
+        ...formData,
+        latitude: currentLocation?.lat?.toString(),
+        longitude: currentLocation?.lng?.toString(),
+      };
+      onComplete('follow_up', customerData, null, appointmentData);
+    }
   };
 
   const isNewCustomer = !customer;
 
   // Show order form if sale is selected
   if (showOrderForm) {
-    const customerForOrder = customer || { 
+    const customerForOrder = customer || savedCustomer || { 
       id: 'new', 
       name: formData.companyName,
       companyName: formData.companyName 
@@ -105,7 +182,7 @@ export default function CustomerForm({
 
   // Show appointment form if follow-up is selected
   if (showAppointmentForm) {
-    const customerForAppointment = customer || { 
+    const customerForAppointment = customer || savedCustomer || { 
       id: 'new', 
       name: formData.companyName,
       companyName: formData.companyName 
@@ -202,6 +279,36 @@ export default function CustomerForm({
                 <i className="fas fa-map-marker-alt mr-2"></i>
                 GPS Koordinatları: {currentLocation.lat.toFixed(6)}, {currentLocation.lng.toFixed(6)}
               </p>
+            </div>
+          )}
+
+          {/* Save Customer Button - Only for new customers */}
+          {isNewCustomer && (
+            <div className="border-t pt-4">
+              <Button
+                type="button"
+                onClick={handleSaveCustomer}
+                disabled={createCustomerMutation.isPending || isCustomerSaved}
+                className="w-full mb-4 bg-blue-600 hover:bg-blue-700 text-white"
+                data-testid="button-save-customer"
+              >
+                {createCustomerMutation.isPending ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                    Kaydediliyor...
+                  </>
+                ) : isCustomerSaved ? (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Müşteri Kaydedildi
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Müşteriyi Kaydet
+                  </>
+                )}
+              </Button>
             </div>
           )}
 
