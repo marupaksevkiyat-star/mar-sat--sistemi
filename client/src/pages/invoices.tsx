@@ -47,6 +47,7 @@ export default function InvoicesPage() {
   const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
   const [showAccountDetails, setShowAccountDetails] = useState(false);
   const [accountDetails, setAccountDetails] = useState<any>(null);
+  const [selectedVatRate, setSelectedVatRate] = useState<number>(20); // Varsayılan %20
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -117,7 +118,8 @@ export default function InvoicesPage() {
       return await apiRequest('POST', '/api/invoices/bulk-smart', {
         customerId: selectedCustomer.customerId,
         orderIds: selectedInvoices,
-        selectedOrders: selectedOrders
+        selectedOrders: selectedOrders,
+        vatRate: selectedVatRate
       });
     },
     onSuccess: (data) => {
@@ -266,16 +268,33 @@ export default function InvoicesPage() {
                         {selectedCustomer.customer?.companyName} - Cari Hesap
                       </CardTitle>
                     </div>
-                    {selectedInvoices.length > 0 && (
-                      <Button 
-                        onClick={processSelectedInvoices}
-                        disabled={bulkInvoiceMutation.isPending}
-                        className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
-                      >
-                        <FileText className="w-4 h-4 mr-2" />
-                        {bulkInvoiceMutation.isPending ? "Faturalaştırılıyor..." : `${selectedInvoices.length} İrsaliyeyi Faturalaştır`}
-                      </Button>
-                    )}
+                    <div className="flex items-center gap-3">
+                      {/* KDV Oranı Seçimi */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">KDV:</label>
+                        <select 
+                          value={selectedVatRate}
+                          onChange={(e) => setSelectedVatRate(Number(e.target.value))}
+                          className="px-2 py-1 border rounded text-sm bg-background"
+                        >
+                          <option value={1}>%1</option>
+                          <option value={5}>%5</option>
+                          <option value={10}>%10</option>
+                          <option value={20}>%20</option>
+                        </select>
+                      </div>
+                      
+                      {selectedInvoices.length > 0 && (
+                        <Button 
+                          onClick={processSelectedInvoices}
+                          disabled={bulkInvoiceMutation.isPending}
+                          className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                        >
+                          <FileText className="w-4 h-4 mr-2" />
+                          {bulkInvoiceMutation.isPending ? "Faturalaştırılıyor..." : `${selectedInvoices.length} İrsaliyeyi Faturalaştır`}
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </CardHeader>
                 
@@ -425,7 +444,7 @@ export default function InvoicesPage() {
                   <div className="mt-6">
                     <h4 className="font-medium mb-3">İrsaliye Detayları:</h4>
                     <div className="space-y-2">
-                      {selectedCustomer.orders.map((order: any) => (
+                      {customerAccountDetails?.pendingInvoices?.map((order: any) => (
                         <div key={order.id} className="flex justify-between items-center p-3 border rounded-lg">
                           <div>
                             <p className="font-medium">{order.orderNumber}</p>
