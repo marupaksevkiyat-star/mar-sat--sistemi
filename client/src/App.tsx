@@ -23,31 +23,26 @@ function Router() {
 
   const canAccess = (requiredRole: string) => {
     const userRole = (user as any)?.role || '';
-    console.log("🔐 Permission check:", { userRole, requiredRole, user });
     
     // Admin her şeye erişebilir
-    if (userRole === 'admin' || userRole === 'Admin') return true;
+    if (userRole === 'admin' || userRole === 'Admin' || userRole.includes('Admin')) return true;
     
-    // Specific role checks
-    if (requiredRole === 'sales') {
-      return userRole === 'sales' || userRole === 'sales_staff' || userRole.includes('Satış');
-    }
-    if (requiredRole === 'production') {
-      return userRole === 'production' || userRole === 'production_staff' || userRole.includes('Üretim');
-    }
-    if (requiredRole === 'shipping') {
-      const hasAccess = userRole === 'shipping' || userRole === 'shipping_staff' || userRole.includes('Sevkiyat') || userRole === 'Sevkiyat Personeli';
-      console.log("🚚 Shipping access check:", { userRole, hasAccess });
-      return hasAccess;
-    }
-    if (requiredRole === 'admin') {
-      return userRole === 'admin' || userRole === 'Admin';
-    }
-    if (requiredRole === 'accounting') {
-      return userRole === 'accounting' || userRole.includes('Muhasebe');
-    }
+    // Unified role mapping - hem İngilizce hem Türkçe rolleri destekler
+    const roleMap = {
+      sales: ['sales', 'sales_staff', 'Satış', 'Satış Personeli'],
+      production: ['production', 'production_staff', 'Üretim', 'Üretim Personeli'],
+      shipping: ['shipping', 'shipping_staff', 'Sevkiyat', 'Sevkiyat Personeli'],
+      admin: ['admin', 'Admin'],
+      accounting: ['accounting', 'accounting_staff', 'Muhasebe', 'Muhasebe Personeli']
+    };
     
-    return false;
+    // Check if user role matches any of the allowed roles for the required permission
+    const allowedRoles = roleMap[requiredRole as keyof typeof roleMap] || [];
+    const hasAccess = allowedRoles.some(role => 
+      userRole === role || userRole.includes(role)
+    );
+    
+    return hasAccess;
   };
 
   const ProtectedRoute = ({ component: Component, requiredRole }: { component: any, requiredRole?: string }) => {
