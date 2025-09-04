@@ -41,14 +41,13 @@ export default function Navigation() {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
         { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
+        { path: "/customers", label: "Müşteriler", icon: "fas fa-building" },
         { path: "/sales", label: "Satış", icon: "fas fa-users" },
         { path: "/sales-reports", label: "Satış Raporları", icon: "fas fa-chart-bar" },
         { path: "/invoices", label: "İrsaliyeler", icon: "fas fa-file-invoice" },
         { path: "/production", label: "Üretim", icon: "fas fa-cogs" },
         { path: "/shipping", label: "Sevkiyat", icon: "fas fa-truck" },
-        { path: "/mail-settings", label: "Mail Ayarları", icon: "fas fa-envelope-open-text" },
         { path: "/admin", label: "Yönetim", icon: "fas fa-shield-alt" },
-        { path: "/permissions", label: "Yetkiler", icon: "fas fa-user-shield" },
       ];
     }
     
@@ -57,6 +56,7 @@ export default function Navigation() {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
         { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
+        { path: "/customers", label: "Müşteriler", icon: "fas fa-building" },
         { path: "/sales", label: "Satış", icon: "fas fa-users" },
       ];
     }

@@ -14,6 +14,7 @@ import Production from "@/pages/production";
 import Shipping from "@/pages/shipping";
 import Admin from "@/pages/admin";
 import Orders from "@/pages/orders";
+import Customers from "@/pages/customers";
 import MailSettings from "@/pages/mail-settings";
 import Permissions from "@/pages/permissions";
 
@@ -73,6 +74,7 @@ function Router() {
         <>
           <Route path="/" component={Home} />
           <Route path="/orders" component={Orders} />
+          <Route path="/customers" component={Customers} />
           <Route path="/sales">
             <ProtectedRoute component={Sales} requiredRole="sales" />
           </Route>
@@ -88,14 +90,8 @@ function Router() {
           <Route path="/invoices">
             <ProtectedRoute component={Invoices} requiredRole="admin" />
           </Route>
-          <Route path="/mail-settings">
-            <ProtectedRoute component={MailSettings} requiredRole="admin" />
-          </Route>
           <Route path="/admin">
             <ProtectedRoute component={Admin} requiredRole="admin" />
-          </Route>
-          <Route path="/permissions">
-            <ProtectedRoute component={Permissions} requiredRole="admin" />
           </Route>
           <Route component={NotFound} />
         </>
