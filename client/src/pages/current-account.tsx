@@ -31,6 +31,39 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
     setShowDeliverySlipDetail(true);
   };
 
+  const handlePdfDownload = (slip: any) => {
+    // Basit PDF indirme - gelecekte gerçek PDF oluşturucu eklenebilir
+    const content = `
+İRSALİYE BELGESI
+
+İrsaliye No: ${slip.deliverySlipNumber}
+Teslimat Tarihi: ${formatDate(slip.deliveredAt)}
+Durum: ${slip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}
+
+Nakliye Bilgileri:
+Şoför: ${slip.driverName}
+Araç Plakası: ${slip.vehiclePlate}
+Not: ${slip.notes || 'Yok'}
+
+İrsaliye Kalemleri:
+${slip.items?.map((item: any) => `${item.productName} - ${item.deliveredQuantity} ${item.unit}`).join('\n') || 'Ürün bulunamadı'}
+
+Teslimat Onayı:
+Tarih: ${formatDate(slip.deliveredAt)}
+Alıcı İmzası: ________________
+    `;
+    
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `irsaliye-${slip.deliverySlipNumber}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
   if (isLoading) {
     return (
       <div className="text-center py-4">
@@ -168,22 +201,18 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
             {/* İmza Alanı */}
             <div className="bg-muted/30 p-6 rounded-lg">
               <h3 className="font-semibold mb-4">Teslimat Onayı</h3>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <div><strong>Teslim Eden:</strong> {selectedSlip.driverName}</div>
-                  <div className="h-20 border-2 border-dashed border-muted-foreground/30 rounded flex items-center justify-center text-muted-foreground">
-                    Şoför İmzası
-                  </div>
-                </div>
+              <div className="space-y-4">
                 <div className="space-y-3">
                   <div><strong>Teslim Alan:</strong> [Müşteri Adı]</div>
-                  <div className="h-20 border-2 border-dashed border-muted-foreground/30 rounded flex items-center justify-center text-muted-foreground">
-                    Alıcı İmzası
+                  <div className="h-24 border-2 border-solid border-gray-400 rounded bg-white flex items-end justify-center p-2">
+                    <div className="text-xs text-gray-500 border-t border-gray-300 pt-1 w-full text-center">
+                      Alıcı İmzası
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="mt-4 text-xs text-muted-foreground">
-                Tarih: {formatDate(selectedSlip.deliveredAt)}
+                <div className="text-right text-xs text-muted-foreground">
+                  Tarih: {formatDate(selectedSlip.deliveredAt)}
+                </div>
               </div>
             </div>
           </div>
@@ -192,7 +221,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
             <Button variant="outline" onClick={() => setShowDeliverySlipDetail(false)}>
               Kapat
             </Button>
-            <Button>
+            <Button onClick={() => handlePdfDownload(selectedSlip)}>
               PDF İndir
             </Button>
           </div>
