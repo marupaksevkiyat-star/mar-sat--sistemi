@@ -59,13 +59,22 @@ export default function CurrentAccountPage() {
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
 
+  // Debug log - fatura verilerini kontrol et
+  console.log("🔍 All invoices data:", allInvoices);
+  
   // Müşteri bazında faturaları grupla
   const customerInvoices = allInvoices ? 
     allInvoices.reduce((acc: any, invoice: CustomerInvoice) => {
+      console.log("🔍 Processing invoice:", {
+        invoiceNumber: invoice.invoiceNumber,
+        hasCustomer: !!invoice.customer,
+        customer: invoice.customer
+      });
+      
       const companyName = invoice.customer?.companyName || 'Bilinmeyen Müşteri';
       if (!acc[companyName]) {
         acc[companyName] = {
-          customer: invoice.customer,
+          customer: invoice.customer || { companyName: 'Bilinmeyen Müşteri' },
           invoices: [],
           totalAmount: 0,
           invoiceCount: 0
@@ -76,6 +85,8 @@ export default function CurrentAccountPage() {
       acc[companyName].invoiceCount++;
       return acc;
     }, {}) : {};
+    
+  console.log("📊 Grouped customer invoices:", customerInvoices);
 
   const filteredCustomers = Object.entries(customerInvoices).filter(([companyName]) => 
     companyName.toLowerCase().includes(searchTerm.toLowerCase())

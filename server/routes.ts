@@ -1051,6 +1051,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { status } = req.query;
       const filters = status && status !== 'all' ? { status: status as string } : undefined;
       const invoices = await storage.getInvoices(filters);
+      
+      console.log("📋 Fetching invoices, count:", invoices.length);
+      if (invoices.length > 0) {
+        console.log("🔍 Sample invoice customer info:", {
+          hasCustomer: !!invoices[0].customer,
+          customerInfo: invoices[0].customer
+        });
+      }
+      
       res.json(invoices);
     } catch (error) {
       console.error("Error fetching invoices:", error);
