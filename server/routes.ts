@@ -837,62 +837,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Delivered orders grouped by customer - for bulk invoicing
   app.get('/api/orders/delivered-by-customer', isAuthenticated, async (req, res) => {
+    console.log("🚀 BAŞLADI: delivered-by-customer endpoint");
     try {
-      console.log("🔍 API called: /api/orders/delivered-by-customer");
-      console.log("🔍 About to call storage.getOrders with status: delivered");
-      const deliveredOrders = await storage.getOrders({ status: 'delivered' });
-      console.log("📦 Delivered orders found:", deliveredOrders.length);
-      console.log("📦 First order structure:", deliveredOrders.length > 0 ? JSON.stringify(deliveredOrders[0], null, 2) : "No orders");
+      // Basit SQL sorgusu ile test edelim
+      const result = await db.select().from(orders).where(eq(orders.status, 'delivered')).limit(5);
+      console.log("📦 Raw delivered orders:", result.length);
       
-      // Group orders by customer
-      const groupedOrders: Record<string, any> = {};
+      if (result.length === 0) {
+        console.log("❌ No delivered orders found in database");
+        return res.json([]);
+      }
       
-      deliveredOrders.forEach(order => {
-        const customerId = order.customerId;
-        if (!groupedOrders[customerId]) {
-          groupedOrders[customerId] = {
-            customerId,
-            customer: order.customer,
-            orders: [],
-            totalOrders: 0,
-            totalAmount: 0,
-            products: {} // Will aggregate products
-          };
-        }
-        
-        groupedOrders[customerId].orders.push(order);
-        groupedOrders[customerId].totalOrders++;
-        groupedOrders[customerId].totalAmount += parseFloat(order.totalAmount || '0');
-        
-        // Aggregate products
-        if (order.items) {
-          order.items.forEach(item => {
-            const productId = item.productId;
-            if (!groupedOrders[customerId].products[productId]) {
-              groupedOrders[customerId].products[productId] = {
-                product: item.product,
-                totalQuantity: 0,
-                totalPrice: 0,
-                deliveries: []
-              };
-            }
-            
-            groupedOrders[customerId].products[productId].totalQuantity += item.quantity;
-            groupedOrders[customerId].products[productId].totalPrice += parseFloat(item.totalPrice || '0');
-            groupedOrders[customerId].products[productId].deliveries.push({
-              orderId: order.id,
-              orderNumber: order.orderNumber,
-              quantity: item.quantity,
-              deliveredAt: order.deliveredAt
-            });
-          });
-        }
-      });
+      // Basit grouping - sadece test için
+      const mockData = result.map(order => ({
+        customerId: order.customerId,
+        customer: { companyName: "Test Firma", id: order.customerId },
+        totalOrders: 1,
+        totalAmount: parseFloat(order.totalAmount),
+        orders: [order],
+        products: {}
+      }));
       
-      res.json(Object.values(groupedOrders));
+      console.log("✅ Returning mock data:", mockData.length, "items");
+      res.json(mockData);
     } catch (error) {
-      console.error("Error fetching delivered orders by customer:", error);
-      res.status(500).json({ message: "Failed to fetch delivered orders by customer" });
+      console.error("❌ HATA delivered-by-customer:", error);
+      res.status(500).json({ message: "Database error: " + error.message });
     }
   });
 
