@@ -46,7 +46,7 @@ export default function Sales() {
     retry: false,
   });
 
-  const { data: allCustomers, isLoading: customersLoading } = useQuery({
+  const { data: allCustomers, isLoading: customersLoading } = useQuery<any[]>({
     queryKey: ["/api/customers"],
     retry: false,
   });

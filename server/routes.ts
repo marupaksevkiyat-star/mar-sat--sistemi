@@ -10,11 +10,19 @@ import {
   insertAppointmentSchema,
   insertInvoiceSchema,
   insertMailSettingSchema,
-  insertMailTemplateSchema
+  insertMailTemplateSchema,
+  type User
 } from "@shared/schema";
 import { z } from "zod";
 import session from "express-session";
 import { sendDeliveryNotification } from "./mailService";
+
+// Extend the session interface to include user
+declare module 'express-session' {
+  interface SessionData {
+    user?: User;
+  }
+}
 
 // Simple auth middleware for demo
 const isAuthenticated = (req: any, res: any, next: any) => {
@@ -387,7 +395,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         salesPersonId: userId,
       };
       
-      // Items'ları hazırla
+      // Prepare items for order creation
       const orderItems = Array.isArray(items) ? items.map((item: any) => ({
         productId: item.productId,
         quantity: parseInt(item.quantity) || 1,
@@ -395,7 +403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalPrice: item.totalPrice?.toString() || '0',
       })) : [];
       
-      // Siparişi oluştur
+      // Create order with items
       const createdOrder = await storage.createOrder(orderData, orderItems);
       
       res.json({ success: true, order: createdOrder });
