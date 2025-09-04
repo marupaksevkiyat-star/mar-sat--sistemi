@@ -524,8 +524,8 @@ export default function InvoicesPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {invoices && invoices.length > 0 ? (
-                      invoices.map((invoice: any) => (
+                    {(invoices && Array.isArray(invoices) && invoices.length > 0) ? (
+                      (invoices as any[]).map((invoice: any) => (
                         <div key={invoice.id} className="border rounded p-4 hover:bg-muted/50">
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
