@@ -127,10 +127,18 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
   });
 
   // İrsaliye listesi
-  const { data: deliverySlips, isLoading: deliverySlipsLoading } = useQuery<DeliverySlip[]>({
+  const { data: deliverySlips, isLoading: deliverySlipsLoading, error: deliverySlipsError } = useQuery<DeliverySlip[]>({
     queryKey: [`/api/invoices/${invoiceId}/delivery-slips`],
     enabled: !!invoiceId,
     retry: false,
+  });
+
+  // Debug logları
+  console.log("🚚 İrsaliye debug:", {
+    invoiceId,
+    deliverySlipsLoading,
+    deliverySlips,
+    deliverySlipsError
   });
 
   // İrsaliye detayı
