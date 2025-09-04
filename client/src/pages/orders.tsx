@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { OrderWithDetails } from "@shared/schema";
 import InvoiceModal from "@/components/orders/invoice-modal";
+import { FileText, Trash2 } from "lucide-react";
 
 type OrderStatus = "pending" | "production" | "production_ready" | "shipping" | "delivered" | "cancelled";
 
@@ -111,15 +113,45 @@ const formatDate = (dateString: string | Date | null) => {
 
 export default function Orders() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>("all");
   const [selectedOrder, setSelectedOrder] = useState<OrderWithDetails | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   // Fetch all orders
-  const { data: allOrders = [], isLoading, error } = useQuery<OrderWithDetails[]>({
+  const { data: allOrders = [], isLoading, error, refetch } = useQuery<OrderWithDetails[]>({
     queryKey: ["/api/orders"],
     retry: false,
   });
+
+  // Durum değiştirme
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
+      const response = await fetch(`/api/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (!response.ok) throw new Error('Durum güncellenemedi');
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Başarılı", description: "Sipariş durumu güncellendi" });
+      refetch();
+    },
+    onError: () => {
+      toast({ title: "Hata", description: "Durum güncellenemedi", variant: "destructive" });
+    }
+  });
+
+  const handleStatusChange = (orderId: string, newStatus: string) => {
+    updateStatusMutation.mutate({ orderId, status: newStatus });
+  };
+
+  const handleDeleteOrder = (orderId: string) => {
+    // TODO: Sipariş silme işlemi
+    toast({ title: "Bilgi", description: "Sipariş silme özelliği yakında eklenecek" });
+  };
 
   // Filter orders by active tab
   const filteredOrders = (allOrders as OrderWithDetails[]).filter((order: OrderWithDetails) => {
@@ -304,6 +336,47 @@ export default function Orders() {
                         
                         {/* Aksiyon Butonları */}
                         <div className="mt-4 pt-3 border-t space-y-2">
+                          {/* Durum Değiştirme */}
+                          <div className="flex gap-2">
+                            <Select
+                              value={order.status}
+                              onValueChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="pending">
+                                  Beklemede
+                                </SelectItem>
+                                <SelectItem value="production">
+                                  Üretimde
+                                </SelectItem>
+                                <SelectItem value="production_ready">
+                                  Üretim Tamamlandı
+                                </SelectItem>
+                                <SelectItem value="shipping">
+                                  Kargoda
+                                </SelectItem>
+                                <SelectItem value="delivered">
+                                  Teslim Edildi
+                                </SelectItem>
+                                <SelectItem value="cancelled">
+                                  İptal Edildi
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                            {order.status === 'cancelled' && (
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteOrder(order.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                          
                           <Button
                             variant="outline"
                             size="sm"
@@ -314,7 +387,7 @@ export default function Orders() {
                             className="w-full"
                             data-testid={`button-invoice-${order.id}`}
                           >
-                            <i className="fas fa-file-invoice mr-2"></i>
+                            <FileText className="w-4 h-4 mr-2" />
                             İrsaliye Görüntüle / Yazdır
                           </Button>
                           
