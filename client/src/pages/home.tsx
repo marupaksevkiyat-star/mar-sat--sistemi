@@ -212,14 +212,15 @@ export default function Home() {
       return [
         {
           title: "Sevkiyata Hazır",
-          value: (stats as any)?.readyForShipping?.toString() || "0",
+          value: (stats as any)?.productionOrders?.toString() || "0",
+          subtitle: "üretim tamamlandı",
           icon: "fas fa-box",
           color: "blue",
           onClick: () => setLocation('/shipping')
         },
         {
           title: "Yolda",
-          value: (stats as any)?.inTransit?.toString() || "0",
+          value: (stats as any)?.shippingOrders?.toString() || "0",
           subtitle: "teslimat",
           icon: "fas fa-truck",
           color: "yellow",
@@ -227,8 +228,8 @@ export default function Home() {
         },
         {
           title: "Teslim Edildi",
-          value: (stats as any)?.delivered?.toString() || "0",
-          subtitle: "bugün",
+          value: (stats as any)?.deliveredOrders?.toString() || "0",
+          subtitle: "toplam",
           icon: "fas fa-check-circle",
           color: "green",
           onClick: () => setLocation('/shipping')
