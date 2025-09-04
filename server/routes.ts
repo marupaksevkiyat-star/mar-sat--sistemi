@@ -1238,6 +1238,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Müşteri ödemelerini getir
+  app.get('/api/customers/:customerId/payments', isAuthenticated, async (req: any, res) => {
+    try {
+      const { customerId } = req.params;
+      const payments = await storage.getPayments(customerId);
+      res.json(payments);
+    } catch (error) {
+      console.error("Error fetching customer payments:", error);
+      res.status(500).json({ message: "Failed to fetch payments" });
+    }
+  });
+
   // İrsaliye e-posta gönderme endpoint'i (mailto: link yaklaşımı)
   app.post('/api/orders/send-invoice', isAuthenticated, async (req: any, res) => {
     try {
