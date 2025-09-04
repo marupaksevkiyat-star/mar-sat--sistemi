@@ -234,8 +234,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.user.id;
       const userRole = req.session.user.role;
       
-      // Admin tüm verileri görebilir, diğerleri sadece kendi verilerini
-      const filterUserId = (userRole === 'admin' || userRole === 'Admin') ? null : userId;
+      // Admin, üretim ve sevkiyat personeli tüm verileri görebilir
+      // Sadece satış personeli kendi verilerini görebilir
+      const canSeeAllData = userRole === 'admin' || userRole === 'Admin' || 
+                           userRole === 'production' || userRole === 'production_staff' ||
+                           userRole === 'shipping' || userRole === 'shipping_staff' ||
+                           userRole.includes('Üretim') || userRole.includes('Sevkiyat');
+      
+      const filterUserId = canSeeAllData ? null : userId;
       const stats = await storage.getDashboardStats(filterUserId);
       res.json(stats);
     } catch (error) {
