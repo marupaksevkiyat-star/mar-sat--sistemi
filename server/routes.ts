@@ -428,27 +428,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/orders/delivered-by-customer', isAuthenticated, async (req, res) => {
     console.log("🚀 ÇALIŞTI: delivered-by-customer endpoint");
     try {
-      // Basit SQL sorgusu ile test
-      const result = await db.select().from(orders).where(eq(orders.status, 'delivered')).limit(5);
+      // Müşteriyi de dahil ederek delivered orderları getir
+      const result = await db
+        .select({
+          orderId: orders.id,
+          orderNumber: orders.orderNumber,
+          customerId: orders.customerId,
+          totalAmount: orders.totalAmount,
+          deliveredAt: orders.deliveredAt,
+          companyName: customers.companyName,
+          customerEmail: customers.email,
+          customerPhone: customers.phone
+        })
+        .from(orders)
+        .innerJoin(customers, eq(orders.customerId, customers.id))
+        .where(eq(orders.status, 'delivered'));
+      
       console.log("📦 Raw delivered orders:", result.length);
       
       if (result.length === 0) {
-        console.log("❌ No delivered orders found");
         return res.json([]);
       }
       
-      // Basit test data
-      const mockData = result.map(order => ({
-        customerId: order.customerId,
-        customer: { companyName: "Test Firma", id: order.customerId },
-        totalOrders: 1,
-        totalAmount: parseFloat(order.totalAmount),
-        orders: [order],
-        products: {}
-      }));
+      // Müşteri bazında grupla
+      const customerMap = new Map();
       
-      console.log("✅ SUCCESS: Returning", mockData.length, "firms");
-      res.json(mockData);
+      for (const order of result) {
+        if (!customerMap.has(order.customerId)) {
+          customerMap.set(order.customerId, {
+            customerId: order.customerId,
+            customer: {
+              companyName: order.companyName,
+              email: order.customerEmail,
+              phone: order.customerPhone
+            },
+            pendingInvoices: [], // Bekleyen irsaliyeler
+            totalOrders: 0,
+            totalAmount: 0
+          });
+        }
+        
+        const customerData = customerMap.get(order.customerId);
+        customerData.pendingInvoices.push({
+          id: order.orderId,
+          orderNumber: order.orderNumber,
+          totalAmount: parseFloat(order.totalAmount),
+          deliveredAt: order.deliveredAt
+        });
+        customerData.totalOrders++;
+        customerData.totalAmount += parseFloat(order.totalAmount);
+      }
+      
+      const groupedData = Array.from(customerMap.values());
+      console.log("✅ SUCCESS: Returning", groupedData.length, "customers with pending invoices");
+      res.json(groupedData);
     } catch (error) {
       console.error("❌ ERROR:", error);
       res.status(500).json({ message: "Database error: " + error.message });
