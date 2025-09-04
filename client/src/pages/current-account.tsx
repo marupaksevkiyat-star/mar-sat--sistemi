@@ -127,6 +127,13 @@ export default function CurrentAccountPage() {
     retry: false,
   });
 
+  // Seçili müşterinin ödemelerini getir
+  const { data: customerPayments } = useQuery({
+    queryKey: [`/api/customers/${selectedCustomer}/payments`],
+    enabled: !!selectedCustomer,
+    retry: false,
+  });
+
   const formatCurrency = (amount: number | string) => {
     const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
     return new Intl.NumberFormat('tr-TR', {
@@ -380,13 +387,17 @@ export default function CurrentAccountPage() {
                       </div>
                       <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded">
                         <div className="text-2xl font-bold text-orange-600">
-                          ₺12,450
+                          {formatCurrency(customerInvoices[selectedCustomer]?.totalAmount || 0)}
                         </div>
                         <div className="text-sm text-muted-foreground">Borç Bakiyesi</div>
                       </div>
                       <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded">
                         <div className="text-2xl font-bold text-red-600">
-                          2
+                          {customerInvoices[selectedCustomer]?.invoices.filter((inv: any) => {
+                            const dueDate = new Date(inv.createdAt);
+                            dueDate.setDate(dueDate.getDate() + 30); // 30 gün vade
+                            return dueDate < new Date() && inv.status !== 'paid';
+                          }).length || 0}
                         </div>
                         <div className="text-sm text-muted-foreground">Vadesi Geçen</div>
                       </div>
@@ -414,37 +425,36 @@ export default function CurrentAccountPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3 max-h-64 overflow-y-auto">
-                      {/* Örnek ödeme kayıtları */}
-                      <div className="flex justify-between items-center p-3 border rounded">
-                        <div>
-                          <div className="font-medium">Nakit Ödeme</div>
-                          <div className="text-sm text-muted-foreground">28.08.2025</div>
+                      {(customerPayments && Array.isArray(customerPayments) && customerPayments.length > 0) ? (
+                        customerPayments.map((payment: any) => (
+                          <div key={payment.id} className="flex justify-between items-center p-3 border rounded">
+                            <div>
+                              <div className="font-medium">
+                                {payment.paymentMethod === 'nakit' ? 'Nakit Ödeme' : 
+                                 payment.paymentMethod === 'havale' ? 'Banka Havalesi' :
+                                 payment.paymentMethod === 'kredi_karti' ? 'Kredi Kartı' :
+                                 payment.paymentMethod === 'cek' ? 'Çek Ödemesi' : payment.paymentMethod}
+                              </div>
+                              <div className="text-sm text-muted-foreground">{formatDate(payment.paymentDate)}</div>
+                              {payment.description && (
+                                <div className="text-xs text-muted-foreground">{payment.description}</div>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <div className="font-semibold text-green-600">+{formatCurrency(parseFloat(payment.amount))}</div>
+                              <Badge variant="outline" className="text-green-700">
+                                {payment.status === 'completed' ? 'Tamamlandı' : 
+                                 payment.status === 'pending' ? 'Beklemede' : payment.status}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <CreditCard className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">Henüz ödeme yapılmamış</p>
                         </div>
-                        <div className="text-right">
-                          <div className="font-semibold text-green-600">+₺5,000</div>
-                          <Badge variant="outline" className="text-green-700">Tamamlandı</Badge>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded">
-                        <div>
-                          <div className="font-medium">Banka Havalesi</div>
-                          <div className="text-sm text-muted-foreground">25.08.2025</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-semibold text-green-600">+₺8,750</div>
-                          <Badge variant="outline" className="text-green-700">Tamamlandı</Badge>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded">
-                        <div>
-                          <div className="font-medium">Çek Ödemesi</div>
-                          <div className="text-sm text-muted-foreground">20.09.2025 - Vade</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-semibold text-orange-600">₺3,200</div>
-                          <Badge variant="outline" className="text-orange-700">Beklemede</Badge>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -459,24 +469,63 @@ export default function CurrentAccountPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded">
-                        <div>
-                          <div className="font-medium text-red-800 dark:text-red-200">Fatura #SMART-20250815-143022</div>
-                          <div className="text-sm text-red-600 dark:text-red-300">Vade: 15.08.2025 (20 gün gecikme)</div>
+                      {customerInvoices[selectedCustomer]?.invoices
+                        .filter((invoice: CustomerInvoice) => {
+                          const dueDate = new Date(invoice.createdAt);
+                          dueDate.setDate(dueDate.getDate() + 30); // 30 gün vade
+                          return invoice.status !== 'paid';
+                        })
+                        .map((invoice: CustomerInvoice) => {
+                          const dueDate = new Date(invoice.createdAt);
+                          dueDate.setDate(dueDate.getDate() + 30);
+                          const today = new Date();
+                          const isOverdue = dueDate < today;
+                          const daysDiff = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                          
+                          return (
+                            <div 
+                              key={invoice.id}
+                              className={`flex justify-between items-center p-3 border rounded ${
+                                isOverdue 
+                                  ? 'bg-red-50 dark:bg-red-900/20 border-red-200' 
+                                  : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200'
+                              }`}
+                            >
+                              <div>
+                                <div className={`font-medium ${
+                                  isOverdue 
+                                    ? 'text-red-800 dark:text-red-200' 
+                                    : 'text-yellow-800 dark:text-yellow-200'
+                                }`}>
+                                  Fatura #{invoice.invoiceNumber}
+                                </div>
+                                <div className={`text-sm ${
+                                  isOverdue 
+                                    ? 'text-red-600 dark:text-red-300' 
+                                    : 'text-yellow-600 dark:text-yellow-300'
+                                }`}>
+                                  Vade: {formatDate(dueDate.toISOString())} 
+                                  {isOverdue 
+                                    ? ` (${Math.abs(daysDiff)} gün gecikme)` 
+                                    : ` (${daysDiff} gün kaldı)`
+                                  }
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className={`font-semibold ${
+                                  isOverdue ? 'text-red-600' : 'text-yellow-600'
+                                }`}>
+                                  {formatCurrency(parseFloat(invoice.totalAmount || '0'))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }) || (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <AlertTriangle className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">Vadesi yaklaşan fatura yok</p>
                         </div>
-                        <div className="text-right">
-                          <div className="font-semibold text-red-600">₺4,800</div>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 rounded">
-                        <div>
-                          <div className="font-medium text-yellow-800 dark:text-yellow-200">Fatura #SMART-20250820-091155</div>
-                          <div className="text-sm text-yellow-600 dark:text-yellow-300">Vade: 10.09.2025 (5 gün kaldı)</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-semibold text-yellow-600">₺7,650</div>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
