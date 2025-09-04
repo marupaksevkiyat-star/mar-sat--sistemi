@@ -20,7 +20,7 @@ function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
 
   const canAccess = (requiredRole: string) => {
-    const userRole = user?.role || '';
+    const userRole = (user as any)?.role || '';
     
     // Admin her şeye erişebilir
     if (userRole === 'admin' || userRole === 'Admin') return true;
