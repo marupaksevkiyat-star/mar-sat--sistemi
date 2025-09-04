@@ -253,8 +253,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                            userRole === 'production' || userRole === 'production_staff' ||
                            userRole === 'shipping' || userRole === 'shipping_staff' ||
                            userRole === 'accounting' || userRole === 'accounting_staff' ||
-                           userRole.includes('Üretim') || userRole.includes('Sevkiyat') || userRole.includes('Muhasebe');
+                           userRole.includes('Admin') || userRole.includes('Üretim') || 
+                           userRole.includes('Sevkiyat') || userRole.includes('Muhasebe') ||
+                           userRole === 'Sevkiyat Personeli' || userRole === 'Üretim Personeli' ||
+                           userRole === 'Muhasebe Personeli';
       
+      console.log(`📊 Dashboard stats request - User: ${userId}, Role: ${userRole}, Can see all data: ${canSeeAllData}`);
       const filterUserId = canSeeAllData ? null : userId;
       const stats = await storage.getDashboardStats(filterUserId);
       res.json(stats);
@@ -633,11 +637,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Admin, üretim, sevkiyat ve muhasebe personeli tüm siparişleri görebilir
       // Sadece satış personeli kendi siparişlerini görebilir
-      if (userRole !== 'admin' && userRole !== 'Admin' && 
-          userRole !== 'production' && userRole !== 'production_staff' &&
-          userRole !== 'shipping' && userRole !== 'shipping_staff' &&
-          userRole !== 'accounting' && userRole !== 'accounting_staff' &&
-          !userRole.includes('Üretim') && !userRole.includes('Sevkiyat') && !userRole.includes('Muhasebe')) {
+      const canSeeAllOrders = userRole === 'admin' || userRole === 'Admin' || 
+                             userRole === 'production' || userRole === 'production_staff' ||
+                             userRole === 'shipping' || userRole === 'shipping_staff' ||
+                             userRole === 'accounting' || userRole === 'accounting_staff' ||
+                             userRole.includes('Admin') || userRole.includes('Üretim') || 
+                             userRole.includes('Sevkiyat') || userRole.includes('Muhasebe') ||
+                             userRole === 'Sevkiyat Personeli' || userRole === 'Üretim Personeli' ||
+                             userRole === 'Muhasebe Personeli';
+      
+      if (!canSeeAllOrders) {
         filters.salesPersonId = userId;
         console.log(`🔒 Filtering orders by salesPersonId: ${userId}`);
       } else {
