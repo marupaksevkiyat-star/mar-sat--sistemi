@@ -14,6 +14,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import session from "express-session";
+import { sendDeliveryNotification } from "./mailService";
 
 // Simple auth middleware for demo
 const isAuthenticated = (req: any, res: any, next: any) => {
@@ -431,6 +432,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { status, ...updates } = req.body;
       const order = await storage.updateOrderStatus(req.params.id, status, updates);
+      
+      // Eğer sipariş "delivered" durumuna geçtiyse, müşteriye mail gönder
+      if (status === 'delivered') {
+        console.log(`📧 Sending delivery notification for order: ${req.params.id}`);
+        try {
+          await sendDeliveryNotification(req.params.id);
+          console.log(`✅ Delivery notification sent successfully for order: ${req.params.id}`);
+        } catch (mailError) {
+          console.error(`❌ Failed to send delivery notification for order ${req.params.id}:`, mailError);
+          // Mail gönderimi başarısız olsa bile sipariş durumu güncellensin
+        }
+      }
+      
       res.json(order);
     } catch (error) {
       console.error("Error updating order status:", error);
@@ -700,6 +714,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error deleting mail template:', error);
       res.status(500).json({ message: 'Failed to delete mail template' });
+    }
+  });
+
+  // Mail gönderme endpoint - manuel mail gönderimi için
+  app.post('/api/orders/:id/send-delivery-email', isAuthenticated, async (req: any, res) => {
+    try {
+      const orderId = req.params.id;
+      
+      // Sipariş detaylarını al
+      const order = await storage.getOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+
+      // Müşteri email kontrolü
+      if (!order.customer.email) {
+        return res.status(400).json({ message: 'Customer email not found' });
+      }
+
+      // Mail gönderimi
+      const success = await sendDeliveryNotification(orderId);
+      
+      if (success) {
+        res.json({ 
+          success: true, 
+          message: 'Delivery notification sent successfully',
+          customerEmail: order.customer.email
+        });
+      } else {
+        res.status(500).json({ message: 'Failed to send delivery notification' });
+      }
+    } catch (error) {
+      console.error('Error sending delivery email:', error);
+      res.status(500).json({ message: 'Failed to send delivery email' });
     }
   });
 
