@@ -373,7 +373,7 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
                     <p className="text-sm text-muted-foreground">İrsaliye bilgileri yükleniyor...</p>
                   </div>
-                ) : items && items.length > 0 ? (
+                ) : (items && Array.isArray(items) && items.length > 0) ? (
                   <div className="space-y-4">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
@@ -387,7 +387,7 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
                           </tr>
                         </thead>
                         <tbody>
-                          {items.map((item: InvoiceItem) => (
+                          {(items as InvoiceItem[]).map((item: InvoiceItem) => (
                             <tr key={item.id} className="border-b">
                               <td className="p-3 font-medium">{item.productName}</td>
                               <td className="text-center p-3">{item.quantity}</td>
