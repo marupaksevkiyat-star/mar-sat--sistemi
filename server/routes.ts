@@ -1268,6 +1268,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { invoiceId } = req.params;
       
+      console.log("🚚 İrsaliye listesi istendi, fatura ID:", invoiceId);
+      
       // Gerçek irsaliye verilerini getir
       const deliverySlipList = await db
         .select({
@@ -1293,12 +1295,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(deliverySlips)
         .where(eq(deliverySlips.invoiceId, invoiceId));
 
+      console.log("📦 Bulunan irsaliye sayısı:", deliverySlipList.length);
+
       // Items alanını parse et
       const processedSlips = deliverySlipList.map((slip: any) => ({
         ...slip,
         items: slip.items || []
       }));
       
+      console.log("✅ İşlenmiş irsaliye verisi:", processedSlips);
       res.json(processedSlips);
     } catch (error) {
       console.error("Error fetching delivery slips:", error);
