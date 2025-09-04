@@ -127,10 +127,19 @@ export default function InvoicesPage() {
       });
     },
     onSuccess: (data) => {
+      const isCustomNumber = customInvoiceNumber && customInvoiceNumber.trim();
+      const isModified = isCustomNumber && data.invoiceNumber !== customInvoiceNumber.trim();
+      
       toast({
         title: "🎉 Toplu Fatura Oluşturuldu!",
-        description: `Fatura No: ${data.invoiceNumber} - ${data.orderCount} sipariş birleştirildi`,
+        description: isModified 
+          ? `Fatura No: ${data.invoiceNumber} (${customInvoiceNumber} mevcut olduğu için otomatik düzenlendi) - ${data.orderCount} sipariş birleştirildi`
+          : `Fatura No: ${data.invoiceNumber} - ${data.orderCount} sipariş birleştirildi`,
       });
+      
+      // Seçili irsaliyeleri temizle
+      setSelectedInvoices([]);
+      setCustomInvoiceNumber('');
       
       // Cache'i güncelle
       queryClient.invalidateQueries({ queryKey: ["/api/orders/delivered-by-customer"] });

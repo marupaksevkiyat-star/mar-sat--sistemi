@@ -946,11 +946,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         toplam: totalWithKdv.toFixed(2) 
       });
 
-      // Fatura numarası oluştur - custom veya otomatik
+      // Fatura numarası oluştur - benzersizlik kontrollü
       let finalInvoiceNumber;
       if (customInvoiceNumber && customInvoiceNumber.trim()) {
-        finalInvoiceNumber = customInvoiceNumber.trim();
-        console.log("📋 Manuel fatura numarası kullanılıyor:", finalInvoiceNumber);
+        let baseNumber = customInvoiceNumber.trim();
+        console.log("📋 Manuel fatura numarası kontrol ediliyor:", baseNumber);
+        
+        // Aynı numara var mı kontrol et
+        let counter = 0;
+        let candidateNumber = baseNumber;
+        
+        while (true) {
+          const existingInvoice = await db
+            .select()
+            .from(invoices)
+            .where(eq(invoices.invoiceNumber, candidateNumber))
+            .limit(1);
+            
+          if (existingInvoice.length === 0) {
+            // Bu numara mevcut değil, kullanabiliriz
+            finalInvoiceNumber = candidateNumber;
+            if (counter > 0) {
+              console.log("🔄 Benzersiz numara oluşturuldu:", finalInvoiceNumber);
+            } else {
+              console.log("✅ Manuel numara benzersiz:", finalInvoiceNumber);
+            }
+            break;
+          }
+          
+          // Bu numara mevcut, sıralama ekle
+          counter++;
+          candidateNumber = `${baseNumber}-${counter}`;
+          console.log("⚠️ Numara mevcut, deneniyor:", candidateNumber);
+        }
       } else {
         const timestamp = new Date();
         const dateStr = timestamp.toISOString().slice(0, 10).replace(/-/g, '');
