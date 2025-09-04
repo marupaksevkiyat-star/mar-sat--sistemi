@@ -832,7 +832,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delivered orders grouped by customer - for bulk invoicing
   app.get('/api/orders/delivered-by-customer', isAuthenticated, async (req, res) => {
     try {
+      console.log("🔍 API called: /api/orders/delivered-by-customer");
       const deliveredOrders = await storage.getOrders({ status: 'delivered' });
+      console.log("📦 Delivered orders found:", deliveredOrders.length);
       
       // Group orders by customer
       const groupedOrders: Record<string, any> = {};
