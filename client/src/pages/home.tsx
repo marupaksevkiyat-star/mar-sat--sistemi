@@ -146,24 +146,25 @@ export default function Home() {
           onClick: () => setLocation('/sales')
         },
         {
-          title: "Başarılı Satışlar",
-          value: (stats as any)?.successfulSales?.toString() || "0",
-          subtitle: "bu ay",
-          icon: "fas fa-check-circle",
-          color: "green",
-          onClick: () => setLocation('/sales')
-        },
-        {
           title: "Bekleyen Randevular",
           value: (stats as any)?.pendingAppointments?.toString() || "0",
           icon: "fas fa-calendar-alt",
           color: "orange",
-          onClick: () => setLocation('/sales')
+          onClick: () => setLocation('/appointments')
         },
         {
-          title: "Potansiyel Müşteriler",
-          value: (stats as any)?.potentialCustomers?.toString() || "0",
-          icon: "fas fa-users",
+          title: "Aktif Siparişler",
+          value: (stats as any)?.activeOrders?.toString() || "0",
+          subtitle: "toplam",
+          icon: "fas fa-shopping-cart",
+          color: "green",
+          onClick: () => setLocation('/orders')
+        },
+        {
+          title: "Başarılı Satışlar",
+          value: (stats as any)?.successfulSales?.toString() || "0",
+          subtitle: "bu ay",
+          icon: "fas fa-check-circle",
           color: "purple",
           onClick: () => setLocation('/sales')
         }
