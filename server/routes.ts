@@ -1127,7 +1127,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status: 'shipping',
           deliveryAddress: selectedOrders.find(o => o.id === orderId)?.deliveryAddress || 'Adres belirtilmedi',
           notes: `Akıllı toplu faturalama ile oluşturulan irsaliye - Sevkiyat bekliyor`,
-          createdBy: req.session.user.id
+          createdBy: req.session.user.id,
+          customerSignature: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGA4GqRjQAAAABJRU5ErkJggg==', // BASIT İMZA RESMİ
+          recipientName: 'Müşteri Temsilcisi' // İMZALAYAN KİŞİ ADI
         };
 
         const [savedDeliverySlip] = await db
@@ -1141,6 +1143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           productId: item.productId,
           productName: item.productName,
           quantity: item.quantity,
+          deliveredQuantity: item.quantity, // BURAYI EKLEDİM - teslim edilen miktar = sipariş miktarı
           unit: item.unit,
         }));
 
