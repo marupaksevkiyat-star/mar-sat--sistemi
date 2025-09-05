@@ -1,0 +1,280 @@
+2025-09-05T22:58:13.166522667Z     address: '10.202.189.57',
+2025-09-05T22:58:13.166530887Z 10:58:13 PM [express] GET /api/appointments/today/2025-09-05 500 in 6ms :: {"message":"Failed to fetc…
+2025-09-05T22:58:13.166536518Z     port: 443
+2025-09-05T22:58:13.166538378Z   },
+2025-09-05T22:58:13.166540858Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.189.57:443'
+2025-09-05T22:58:13.166542587Z }
+2025-09-05T22:58:13.166544598Z Error fetching today's appointments: ErrorEvent {
+2025-09-05T22:58:13.166546918Z   [Symbol(kTarget)]: WebSocket {
+2025-09-05T22:58:13.166549148Z     _events: [Object: null prototype] {
+2025-09-05T22:58:13.166551398Z       error: [Function],
+2025-09-05T22:58:13.166553108Z       message: [Function],
+2025-09-05T22:58:13.166554808Z       close: [Function],
+2025-09-05T22:58:13.166556548Z       open: [Function]
+2025-09-05T22:58:13.166558278Z     },
+2025-09-05T22:58:13.166559958Z     _eventsCount: 4,
+2025-09-05T22:58:13.166561598Z     _maxListeners: undefined,
+2025-09-05T22:58:13.166563348Z     _binaryType: 'arraybuffer',
+2025-09-05T22:58:13.166565058Z     _closeCode: 1006,
+2025-09-05T22:58:13.166566728Z     _closeFrameReceived: false,
+2025-09-05T22:58:13.166568398Z     _closeFrameSent: false,
+2025-09-05T22:58:13.166570068Z     _closeMessage: <Buffer >,
+2025-09-05T22:58:13.166571698Z     _closeTimer: null,
+2025-09-05T22:58:13.166573318Z     _errorEmitted: true,
+2025-09-05T22:58:13.166574948Z     _extensions: {},
+2025-09-05T22:58:13.166576598Z     _paused: false,
+2025-09-05T22:58:13.166578288Z     _protocol: '',
+2025-09-05T22:58:13.166579928Z     _readyState: 3,
+2025-09-05T22:58:13.166581608Z     _receiver: null,
+2025-09-05T22:58:13.166583468Z     _sender: null,
+2025-09-05T22:58:13.166585118Z     _socket: null,
+2025-09-05T22:58:13.166586758Z     _bufferedAmount: 0,
+2025-09-05T22:58:13.166588408Z     _isServer: false,
+2025-09-05T22:58:13.166590039Z     _redirects: 0,
+2025-09-05T22:58:13.166591699Z     _autoPong: true,
+2025-09-05T22:58:13.166593379Z     _url: 'wss://dpg-d2tmgih5pdvs739nfogg-a/v2',
+2025-09-05T22:58:13.166595068Z     _req: null,
+2025-09-05T22:58:13.166596788Z     [Symbol(shapeMode)]: false,
+2025-09-05T22:58:13.166598448Z     [Symbol(kCapture)]: false
+2025-09-05T22:58:13.166600109Z   },
+2025-09-05T22:58:13.166601799Z   [Symbol(kType)]: 'error',
+2025-09-05T22:58:13.166604369Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.189.57:443
+2025-09-05T22:58:13.166606099Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-05T22:58:13.166607769Z     errno: -111,
+2025-09-05T22:58:13.166609449Z     code: 'ECONNREFUSED',
+2025-09-05T22:58:13.166611109Z     syscall: 'connect',
+2025-09-05T22:58:13.166612869Z     address: '10.202.189.57',
+2025-09-05T22:58:13.166614549Z     port: 443
+2025-09-05T22:58:13.166616269Z   },
+2025-09-05T22:58:13.166617949Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.189.57:443'
+2025-09-05T22:58:13.166644509Z }
+2025-09-05T22:58:28.673516051Z Error creating customer: ErrorEvent {
+2025-09-05T22:58:28.673543142Z   [Symbol(kTarget)]: WebSocket {
+2025-09-05T22:58:28.673548242Z     _events: [Object: null prototype] {
+2025-09-05T22:58:28.673552982Z       error: [Function],
+2025-09-05T22:58:28.673556952Z       message: [Function],
+2025-09-05T22:58:28.673560932Z       close: [Function],
+2025-09-05T22:58:28.673564972Z       open: [Function]
+2025-09-05T22:58:28.673569022Z     },
+2025-09-05T22:58:28.673573202Z     _eventsCount: 4,
+2025-09-05T22:58:28.673577762Z     _maxListeners: undefined,
+2025-09-05T22:58:28.673581822Z     _binaryType: 'arraybuffer',
+2025-09-05T22:58:28.673586272Z     _closeCode: 1006,
+2025-09-05T22:58:28.673590372Z     _closeFrameReceived: false,
+2025-09-05T22:58:28.673594532Z     _closeFrameSent: false,
+2025-09-05T22:58:28.673598503Z     _closeMessage: <Buffer >,
+2025-09-05T22:58:28.673602432Z     _closeTimer: null,
+2025-09-05T22:58:28.673606423Z     _errorEmitted: true,
+2025-09-05T22:58:28.673610293Z     _extensions: {},
+2025-09-05T22:58:28.673614243Z     _paused: false,
+2025-09-05T22:58:28.673618283Z     _protocol: '',
+2025-09-05T22:58:28.673640683Z     _readyState: 3,
+2025-09-05T22:58:28.673647103Z     _receiver: null,
+2025-09-05T22:58:28.673651393Z     _sender: null,
+2025-09-05T22:58:28.673655744Z     _socket: null,
+2025-09-05T22:58:28.673659824Z     _bufferedAmount: 0,
+2025-09-05T22:58:28.673663954Z     _isServer: false,
+2025-09-05T22:58:28.673667634Z     _redirects: 0,
+2025-09-05T22:58:28.673671824Z     _autoPong: true,
+2025-09-05T22:58:28.673675794Z     _url: 'wss://dpg-d2tmgih5pdvs739nfogg-a/v2',
+2025-09-05T22:58:28.673679734Z     _req: null,
+2025-09-05T22:58:28.673683744Z     [Symbol(shapeMode)]: false,
+2025-09-05T22:58:28.673687724Z     [Symbol(kCapture)]: false
+2025-09-05T22:58:28.673691824Z   },
+2025-09-05T22:58:28.673695994Z   [Symbol(kType)]: 'error',
+2025-09-05T22:58:28.673700944Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.189.57:443
+2025-09-05T22:58:28.673705064Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-05T22:58:28.673709094Z     errno: -111,
+2025-09-05T22:58:28.673713014Z     code: 'ECONNREFUSED',
+2025-09-05T22:58:28.673716985Z     syscall: 'connect',
+2025-09-05T22:58:28.673720775Z     address: '10.202.189.57',
+2025-09-05T22:58:28.673724595Z     port: 443
+2025-09-05T22:58:28.673731205Z   },
+2025-09-05T22:58:28.673736185Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.189.57:443'
+2025-09-05T22:58:28.673740535Z }
+2025-09-05T22:58:28.674273315Z 10:58:28 PM [express] POST /api/customers 400 in 6ms :: {"message":"Failed to create customer"}
+2025-09-05T22:58:34.873886781Z 10:58:34 PM [express] GET /api/reports/sales/daily/2025-09-05 200 in 5ms
+2025-09-05T22:58:34.874997321Z 10:58:34 PM [express] GET /api/reports/top-products/daily/2025-09-05 200 in 4ms
+2025-09-05T22:58:34.875663423Z 10:58:34 PM [express] GET /api/reports/sales-by-person/daily/2025-09-05 200 in 4ms
+2025-09-05T22:58:35.987144634Z Error fetching customers: ErrorEvent {
+2025-09-05T22:58:35.987177275Z   [Symbol(kTarget)]: WebSocket {
+2025-09-05T22:58:35.987180935Z     _events: [Object: null prototype] {
+2025-09-05T22:58:35.987185085Z       error: [Function],
+2025-09-05T22:58:35.987187855Z       message: [Function],
+2025-09-05T22:58:35.987190695Z       close: [Function],
+2025-09-05T22:58:35.987193495Z       open: [Function]
+2025-09-05T22:58:35.987196285Z     },
+2025-09-05T22:58:35.987199155Z     _eventsCount: 4,
+2025-09-05T22:58:35.987201995Z     _maxListeners: undefined,
+2025-09-05T22:58:35.987220635Z     _binaryType: 'arraybuffer',
+2025-09-05T22:58:35.987223646Z     _closeCode: 1006,
+2025-09-05T22:58:35.987226226Z     _closeFrameReceived: false,
+2025-09-05T22:58:35.987229006Z     _closeFrameSent: false,
+2025-09-05T22:58:35.987231796Z     _closeMessage: <Buffer >,
+2025-09-05T22:58:35.987234186Z     _closeTimer: null,
+2025-09-05T22:58:35.987236526Z     _errorEmitted: true,
+2025-09-05T22:58:35.987238876Z     _extensions: {},
+2025-09-05T22:58:35.987244516Z     _paused: false,
+2025-09-05T22:58:35.987247566Z     _protocol: '',
+2025-09-05T22:58:35.987250366Z     _readyState: 3,
+2025-09-05T22:58:35.987252016Z     _receiver: null,
+2025-09-05T22:58:35.987253616Z     _sender: null,
+2025-09-05T22:58:35.987255306Z     _socket: null,
+2025-09-05T22:58:35.987256926Z     _bufferedAmount: 0,
+2025-09-05T22:58:35.987258596Z     _isServer: false,
+2025-09-05T22:58:35.987260226Z     _redirects: 0,
+2025-09-05T22:58:35.987261906Z     _autoPong: true,
+2025-09-05T22:58:35.987263646Z     _url: 'wss://dpg-d2tmgih5pdvs739nfogg-a/v2',
+2025-09-05T22:58:35.987265406Z     _req: null,
+2025-09-05T22:58:35.987267326Z     [Symbol(shapeMode)]: false,
+2025-09-05T22:58:35.987269007Z     [Symbol(kCapture)]: false
+2025-09-05T22:58:35.987270676Z   },
+2025-09-05T22:58:35.987272427Z   [Symbol(kType)]: 'error',
+2025-09-05T22:58:35.987274647Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.189.57:443
+2025-09-05T22:58:35.987276387Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-05T22:58:35.987278007Z     errno: -111,
+2025-09-05T22:58:35.987279737Z     code: 'ECONNREFUSED',
+2025-09-05T22:58:35.987281667Z     syscall: 'connect',
+2025-09-05T22:58:35.987283337Z     address: '10.202.189.57',
+2025-09-05T22:58:35.987285027Z     port: 443
+2025-09-05T22:58:35.987286717Z   },
+2025-09-05T22:58:35.987289167Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.189.57:443'
+2025-09-05T22:58:35.987290857Z }
+2025-09-05T22:58:35.987866437Z 10:58:35 PM [express] GET /api/customers 500 in 5ms :: {"message":"Failed to fetch customers"}
+2025-09-05T22:58:35.989402805Z Error fetching appointments: ErrorEvent {
+2025-09-05T22:58:35.989413165Z   [Symbol(kTarget)]: WebSocket {
+2025-09-05T22:58:35.989417285Z     _events: [Object: null prototype] {
+2025-09-05T22:58:35.989420955Z       error: [Function],
+2025-09-05T22:58:35.989424075Z       message: [Function],
+2025-09-05T22:58:35.989427335Z       close: [Function],
+2025-09-05T22:58:35.989430525Z       open: [Function]
+2025-09-05T22:58:35.989433785Z     },
+2025-09-05T22:58:35.989440555Z     _eventsCount: 4,
+2025-09-05T22:58:35.989443125Z     _maxListeners: undefined,
+2025-09-05T22:58:35.989446355Z     _binaryType: 'arraybuffer',
+2025-09-05T22:58:35.989449925Z     _closeCode: 1006,
+2025-09-05T22:58:35.989453555Z     _closeFrameReceived: false,
+2025-09-05T22:58:35.989456975Z     _closeFrameSent: false,
+2025-09-05T22:58:35.989460786Z     _closeMessage: <Buffer >,
+2025-09-05T22:58:35.989463835Z     _closeTimer: null,
+2025-09-05T22:58:35.989467136Z     _errorEmitted: true,
+2025-09-05T22:58:35.989470276Z     _extensions: {},
+2025-09-05T22:58:35.989473876Z     _paused: false,
+2025-09-05T22:58:35.989476746Z     _protocol: '',
+2025-09-05T22:58:35.989478846Z     _readyState: 3,
+2025-09-05T22:58:35.989480956Z     _receiver: null,
+2025-09-05T22:58:35.989482976Z     _sender: null,
+2025-09-05T22:58:35.989485026Z     _socket: null,
+2025-09-05T22:58:35.989487056Z     _bufferedAmount: 0,
+2025-09-05T22:58:35.989489106Z     _isServer: false,
+2025-09-05T22:58:35.989501116Z     _redirects: 0,
+2025-09-05T22:58:35.989503286Z     _autoPong: true,
+2025-09-05T22:58:35.989505446Z     _url: 'wss://dpg-d2tmgih5pdvs739nfogg-a/v2',
+2025-09-05T22:58:35.989507776Z     _req: null,
+2025-09-05T22:58:35.989509896Z     [Symbol(shapeMode)]: false,
+2025-09-05T22:58:35.989511947Z     [Symbol(kCapture)]: false
+2025-09-05T22:58:35.989514056Z   },
+2025-09-05T22:58:35.989516156Z   [Symbol(kType)]: 'error',
+2025-09-05T22:58:35.989518827Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.189.57:443
+2025-09-05T22:58:35.989521007Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-05T22:58:35.989523127Z     errno: -111,
+2025-09-05T22:58:35.989525557Z     code: 'ECONNREFUSED',
+2025-09-05T22:58:35.989527697Z     syscall: 'connect',
+2025-09-05T22:58:35.989529727Z     address: '10.202.189.57',
+2025-09-05T22:58:35.989531797Z     port: 443
+2025-09-05T22:58:35.989533837Z   },
+2025-09-05T22:58:35.989536537Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.189.57:443'
+2025-09-05T22:58:35.989538637Z }
+2025-09-05T22:58:35.990019225Z 10:58:35 PM [express] GET /api/appointments 500 in 9ms :: {"message":"Failed to fetch appointments"}
+2025-09-05T22:58:37.47420223Z 🕐 Date filter applied: 2025-09-05T00:00:00.000Z to 2025-09-05T23:59:59.999Z
+2025-09-05T22:58:37.478453916Z Error fetching today's appointments: ErrorEvent {
+2025-09-05T22:58:37.478475026Z   [Symbol(kTarget)]: WebSocket {
+2025-09-05T22:58:37.478478896Z     _events: [Object: null prototype] {
+2025-09-05T22:58:37.478482986Z       error: [Function],
+2025-09-05T22:58:37.478485756Z       message: [Function],
+2025-09-05T22:58:37.478488636Z       close: [Function],
+2025-09-05T22:58:37.478490326Z       open: [Function]
+2025-09-05T22:58:37.478492146Z     },
+2025-09-05T22:58:37.478493886Z     _eventsCount: 4,
+2025-09-05T22:58:37.478495616Z     _maxListeners: undefined,
+2025-09-05T22:58:37.478497296Z     _binaryType: 'arraybuffer',
+2025-09-05T22:58:37.478498936Z     _closeCode: 1006,
+2025-09-05T22:58:37.478500627Z     _closeFrameReceived: false,
+2025-09-05T22:58:37.478502816Z     _closeFrameSent: false,
+2025-09-05T22:58:37.478504487Z     _closeMessage: <Buffer >,
+2025-09-05T22:58:37.478506176Z     _closeTimer: null,
+2025-09-05T22:58:37.478507887Z     _errorEmitted: true,
+2025-09-05T22:58:37.478509497Z     _extensions: {},
+2025-09-05T22:58:37.478511117Z     _paused: false,
+2025-09-05T22:58:37.478513107Z     _protocol: '',
+2025-09-05T22:58:37.478514807Z     _readyState: 3,
+2025-09-05T22:58:37.478516477Z     _receiver: null,
+2025-09-05T22:58:37.478518107Z     _sender: null,
+2025-09-05T22:58:37.478519777Z     _socket: null,
+2025-09-05T22:58:37.478521427Z     _bufferedAmount: 0,
+2025-09-05T22:58:37.478523067Z     _isServer: false,
+2025-09-05T22:58:37.478524707Z     _redirects: 0,
+2025-09-05T22:58:37.478526407Z     _autoPong: true,
+2025-09-05T22:58:37.478528077Z     _url: 'wss://dpg-d2tmgih5pdvs739nfogg-a/v2',
+2025-09-05T22:58:37.478529787Z     _req: null,
+2025-09-05T22:58:37.478531497Z     [Symbol(shapeMode)]: false,
+2025-09-05T22:58:37.478533197Z     [Symbol(kCapture)]: false
+2025-09-05T22:58:37.478534887Z   },
+2025-09-05T22:58:37.478536617Z   [Symbol(kType)]: 'error',
+2025-09-05T22:58:37.478539037Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.189.57:443
+2025-09-05T22:58:37.478540777Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-05T22:58:37.478542657Z     errno: -111,
+2025-09-05T22:58:37.478544347Z     code: 'ECONNREFUSED',
+2025-09-05T22:58:37.478558128Z     syscall: 'connect',
+2025-09-05T22:58:37.478559897Z     address: '10.202.189.57',
+2025-09-05T22:58:37.478561617Z     port: 443
+2025-09-05T22:58:37.478563277Z   },
+2025-09-05T22:58:37.478564978Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.189.57:443'
+2025-09-05T22:58:37.478566688Z }
+2025-09-05T22:58:37.479152058Z 10:58:37 PM [express] GET /api/appointments/today/2025-09-05 500 in 5ms :: {"message":"Failed to fetc…
+2025-09-05T22:58:37.479751889Z Error fetching customers: ErrorEvent {
+2025-09-05T22:58:37.479759269Z   [Symbol(kTarget)]: WebSocket {
+2025-09-05T22:58:37.479761129Z     _events: [Object: null prototype] {
+2025-09-05T22:58:37.479763729Z       error: [Function],
+2025-09-05T22:58:37.479765379Z       message: [Function],
+2025-09-05T22:58:37.479767019Z       close: [Function],
+2025-09-05T22:58:37.479769229Z       open: [Function]
+2025-09-05T22:58:37.479770919Z     },
+2025-09-05T22:58:37.479772579Z     _eventsCount: 4,
+2025-09-05T22:58:37.479774269Z     _maxListeners: undefined,
+2025-09-05T22:58:37.479776009Z     _binaryType: 'arraybuffer',
+2025-09-05T22:58:37.479778449Z     _closeCode: 1006,
+2025-09-05T22:58:37.479781239Z     _closeFrameReceived: false,
+2025-09-05T22:58:37.479784129Z     _closeFrameSent: false,
+2025-09-05T22:58:37.479786759Z     _closeMessage: <Buffer >,
+2025-09-05T22:58:37.479789799Z     _closeTimer: null,
+2025-09-05T22:58:37.479792489Z     _errorEmitted: true,
+2025-09-05T22:58:37.47979513Z     _extensions: {},
+2025-09-05T22:58:37.47979807Z     _paused: false,
+2025-09-05T22:58:37.47980111Z     _protocol: '',
+2025-09-05T22:58:37.47980303Z     _readyState: 3,
+2025-09-05T22:58:37.479804659Z     _receiver: null,
+2025-09-05T22:58:37.47980628Z     _sender: null,
+2025-09-05T22:58:37.47980789Z     _socket: null,
+2025-09-05T22:58:37.47980951Z     _bufferedAmount: 0,
+2025-09-05T22:58:37.47981115Z     _isServer: false,
+2025-09-05T22:58:37.47981282Z     _redirects: 0,
+2025-09-05T22:58:37.47981446Z     _autoPong: true,
+2025-09-05T22:58:37.47981626Z     _url: 'wss://dpg-d2tmgih5pdvs739nfogg-a/v2',
+2025-09-05T22:58:37.47981794Z     _req: null,
+2025-09-05T22:58:37.4798196Z     [Symbol(shapeMode)]: false,
+2025-09-05T22:58:37.47982128Z     [Symbol(kCapture)]: false
+2025-09-05T22:58:37.47982293Z   },
+2025-09-05T22:58:37.4798246Z   [Symbol(kType)]: 'error',
+2025-09-05T22:58:37.47982678Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.189.57:443
+2025-09-05T22:58:37.47982857Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-05T22:58:37.47983023Z     errno: -111,
+2025-09-05T22:58:37.47983217Z     code: 'ECONNREFUSED',
+2025-09-05T22:58:37.47983386Z     syscall: 'connect',
+2025-09-05T22:58:37.47983554Z     address: '10.202.189.57',
+2025-09-05T22:58:37.47983722Z     port: 443
+2025-09-05T22:58:37.47983888Z   },
+2025-09-05T22:58:37.4798413Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.189.57:443'
+2025-09-05T22:58:37.47984299Z }
+2025-09-05T22:58:37.480324069Z 10:58:37 PM [express] GET /api/customers 500 in 4ms :: {"message":"Failed to fetch customers"}
+2025-09-05T22:58:37.482317764Z 10:58:37 PM [express] GET /api/visits/2025-09-05 304 in 1ms
