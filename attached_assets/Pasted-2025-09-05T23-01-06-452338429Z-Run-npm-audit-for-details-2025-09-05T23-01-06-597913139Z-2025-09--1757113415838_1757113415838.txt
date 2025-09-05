@@ -1,0 +1,50 @@
+2025-09-05T23:01:06.452338429Z Run `npm audit` for details.
+2025-09-05T23:01:06.597913139Z 
+2025-09-05T23:01:06.59793389Z > rest-express@1.0.0 build
+2025-09-05T23:01:06.59793886Z > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+2025-09-05T23:01:06.59794373Z 
+2025-09-05T23:01:06.788815875Z vite v5.4.19 building for production...
+2025-09-05T23:01:06.839134681Z transforming...
+2025-09-05T23:01:07.114626868Z Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+2025-09-05T23:01:07.114647259Z   npx update-browserslist-db@latest
+2025-09-05T23:01:07.114651979Z   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2025-09-05T23:01:12.690009264Z ✓ 2259 modules transformed.
+2025-09-05T23:01:12.953611541Z rendering chunks...
+2025-09-05T23:01:13.298089897Z computing gzip size...
+2025-09-05T23:01:13.327117379Z ../dist/public/index.html                                          2.25 kB │ gzip:   0.91 kB
+2025-09-05T23:01:13.32713453Z ../dist/public/assets/MARUPAK_LOGO_1757030221412-DlQta4u5.png     80.59 kB
+2025-09-05T23:01:13.327256245Z ../dist/public/assets/index-B8NcCs4s.css                          76.72 kB │ gzip:  13.10 kB
+2025-09-05T23:01:13.327345329Z ../dist/public/assets/purify.es-BFmuJLeH.js                       21.93 kB │ gzip:   8.62 kB
+2025-09-05T23:01:13.327375511Z ../dist/public/assets/index.es-gWZ34Ako.js                       150.53 kB │ gzip:  51.48 kB
+2025-09-05T23:01:13.327411743Z ../dist/public/assets/html2canvas.esm-CBrSDip1.js                201.42 kB │ gzip:  48.03 kB
+2025-09-05T23:01:13.327425213Z ../dist/public/assets/index-8VjKs_HX.js                        1,246.01 kB │ gzip: 358.32 kB
+2025-09-05T23:01:13.327531708Z 
+2025-09-05T23:01:13.327543899Z (!) Some chunks are larger than 500 kB after minification. Consider:
+2025-09-05T23:01:13.327549019Z - Using dynamic import() to code-split the application
+2025-09-05T23:01:13.327553209Z - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+2025-09-05T23:01:13.32756966Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+2025-09-05T23:01:13.327728197Z ✓ built in 6.52s
+2025-09-05T23:01:13.4186209Z 
+2025-09-05T23:01:13.41863922Z   dist/index.js  113.0kb
+2025-09-05T23:01:13.41864165Z 
+2025-09-05T23:01:13.41864357Z ⚡ Done in 11ms
+2025-09-05T23:01:13.965249352Z ==> Uploading build...
+2025-09-05T23:01:23.587442263Z ==> Uploaded in 6.4s. Compression took 3.2s
+2025-09-05T23:01:23.624901284Z ==> Build successful 🎉
+2025-09-05T23:01:32.907846701Z ==> Deploying...
+2025-09-05T23:01:51.538680562Z ==> Running 'npm run start'
+2025-09-05T23:01:52.636718864Z 
+2025-09-05T23:01:52.636745675Z > rest-express@1.0.0 start
+2025-09-05T23:01:52.636751555Z > NODE_ENV=production node dist/index.js
+2025-09-05T23:01:52.636754935Z 
+2025-09-05T23:01:59.336457623Z Warning: connect.session() MemoryStore is not
+2025-09-05T23:01:59.336483064Z designed for a production environment, as it will leak
+2025-09-05T23:01:59.336485954Z memory, and will not scale past a single process.
+2025-09-05T23:01:59.530722836Z 11:01:59 PM [express] serving on port 10000
+2025-09-05T23:02:03.658541142Z ==> Your service is live 🎉
+2025-09-05T23:02:03.817496568Z ==> 
+2025-09-05T23:02:03.972463785Z ==> ///////////////////////////////////////////////////////////
+2025-09-05T23:02:04.12831897Z ==> 
+2025-09-05T23:02:04.286822137Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-05T23:02:04.442258043Z ==> 
+2025-09-05T23:02:04.631881996Z ==> ///////////////////////////////////////////////////////////
