@@ -1448,6 +1448,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const deliverySlipList = await db
         .select({
           id: deliverySlips.id,
+          orderId: deliverySlips.orderId, // BURAYI EKLEDİM
           deliverySlipNumber: deliverySlips.deliverySlipNumber,
           status: deliverySlips.status,
           deliveredAt: deliverySlips.deliveredAt,
