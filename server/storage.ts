@@ -530,7 +530,7 @@ export class DatabaseStorage implements IStorage {
     const results = await query;
     return results.map(row => ({
       ...row.appointments,
-      customer: row.customers!,
+      customer: row.customers || { id: 'unknown', companyName: 'Bilinmeyen Müşteri', contactPerson: 'N/A' },
       salesPerson: row.users!,
     }));
   }
