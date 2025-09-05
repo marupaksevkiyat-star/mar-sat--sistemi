@@ -1722,8 +1722,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .from(orders)
         .innerJoin(invoiceItems, eq(invoiceItems.orderId, orders.id))
-        .where(eq(orders.status, 'delivered'))
-        .groupBy(orders.id, orders.orderNumber);
+        .where(eq(orders.status, 'delivered'));
       
       let updatedCount = 0;
       
