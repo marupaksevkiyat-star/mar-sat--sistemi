@@ -27,27 +27,33 @@ function Router() {
   const canAccess = (requiredRole: string) => {
     const userRole = (user as any)?.role || '';
     
-    // Admin her şeye erişebilir - daha kapsamlı kontrol
-    if (userRole === 'admin' || userRole === 'Admin' || userRole.toLowerCase() === 'admin' || userRole.includes('admin') || userRole.includes('Admin')) {
+    console.log(`🔍 Checking access: User role "${userRole}" for required role "${requiredRole}"`);
+    
+    // Admin her şeye erişebilir
+    if (userRole === 'admin' || userRole === 'Admin') {
+      console.log('✅ Admin access granted');
       return true;
     }
     
-    // Unified role mapping - hem İngilizce hem Türkçe rolleri destekler
-    const roleMap = {
-      sales: ['sales', 'sales_staff', 'Satış', 'Satış Personeli'],
-      production: ['production', 'production_staff', 'Üretim', 'Üretim Personeli', 'admin', 'Admin'],
-      shipping: ['shipping', 'shipping_staff', 'Sevkiyat', 'Sevkiyat Personeli', 'admin', 'Admin'],
-      admin: ['admin', 'Admin'],
-      accounting: ['accounting', 'accounting_staff', 'Muhasebe', 'Muhasebe Personeli', 'admin', 'Admin']
+    // Direkt rol eşleşmesi
+    if (userRole === requiredRole) {
+      console.log('✅ Direct role match');
+      return true;
+    }
+    
+    // Role mapping - her rol kendi sayfasına erişebilir + admin her şeye
+    const roleMap: Record<string, string[]> = {
+      sales: ['sales'],
+      production: ['production'], 
+      shipping: ['shipping'],
+      accounting: ['accounting'],
+      admin: ['admin']
     };
     
-    // Check if user role matches any of the allowed roles for the required permission
-    const allowedRoles = roleMap[requiredRole as keyof typeof roleMap] || [];
+    const allowedRoles = roleMap[requiredRole] || [];
+    const hasAccess = allowedRoles.includes(userRole) || userRole === 'admin';
     
-    const hasAccess = allowedRoles.some(role => 
-      userRole === role || userRole.includes(role) || userRole.toLowerCase() === role.toLowerCase()
-    );
-    
+    console.log(`${hasAccess ? '✅' : '❌'} Access ${hasAccess ? 'granted' : 'denied'}: ${userRole} -> ${requiredRole}`);
     return hasAccess;
   };
 
