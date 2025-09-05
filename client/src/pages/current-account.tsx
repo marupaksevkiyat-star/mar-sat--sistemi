@@ -78,13 +78,18 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFont(undefined, 'normal');
       pdf.text(`NO:${slip.deliverySlipNumber.split('-').pop()}`, centerX - 15, 35);
       
-      // Sağ üst - MARUPAK Logo alanı (metin olarak)
+      // Sağ üst - MARUPAK Logo alanı
       pdf.setFontSize(18);
       pdf.setFont(undefined, 'bold');
-      pdf.text('MARUPAK', pageWidth - 50, 30);
+      pdf.text('MARUPAK', pageWidth - 60, 25);
+      
+      // Logo çerçevesi
+      pdf.setLineWidth(2);
+      pdf.rect(pageWidth - 70, 15, 55, 25);
+      
       pdf.setFontSize(8);
       pdf.setFont(undefined, 'normal');
-      pdf.text('www.marupak.com', pageWidth - 50, 38);
+      pdf.text('www.marupak.com', pageWidth - 65, 36);
       
       yPos = 70;
       
@@ -123,30 +128,38 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       
       yPos += 30;
       
-      // Alt imza bölümü - basit ve temiz
-      const signatureY = Math.max(yPos, pageHeight - 80);
+      // Alt imza bölümü - belirgin çerçeveler
+      const signatureY = Math.max(yPos, pageHeight - 100);
       
-      // Sol taraf - Teslim Eden
+      // Sol taraf - Teslim Eden (çerçeveli)
+      pdf.setLineWidth(1);
+      pdf.rect(20, signatureY, 80, 50);
+      
       pdf.setFontSize(12);
       pdf.setFont(undefined, 'bold');
-      pdf.text('TESLIM EDEN', 40, signatureY);
+      pdf.text('TESLIM EDEN', 25, signatureY + 15);
+      
+      pdf.setFontSize(14);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('MARUPAK', 25, signatureY + 30);
       
       pdf.setFontSize(10);
       pdf.setFont(undefined, 'normal');
-      pdf.text('MARUPAK', 40, signatureY + 30);
+      pdf.text('Imza: ___________________', 25, signatureY + 42);
       
-      // Sağ taraf - Teslim Alan
+      // Sağ taraf - Teslim Alan (çerçeveli)
+      pdf.rect(120, signatureY, 80, 50);
+      
       pdf.setFontSize(12);
       pdf.setFont(undefined, 'bold');
-      pdf.text('TESLIM ALAN', 130, signatureY);
+      pdf.text('TESLIM ALAN', 125, signatureY + 15);
       
       pdf.setFontSize(10);
       pdf.setFont(undefined, 'normal');
-      pdf.text('ADI SOYADI IMZA', 130, signatureY + 15);
-      
-      // İmza çizgileri
-      pdf.setLineWidth(0.3);
-      pdf.line(130, signatureY + 25, 180, signatureY + 25);
+      pdf.text('ADI SOYADI:', 125, signatureY + 25);
+      pdf.text('_________________________', 125, signatureY + 32);
+      pdf.text('IMZA:', 125, signatureY + 40);
+      pdf.text('_________________________', 125, signatureY + 47);
       
       // PDF'i indir
       pdf.save(`teslim-fisi-${slip.deliverySlipNumber}.pdf`);
