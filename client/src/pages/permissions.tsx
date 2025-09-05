@@ -45,16 +45,29 @@ const PAGES_WITH_ACTIONS = [
     ]
   },
   { 
+    id: 'customers', 
+    name: 'Müşteriler', 
+    description: 'Müşteri yönetimi ve bilgileri',
+    icon: 'fas fa-building',
+    actions: [
+      { id: 'create', name: 'Oluştur', description: 'Yeni müşteri ekleme' },
+      { id: 'read', name: 'Görüntüle', description: 'Müşteri bilgilerini görüntüleme' },
+      { id: 'update', name: 'Düzenle', description: 'Müşteri bilgilerini düzenleme' },
+      { id: 'delete', name: 'Sil', description: 'Müşteri kayıtlarını silme' },
+      { id: 'export', name: 'Dışa Aktar', description: 'Müşteri raporları' }
+    ]
+  },
+  { 
     id: 'sales', 
     name: 'Satış', 
     description: 'Satış işlemleri ve müşteri ziyaretleri',
     icon: 'fas fa-users',
     actions: [
-      { id: 'create', name: 'Oluştur', description: 'Yeni müşteri ve ziyaret ekleme' },
-      { id: 'read', name: 'Görüntüle', description: 'Müşteri ve satış verilerini görüntüleme' },
-      { id: 'update', name: 'Düzenle', description: 'Müşteri bilgilerini düzenleme' },
-      { id: 'delete', name: 'Sil', description: 'Müşteri kayıtlarını silme' },
-      { id: 'export', name: 'Dışa Aktar', description: 'Müşteri ve satış raporları' }
+      { id: 'create', name: 'Oluştur', description: 'Yeni ziyaret ekleme' },
+      { id: 'read', name: 'Görüntüle', description: 'Satış verilerini görüntüleme' },
+      { id: 'update', name: 'Düzenle', description: 'Satış bilgilerini düzenleme' },
+      { id: 'delete', name: 'Sil', description: 'Satış kayıtlarını silme' },
+      { id: 'export', name: 'Dışa Aktar', description: 'Satış raporları' }
     ]
   },
   { 
@@ -147,6 +160,7 @@ const DEFAULT_PERMISSIONS: Record<string, Record<string, string[]>> = {
   admin: {
     dashboard: ['read', 'export'],
     orders: ['create', 'read', 'update', 'delete', 'approve', 'export'],
+    customers: ['create', 'read', 'update', 'delete', 'export'],
     sales: ['create', 'read', 'update', 'delete', 'export'],
     'sales-reports': ['read', 'export'],
     invoices: ['create', 'read', 'update', 'delete', 'approve', 'export'],
@@ -159,6 +173,7 @@ const DEFAULT_PERMISSIONS: Record<string, Record<string, string[]>> = {
   sales: {
     dashboard: ['read'],
     orders: ['create', 'read', 'update'],
+    customers: ['create', 'read', 'update', 'export'],
     sales: ['create', 'read', 'update', 'export']
   },
   production: {
