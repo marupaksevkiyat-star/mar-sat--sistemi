@@ -12,10 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLocation } from "wouter";
 
 export default function Appointments() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
+  const [location] = useLocation();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [filterStatus, setFilterStatus] = useState("all");
@@ -26,6 +28,16 @@ export default function Appointments() {
     scheduledTime: "",
     notes: "",
   });
+
+  // URL'den customer parametresini al
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const customerId = urlParams.get('customer');
+    if (customerId) {
+      setNewAppointment(prev => ({ ...prev, customerId }));
+      setShowCreateDialog(true);
+    }
+  }, [location]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -116,11 +128,13 @@ export default function Appointments() {
       return;
     }
 
-    const appointmentDateTime = `${newAppointment.scheduledDate} ${newAppointment.scheduledTime}`;
+    const appointmentDateTime = new Date(`${newAppointment.scheduledDate}T${newAppointment.scheduledTime}:00`);
     
     createAppointmentMutation.mutate({
-      ...newAppointment,
+      customerId: newAppointment.customerId,
+      appointmentType: newAppointment.appointmentType,
       scheduledAt: appointmentDateTime,
+      notes: newAppointment.notes,
       salesPersonId: user?.id,
     });
   };
