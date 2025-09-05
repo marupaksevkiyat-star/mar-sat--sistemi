@@ -50,14 +50,11 @@ export default function CustomerForm({
       setIsCustomerSaved(true);
       toast({
         title: "Başarılı",
-        description: "Müşteri başarıyla kaydedildi. Sağ taraftaki 'Yeni Satış' kartından sipariş verebilirsiniz.",
+        description: "Müşteri başarıyla kaydedildi. Ne yapmak istiyorsunuz?",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
       
-      // Close the form after 2 seconds to let user see the success message
-      setTimeout(() => {
-        onCancel();
-      }, 2000);
+      // Don't close automatically - let user choose what to do next
     },
     onError: (error) => {
       console.error("Müşteri kaydetme hatası:", error);
@@ -318,12 +315,12 @@ export default function CustomerForm({
           )}
 
           {/* Save Customer Button - Only for new customers */}
-          {isNewCustomer && (
+          {isNewCustomer && !isCustomerSaved && (
             <div className="border-t pt-4">
               <Button
                 type="button"
                 onClick={handleSaveCustomer}
-                disabled={createCustomerMutation.isPending || isCustomerSaved}
+                disabled={createCustomerMutation.isPending}
                 className="w-full mb-4 bg-blue-600 hover:bg-blue-700 text-white"
                 data-testid="button-save-customer"
               >
@@ -331,11 +328,6 @@ export default function CustomerForm({
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                     Kaydediliyor...
-                  </>
-                ) : isCustomerSaved ? (
-                  <>
-                    <Check className="w-4 h-4 mr-2" />
-                    Müşteri Kaydedildi
                   </>
                 ) : (
                   <>
@@ -347,38 +339,110 @@ export default function CustomerForm({
             </div>
           )}
 
-          {/* Ziyaret Sonucu Butonları - Sadece takip ve ilgilenmiyor */}
-          <div className="flex space-x-3 pt-4">
-            <Button
-              type="button"
-              onClick={() => handleCompleteVisit("follow_up")}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
-              data-testid="button-schedule-follow-up"
-            >
-              <Clock className="w-4 h-4 mr-2" />
-              Takip Et
-            </Button>
-            
-            <Button
-              type="button"
-              onClick={() => handleCompleteVisit("not_interested")}
-              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white"
-              data-testid="button-not-interested"
-            >
-              <X className="w-4 h-4 mr-2" />
-              İlgilenmiyor
-            </Button>
-          </div>
+          {/* Müşteri kaydedildikten sonra seçenekler */}
+          {isNewCustomer && isCustomerSaved && (
+            <div className="border-t pt-4 space-y-4">
+              <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
+                <Check className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                <p className="text-sm text-green-700 font-medium">Müşteri başarıyla kaydedildi!</p>
+                <p className="text-xs text-green-600">Devamında ne yapmak istiyorsunuz?</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  onClick={() => setShowOrderForm(true)}
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                  data-testid="button-create-order"
+                >
+                  <i className="fas fa-shopping-cart w-4 h-4 mr-2"></i>
+                  Satış Yap
+                </Button>
+                
+                <Button
+                  type="button"
+                  onClick={() => handleCompleteVisit("follow_up")}
+                  className="bg-orange-500 hover:bg-orange-600 text-white"
+                  data-testid="button-schedule-follow-up"
+                >
+                  <Clock className="w-4 h-4 mr-2" />
+                  Randevu Ver
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  onClick={() => handleCompleteVisit("not_interested")}
+                  className="bg-gray-500 hover:bg-gray-600 text-white"
+                  data-testid="button-not-interested"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  İlgilenmiyor
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onCancel}
+                  data-testid="button-close"
+                >
+                  <i className="fas fa-times w-4 h-4 mr-2"></i>
+                  Kapat
+                </Button>
+              </div>
+            </div>
+          )}
 
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            className="w-full mt-4"
-            data-testid="button-cancel"
-          >
-            İptal
-          </Button>
+          {/* Sadece mevcut müşteriler için ziyaret sonucu butonları */}
+          {customer && (
+            <>
+              <div className="flex space-x-3 pt-4">
+                <Button
+                  type="button"
+                  onClick={() => handleCompleteVisit("follow_up")}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+                  data-testid="button-schedule-follow-up"
+                >
+                  <Clock className="w-4 h-4 mr-2" />
+                  Takip Et
+                </Button>
+                
+                <Button
+                  type="button"
+                  onClick={() => handleCompleteVisit("not_interested")}
+                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white"
+                  data-testid="button-not-interested"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  İlgilenmiyor
+                </Button>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                className="w-full mt-4"
+                data-testid="button-cancel"
+              >
+                İptal
+              </Button>
+            </>
+          )}
+
+          {/* Yeni müşteri için henüz kaydedilmemişse sadece iptal */}
+          {!customer && !isCustomerSaved && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="w-full mt-4"
+              data-testid="button-cancel"
+            >
+              İptal
+            </Button>
+          )}
         </form>
       </CardContent>
     </Card>
