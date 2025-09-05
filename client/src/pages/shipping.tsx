@@ -160,20 +160,15 @@ export default function Shipping() {
   // İrsaliye görüntüleme
   const handleViewDeliverySlip = async (order: any) => {
     try {
-      console.log('🚚 İrsaliye isteniyor, sipariş ID:', order.id);
       // Delivery slip bilgilerini fetch et
       const response = await apiRequest('GET', `/api/orders/${order.id}/delivery-slips`);
       const deliverySlips: any[] = await response.json();
-      console.log('📦 API Response:', deliverySlips);
-      console.log('📊 Array kontrolü:', Array.isArray(deliverySlips), 'Length:', deliverySlips?.length);
       
       if (Array.isArray(deliverySlips) && deliverySlips.length > 0) {
-        console.log('✅ İrsaliye bulundu, modal açılıyor:', deliverySlips[0]);
         setDeliverySlipData(deliverySlips[0]);
         setSelectedOrder(order);
         setShowDeliverySlipDialog(true);
       } else {
-        console.log('❌ İrsaliye bulunamadı:', deliverySlips);
         toast({
           title: "İrsaliye bulunamadı",
           description: "Bu sipariş için irsaliye bulunamadı",
@@ -181,7 +176,6 @@ export default function Shipping() {
         });
       }
     } catch (error) {
-      console.error('❌ API Hatası:', error);
       toast({
         title: "Hata",
         description: "İrsaliye bilgileri yüklenirken bir hata oluştu",

@@ -37,9 +37,24 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
 
   console.log("🚚 Modal irsaliye debug:", { invoiceId, isLoading, deliverySlips });
 
-  const handleSlipClick = (slip: any) => {
-    setSelectedSlip(slip);
-    setShowDeliverySlipDetail(true);
+  const handleSlipClick = async (slip: any) => {
+    try {
+      // Delivery slip'in orderId'sini alıp detayları getir
+      const response = await apiRequest('GET', `/api/orders/${slip.orderId}/delivery-slips`);
+      const deliverySlips: any[] = await response.json();
+      
+      if (Array.isArray(deliverySlips) && deliverySlips.length > 0) {
+        // İlgili slip'i bul
+        const targetSlip = deliverySlips.find(ds => ds.id === slip.id) || deliverySlips[0];
+        setSelectedSlip(targetSlip);
+        setShowDeliverySlipDetail(true);
+      } else {
+      }
+    } catch (error) {
+      // Fallback to existing modal with existing data
+      setSelectedSlip(slip);
+      setShowDeliverySlipDetail(true);
+    }
   };
 
   const handlePdfDownload = async (slip: any) => {
