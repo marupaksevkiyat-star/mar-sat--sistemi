@@ -62,68 +62,70 @@ function Router() {
     return <Component />;
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <Switch>
+        <Route path="/" component={Landing} />
+        <Route path="*" component={Landing} />
+      </Switch>
+    );
+  }
+
   return (
     <Switch>
-      {isLoading ? (
-        <Route path="*">
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Yükleniyor...</p>
-            </div>
-          </div>
-        </Route>
-      ) : !isAuthenticated ? (
-        <>
-          <Route path="/" component={Landing} />
-          <Route path="*" component={Landing} />
-        </>
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-          <Route path="/orders" component={Orders} />
-          <Route path="/customers" component={Customers} />
-          <Route path="/sales">
-            <ProtectedRoute component={Sales} requiredRole="sales" />
-          </Route>
-          <Route path="/appointments">
-            <ProtectedRoute component={Appointments} requiredRole="sales" />
-          </Route>
-          <Route path="/production">
-            <ProtectedRoute component={Production} requiredRole="production" />
-          </Route>
-          <Route path="/shipping">
-            <ProtectedRoute component={Shipping} requiredRole="shipping" />
-          </Route>
-          <Route path="/sales-reports">
-            <ProtectedRoute component={SalesReports} requiredRole="admin" />
-          </Route>
-          <Route path="/invoices">
-            <ProtectedRoute component={Invoices} requiredRole="accounting" />
-          </Route>
-          <Route path="/invoices/:id">
-            {(params) => (
-              <ProtectedRoute 
-                component={() => <InvoiceDetail invoiceId={params.id} />} 
-                requiredRole="accounting" 
-              />
-            )}
-          </Route>
-          <Route path="/current-account">
-            <ProtectedRoute component={CurrentAccount} requiredRole="accounting" />
-          </Route>
-          <Route path="/mail-settings">
-            <ProtectedRoute component={MailSettings} requiredRole="admin" />
-          </Route>
-          <Route path="/admin">
-            <ProtectedRoute component={Admin} requiredRole="admin" />
-          </Route>
-          <Route path="/permissions">
-            <ProtectedRoute component={Permissions} requiredRole="admin" />
-          </Route>
-          <Route path="*" component={NotFound} />
-        </>
-      )}
+      <Route path="/" component={Home} />
+      <Route path="/orders" component={Orders} />
+      <Route path="/customers" component={Customers} />
+      <Route path="/sales">
+        <ProtectedRoute component={Sales} requiredRole="sales" />
+      </Route>
+      <Route path="/appointments">
+        <ProtectedRoute component={Appointments} requiredRole="sales" />
+      </Route>
+      <Route path="/production">
+        <ProtectedRoute component={Production} requiredRole="production" />
+      </Route>
+      <Route path="/shipping">
+        <ProtectedRoute component={Shipping} requiredRole="shipping" />
+      </Route>
+      <Route path="/sales-reports">
+        <ProtectedRoute component={SalesReports} requiredRole="admin" />
+      </Route>
+      <Route path="/invoices">
+        <ProtectedRoute component={Invoices} requiredRole="accounting" />
+      </Route>
+      <Route path="/invoices/:id">
+        {(params) => (
+          <ProtectedRoute 
+            component={() => <InvoiceDetail invoiceId={params.id} />} 
+            requiredRole="accounting" 
+          />
+        )}
+      </Route>
+      <Route path="/current-account">
+        <ProtectedRoute component={CurrentAccount} requiredRole="accounting" />
+      </Route>
+      <Route path="/mail-settings">
+        <ProtectedRoute component={MailSettings} requiredRole="admin" />
+      </Route>
+      <Route path="/admin">
+        <ProtectedRoute component={Admin} requiredRole="admin" />
+      </Route>
+      <Route path="/permissions">
+        <ProtectedRoute component={Permissions} requiredRole="admin" />
+      </Route>
+      <Route path="*" component={NotFound} />
     </Switch>
   );
 }
