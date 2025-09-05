@@ -714,12 +714,45 @@ export class DatabaseStorage implements IStorage {
 
   async getTodayAppointments(salesPersonId?: string): Promise<AppointmentWithDetails[]> {
     const today = new Date();
-    console.log(`📅 Getting today's appointments for user: ${salesPersonId}, date: ${today.toISOString()}`);
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7);
     
-    const appointments = await this.getAppointments(salesPersonId, today);
-    console.log(`📋 Found ${appointments.length} appointments for today`);
+    console.log(`📅 Getting upcoming appointments (next 7 days) for user: ${salesPersonId}`);
     
-    return appointments;
+    // Bugünden sonraki 7 günlük randevuları getir
+    let query = db
+      .select()
+      .from(appointments)
+      .leftJoin(customers, eq(appointments.customerId, customers.id))
+      .leftJoin(users, eq(appointments.salesPersonId, users.id))
+      .where(
+        and(
+          gte(appointments.scheduledDate, today),
+          lte(appointments.scheduledDate, nextWeek)
+        )
+      )
+      .orderBy(appointments.scheduledDate)
+      .limit(10);
+
+    if (salesPersonId) {
+      query = query.where(
+        and(
+          gte(appointments.scheduledDate, today),
+          lte(appointments.scheduledDate, nextWeek),
+          eq(appointments.salesPersonId, salesPersonId)
+        )
+      );
+    }
+
+    const results = await query;
+    const appointmentsList = results.map(row => ({
+      ...row.appointments,
+      customer: row.customers || { id: 'unknown', companyName: 'Bilinmeyen Müşteri', contactPerson: 'N/A' },
+      salesPerson: row.users!,
+    }));
+    
+    console.log(`📋 Found ${appointmentsList.length} upcoming appointments`);
+    return appointmentsList;
   }
 
   // Invoice operations
