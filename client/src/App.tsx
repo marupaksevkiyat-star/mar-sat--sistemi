@@ -26,8 +26,13 @@ function Router() {
   const canAccess = (requiredRole: string) => {
     const userRole = (user as any)?.role || '';
     
+    console.log(`🔒 Access check: userRole="${userRole}", requiredRole="${requiredRole}"`);
+    
     // Admin her şeye erişebilir
-    if (userRole === 'admin' || userRole === 'Admin' || userRole.includes('Admin')) return true;
+    if (userRole === 'admin' || userRole === 'Admin' || userRole.includes('Admin')) {
+      console.log(`✅ Admin access granted`);
+      return true;
+    }
     
     // Unified role mapping - hem İngilizce hem Türkçe rolleri destekler
     const roleMap = {
@@ -40,10 +45,13 @@ function Router() {
     
     // Check if user role matches any of the allowed roles for the required permission
     const allowedRoles = roleMap[requiredRole as keyof typeof roleMap] || [];
+    console.log(`🔍 Allowed roles for "${requiredRole}":`, allowedRoles);
+    
     const hasAccess = allowedRoles.some(role => 
       userRole === role || userRole.includes(role)
     );
     
+    console.log(`${hasAccess ? '✅' : '❌'} Access result: ${hasAccess}`);
     return hasAccess;
   };
 
