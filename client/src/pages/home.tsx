@@ -91,10 +91,10 @@ export default function Home() {
         {
           title: "Üretimde", 
           value: (stats as any)?.productionOrders?.toString() || "0",
-          subtitle: "üretiliyor",
+          subtitle: "üretim + hazır",
           icon: "fas fa-cogs",
           color: "blue",
-          onClick: () => setLocation('/production')
+          onClick: () => setLocation('/orders?status=production')
         },
         {
           title: "Sevkiyat",
@@ -110,7 +110,7 @@ export default function Home() {
           subtitle: "tamamlandı",
           icon: "fas fa-check-circle",
           color: "green",
-          onClick: () => setLocation('/admin')
+          onClick: () => setLocation('/orders?status=delivered')
         },
         {
           title: "Günlük Ziyaretler",
