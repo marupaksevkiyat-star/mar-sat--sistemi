@@ -345,7 +345,14 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
                             src={selectedSlip.customerSignature} 
                             alt="Müşteri İmzası" 
                             className="max-h-20 max-w-full object-contain"
-                            style={{ minHeight: '60px', minWidth: '120px', filter: 'contrast(1.2)' }}
+                            style={{ 
+                              minHeight: '60px', 
+                              minWidth: '120px', 
+                              filter: 'contrast(1.5) brightness(0.8)',
+                              border: '1px solid #ddd'
+                            }}
+                            onLoad={() => console.log('İmza yüklendi!')}
+                            onError={(e) => console.error('İmza yükleme hatası:', e)}
                           />
                         </div>
                       </div>
