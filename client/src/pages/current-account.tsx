@@ -295,8 +295,12 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
                   Teslim: {formatDate(slip.deliveredAt)}
                 </p>
               </div>
-              <Badge variant={slip.status === 'delivered' ? 'default' : 'secondary'} className="text-xs">
-                {slip.status === 'delivered' ? 'Teslim Edildi' : 'Hazırlandı'}
+              <Badge 
+                variant={slip.status === 'delivered' ? 'default' : 'secondary'} 
+                className={`text-xs ${slip.status === 'delivered' ? 'bg-green-500' : slip.status === 'shipping' ? 'bg-orange-500' : 'bg-gray-500'}`}
+              >
+                {slip.status === 'delivered' ? 'Teslim Edildi' : 
+                 slip.status === 'shipping' ? 'Sevkiyatta' : 'Hazırlandı'}
               </Badge>
             </div>
             <div className="text-xs text-muted-foreground space-y-1">
