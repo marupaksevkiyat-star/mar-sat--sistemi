@@ -131,8 +131,8 @@ export const appointments = pgTable("appointments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   salesPersonId: varchar("sales_person_id").notNull().references(() => users.id),
   customerId: varchar("customer_id").notNull().references(() => customers.id),
-  scheduledAt: timestamp("scheduled_at").notNull(), // Renamed from scheduledDate for consistency
-  appointmentType: varchar("appointment_type").notNull(), // visit, call
+  scheduledDate: timestamp("scheduled_date").notNull(), // Keep as scheduledDate to match existing DB
+  appointmentType: varchar("appointment_type"), // visit, call
   title: varchar("title"),
   notes: text("notes"),
   status: varchar("status").notNull().default("scheduled"), // scheduled, completed, cancelled, rescheduled

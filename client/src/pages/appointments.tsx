@@ -133,7 +133,7 @@ export default function Appointments() {
     createAppointmentMutation.mutate({
       customerId: newAppointment.customerId,
       appointmentType: newAppointment.appointmentType,
-      scheduledAt: appointmentDateTime,
+      scheduledDate: appointmentDateTime,
       notes: newAppointment.notes,
       salesPersonId: user?.id,
     });
@@ -209,6 +209,17 @@ export default function Appointments() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
+        {/* Mobile Navigation */}
+        <div className="flex items-center justify-between mb-6 md:hidden">
+          <Button
+            variant="ghost"
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2"
+          >
+            <i className="fas fa-arrow-left"></i>
+            Geri
+          </Button>
+        </div>
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Randevular</h1>
@@ -352,8 +363,8 @@ export default function Appointments() {
                         <div className="flex items-center gap-2 text-sm">
                           <i className="fas fa-clock text-primary"></i>
                           <span>
-                            {new Date(appointment.scheduledAt).toLocaleDateString('tr-TR')} - 
-                            {new Date(appointment.scheduledAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(appointment.scheduledDate).toLocaleDateString('tr-TR')} - 
+                            {new Date(appointment.scheduledDate).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
                         
