@@ -38,6 +38,7 @@ export default function Customers() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedCustomerHistory, setSelectedCustomerHistory] = useState<Customer | null>(null);
 
   // Müşteri verileri
   const { data: customers = [], isLoading: customersLoading } = useQuery({
@@ -46,6 +47,13 @@ export default function Customers() {
   });
 
   const customersArray = Array.isArray(customers) ? customers : [];
+
+  // Müşteri geçmişi query
+  const { data: customerHistory } = useQuery({
+    queryKey: [`/api/customers/${selectedCustomerHistory?.id}/history`],
+    enabled: !!selectedCustomerHistory,
+    retry: false,
+  });
 
   // Müşteri silme mutation
   const deleteCustomerMutation = useMutation({
@@ -395,6 +403,17 @@ export default function Customers() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => setSelectedCustomerHistory(customer)}
+                          className="text-purple-600 hover:text-purple-700 border-purple-300"
+                          data-testid={`button-history-${customer.id}`}
+                          title="Geçmiş İşlemler"
+                        >
+                          📊
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => handleEditCustomer(customer)}
                           data-testid={`button-edit-${customer.id}`}
                         >
@@ -584,6 +603,189 @@ export default function Customers() {
                   </Button>
                 </div>
               </form>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Müşteri Geçmişi Modal */}
+        <Dialog open={!!selectedCustomerHistory} onOpenChange={() => setSelectedCustomerHistory(null)}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {selectedCustomerHistory?.companyName} - Geçmiş İşlemler
+              </DialogTitle>
+            </DialogHeader>
+            
+            {customerHistory && (
+              <div className="space-y-6">
+                {/* Özet Kartları */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {customerHistory.appointments?.length || 0}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Toplam Randevu</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">
+                          {customerHistory.orders?.length || 0}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Toplam Sipariş</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">
+                          {customerHistory.visits?.length || 0}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Toplam Ziyaret</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Randevular */}
+                {customerHistory.appointments && customerHistory.appointments.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Son Randevular</h3>
+                    <div className="space-y-2">
+                      {customerHistory.appointments.slice(0, 5).map((appointment: any) => (
+                        <div key={appointment.id} className="border rounded-lg p-3">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="font-medium">
+                                {new Date(appointment.scheduledDate).toLocaleDateString('tr-TR')} - 
+                                {new Date(appointment.scheduledDate).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                Tür: {appointment.appointmentType === 'visit' ? 'Ziyaret' : 'Telefon'}
+                              </div>
+                              {appointment.notes && (
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  Not: {appointment.notes}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <Badge variant={appointment.status === 'completed' ? 'default' : 'secondary'}>
+                                {appointment.status === 'completed' ? 'Tamamlandı' : 
+                                 appointment.status === 'scheduled' ? 'Planlandı' : 
+                                 appointment.status === 'cancelled' ? 'İptal' : appointment.status}
+                              </Badge>
+                              {appointment.outcome && (
+                                <Badge variant="outline" className="text-xs">
+                                  {appointment.outcome === 'not_interested' ? 'İlgilenmiyor' :
+                                   appointment.outcome === 'rescheduled' ? 'Yeniden Planlandı' : appointment.outcome}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Siparişler */}
+                {customerHistory.orders && customerHistory.orders.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Son Siparişler</h3>
+                    <div className="space-y-2">
+                      {customerHistory.orders.slice(0, 5).map((order: any) => (
+                        <div key={order.id} className="border rounded-lg p-3">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="font-medium">
+                                Sipariş #{order.orderNumber || order.id?.slice(0, 8)}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {new Date(order.createdAt).toLocaleDateString('tr-TR')}
+                              </div>
+                              <div className="text-sm font-medium text-green-600">
+                                {order.totalAmount} TL
+                              </div>
+                              {order.notes && (
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  Not: {order.notes}
+                                </div>
+                              )}
+                            </div>
+                            <Badge variant={order.status === 'delivered' ? 'default' : 'secondary'}>
+                              {order.status === 'pending' ? 'Bekliyor' :
+                               order.status === 'production' ? 'Üretimde' :
+                               order.status === 'production_ready' ? 'Sevkiyat Hazır' :
+                               order.status === 'shipping' ? 'Kargoda' :
+                               order.status === 'delivered' ? 'Teslim Edildi' : order.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Ziyaretler */}
+                {customerHistory.visits && customerHistory.visits.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Son Ziyaretler</h3>
+                    <div className="space-y-2">
+                      {customerHistory.visits.slice(0, 5).map((visit: any) => (
+                        <div key={visit.id} className="border rounded-lg p-3">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="font-medium">
+                                {new Date(visit.visitDate).toLocaleDateString('tr-TR')}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                Sonuç: {visit.outcome === 'sale_completed' ? 'Satış Yapıldı' :
+                                        visit.outcome === 'follow_up_needed' ? 'Takip Gerekli' :
+                                        visit.outcome === 'not_interested' ? 'İlgilenmiyor' : visit.outcome}
+                              </div>
+                              {visit.notes && (
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  Not: {visit.notes}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* İlgilenmeyen Kayıtlar */}
+                {(customerHistory.appointments?.some((a: any) => a.outcome === 'not_interested') ||
+                  customerHistory.visits?.some((v: any) => v.outcome === 'not_interested')) && (
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <h4 className="font-medium text-orange-800 mb-2">⚠️ Dikkat</h4>
+                    <p className="text-sm text-orange-700">
+                      Bu müşteri daha önce ilgilenmiyor olarak işaretlenmiş. 
+                      Yeni randevu oluştururken bu durumu göz önünde bulundurun.
+                    </p>
+                  </div>
+                )}
+
+                {(!customerHistory.appointments || customerHistory.appointments.length === 0) &&
+                 (!customerHistory.orders || customerHistory.orders.length === 0) &&
+                 (!customerHistory.visits || customerHistory.visits.length === 0) && (
+                  <div className="text-center py-8">
+                    <div className="text-muted-foreground">
+                      Bu müşteri için henüz geçmiş işlem bulunmuyor.
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </DialogContent>
         </Dialog>

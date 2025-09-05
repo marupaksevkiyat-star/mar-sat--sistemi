@@ -1776,6 +1776,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Müşteri geçmişi
+  app.get('/api/customers/:customerId/history', isAuthenticated, async (req, res) => {
+    try {
+      const customerId = req.params.customerId;
+      
+      // Paralel olarak verileri getir
+      const [appointments, orders, visits] = await Promise.all([
+        storage.getAppointmentsByCustomer(customerId),
+        storage.getOrdersByCustomer(customerId),
+        storage.getVisitsByCustomer(customerId)
+      ]);
+      
+      res.json({
+        appointments: appointments || [],
+        orders: orders || [],
+        visits: visits || []
+      });
+    } catch (error) {
+      console.error("Error fetching customer history:", error);
+      res.status(500).json({ message: "Failed to fetch customer history" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
