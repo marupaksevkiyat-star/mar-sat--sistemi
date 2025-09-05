@@ -102,7 +102,11 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFontSize(11);
       if (slip.items && slip.items.length > 0) {
         slip.items.forEach((item: any) => {
-          pdf.text(`${item.productName} (${item.unit})`, 30, yPos);
+          // Türkçe karakter problemini çöz
+          const productName = (item.productName || '').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c');
+          const unit = (item.unit || '').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c');
+          
+          pdf.text(`${productName} (${unit})`, 30, yPos);
           pdf.text(String(item.deliveredQuantity || '0'), 150, yPos);
           yPos += 12;
         });
