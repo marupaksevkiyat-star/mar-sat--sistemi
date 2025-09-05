@@ -1714,46 +1714,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('🔄 Faturalanan siparişlerin irsaliyelerini senkronize ediliyor...');
       
-      // Faturalanan ama irsaliyeleri delivered olmayan siparişleri bul
-      const invoicedOrders = await db
-        .select({
-          orderId: orders.id,
-          orderNumber: orders.orderNumber,
-        })
-        .from(orders)
-        .innerJoin(invoiceItems, eq(invoiceItems.orderId, orders.id))
-        .where(eq(orders.status, 'delivered'));
-      
+      // Direkt SQL kullanarak shipping durumundaki irsaliyeleri delivered yap
       let updatedCount = 0;
       
-      for (const order of invoicedOrders) {
-        // Bu siparişe ait shipping durumundaki irsaliyeleri bul
-        const shippingSlips = await db
-          .select()
-          .from(deliverySlips)
-          .where(
-            and(
-              eq(deliverySlips.orderId, order.orderId),
-              eq(deliverySlips.status, 'shipping')
-            )
-          );
+      // Shipping durumundaki tüm irsaliyeleri bul
+      const shippingSlips = await db
+        .select()
+        .from(deliverySlips)
+        .where(eq(deliverySlips.status, 'shipping'));
+      
+      console.log(`📦 ${shippingSlips.length} shipping durumundaki irsaliye bulundu`);
+      
+      // Bu irsaliyeleri delivered durumuna getir
+      for (const slip of shippingSlips) {
+        await db
+          .update(deliverySlips)
+          .set({
+            status: 'delivered',
+            deliveredAt: new Date(),
+            recipientName: 'Sistem senkronizasyonu',
+            notes: 'Otomatik teslim - senkronizasyon',
+            updatedAt: new Date(),
+          })
+          .where(eq(deliverySlips.id, slip.id));
         
-        // Bu irsaliyeleri delivered durumuna getir
-        for (const slip of shippingSlips) {
-          await db
-            .update(deliverySlips)
-            .set({
-              status: 'delivered',
-              deliveredAt: new Date(),
-              recipientName: 'Sistem senkronizasyonu',
-              notes: 'Faturalanan sipariş - otomatik teslim edildi',
-              updatedAt: new Date(),
-            })
-            .where(eq(deliverySlips.id, slip.id));
-          
-          updatedCount++;
-          console.log(`✅ İrsaliye güncellendi: ${slip.deliverySlipNumber} -> delivered`);
-        }
+        updatedCount++;
+        console.log(`✅ İrsaliye güncellendi: ${slip.deliverySlipNumber} -> delivered`);
       }
       
       console.log(`🎉 Toplam ${updatedCount} irsaliye senkronize edildi`);
