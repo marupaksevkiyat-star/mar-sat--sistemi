@@ -514,6 +514,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { customerId } = req.params;
       console.log("📋 Cari hesap detayları istendi:", customerId);
 
+      // Önce faturalaşmış siparişleri tespit et
+      const invoicedOrderIds = await db
+        .select({ orderId: invoices.orderId })
+        .from(invoices);
+      
+      const invoicedIds = invoicedOrderIds.map(inv => inv.orderId);
+
       // Bekleyen irsaliyeler (delivered ama henüz faturalanmamış)
       const pendingInvoices = await db
         .select({
@@ -527,7 +534,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(
           and(
             eq(orders.customerId, customerId),
-            eq(orders.status, 'delivered')
+            eq(orders.status, 'delivered'),
+            // Faturalaşmamış siparişleri getir
+            invoicedIds.length > 0 ? notInArray(orders.id, invoicedIds) : undefined
           )
         );
 
