@@ -100,7 +100,7 @@ export default function CustomerForm({
     createCustomerMutation.mutate(customerData);
   };
 
-  const handleCompleteVisit = (outcome: string) => {
+  const handleCompleteVisit = async (outcome: string) => {
     // Check if customer is saved for new customers
     if (!customer && !isCustomerSaved) {
       toast({
@@ -116,6 +116,33 @@ export default function CustomerForm({
     if (outcome === 'follow_up') {
       setShowAppointmentForm(true);
       return;
+    }
+
+    // For not_interested, update customer status to inactive
+    if (outcome === 'not_interested') {
+      const customerToUpdate = customer || savedCustomer;
+      if (customerToUpdate && customerToUpdate.id) {
+        try {
+          // Update customer status to inactive
+          const response = await fetch(`/api/customers/${customerToUpdate.id}/deactivate`, {
+            method: 'PATCH',
+          });
+          
+          if (response.ok) {
+            toast({
+              title: "Müşteri Durumu Güncellendi",
+              description: "Müşteri ilgilenmiyor olarak işaretlendi ve pasife alındı",
+            });
+          }
+        } catch (error) {
+          console.error('Error updating customer status:', error);
+          toast({
+            title: "Uyarı",
+            description: "Müşteri durumu güncellenemedi, ancak ziyaret kaydedildi",
+            variant: "destructive",
+          });
+        }
+      }
     }
 
     // For not_interested, use saved customer if available
