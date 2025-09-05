@@ -519,6 +519,8 @@ export class DatabaseStorage implements IStorage {
       const endOfDay = new Date(date);
       endOfDay.setHours(23, 59, 59, 999);
       
+      console.log(`🕐 Date filter applied: ${startOfDay.toISOString()} to ${endOfDay.toISOString()}`);
+      
       query = query.where(
         and(
           gte(appointments.scheduledDate, startOfDay),
@@ -712,7 +714,12 @@ export class DatabaseStorage implements IStorage {
 
   async getTodayAppointments(salesPersonId?: string): Promise<AppointmentWithDetails[]> {
     const today = new Date();
-    return await this.getAppointments(salesPersonId, today);
+    console.log(`📅 Getting today's appointments for user: ${salesPersonId}, date: ${today.toISOString()}`);
+    
+    const appointments = await this.getAppointments(salesPersonId, today);
+    console.log(`📋 Found ${appointments.length} appointments for today`);
+    
+    return appointments;
   }
 
   // Invoice operations
