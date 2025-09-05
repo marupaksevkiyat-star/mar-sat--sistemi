@@ -161,8 +161,8 @@ export default function Shipping() {
   const handleViewDeliverySlip = async (order: any) => {
     try {
       // Delivery slip bilgilerini fetch et
-      const deliverySlips = await apiRequest('GET', `/api/orders/${order.id}/delivery-slips`);
-      if (deliverySlips && deliverySlips.length > 0) {
+      const deliverySlips: any[] = await apiRequest('GET', `/api/orders/${order.id}/delivery-slips`);
+      if (Array.isArray(deliverySlips) && deliverySlips.length > 0) {
         setDeliverySlipData(deliverySlips[0]);
         setSelectedOrder(order);
         setShowDeliverySlipDialog(true);
@@ -194,6 +194,7 @@ export default function Shipping() {
           canvas.width = 200;
           canvas.height = 80;
           const ctx = canvas.getContext('2d');
+          if (!ctx) return resolve(null);
           
           const img = new Image();
           img.onload = function() {
