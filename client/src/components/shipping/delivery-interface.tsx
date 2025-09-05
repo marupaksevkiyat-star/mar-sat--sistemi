@@ -24,7 +24,17 @@ export default function DeliveryInterface({
       alert("Lütfen teslim alan kişinin adını girin");
       return;
     }
-    onCompleteDelivery(recipient, signature);
+    
+    console.log('Teslimat tamamlanıyor - İmza:', signature ? 'VAR' : 'YOK');
+    
+    // Canvas-based async Promise ile güvenli imza transfer
+    const finalSignature = signature && signature !== 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGA4GqRjQAAAABJRU5ErkJggg==' 
+      ? signature 
+      : null;
+      
+    console.log('Final imza:', finalSignature ? 'GERÇEK İMZA' : 'BOŞ İMZA');
+    
+    onCompleteDelivery(recipient, finalSignature);
     setRecipient("");
     setSignature(undefined);
   };

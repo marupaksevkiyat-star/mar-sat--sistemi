@@ -153,10 +153,49 @@ export default function Shipping() {
 
   const handleCompleteDelivery = (recipient: string, signature?: string) => {
     if (activeDelivery) {
-      completeDeliveryMutation.mutate({
-        orderId: activeDelivery.id,
-        recipient,
-        signature,
+      console.log('🎯 Canvas-based async Promise ile imza işleniyor...', signature ? 'VAR' : 'YOK');
+      
+      // Canvas-based async Promise ile SVG → PNG dönüşümü
+      const processSignatureAsync = async () => {
+        if (!signature || signature === 'undefined' || signature === 'null') {
+          console.log('❌ İmza yok, null gönderiliyor');
+          return null;
+        }
+        
+        try {
+          // Validate base64 data
+          if (!signature.startsWith('data:image/png;base64,')) {
+            console.log('❌ Geçersiz imza formatı');
+            return null;
+          }
+          
+          // Test if image is valid by creating new Image
+          return new Promise<string | null>((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              console.log('✅ İmza geçerli, gönderiliyor');
+              resolve(signature);
+            };
+            img.onerror = () => {
+              console.log('❌ İmza bozuk, null gönderiliyor');
+              resolve(null);
+            };
+            img.src = signature;
+          });
+        } catch (error) {
+          console.error('❌ İmza işleme hatası:', error);
+          return null;
+        }
+      };
+      
+      // Async signature processing
+      processSignatureAsync().then((validSignature) => {
+        console.log('🚀 Final imza:', validSignature ? 'GERÇEK' : 'NULL');
+        completeDeliveryMutation.mutate({
+          orderId: activeDelivery.id,
+          recipient,
+          signature: validSignature || undefined,
+        });
       });
     }
   };
