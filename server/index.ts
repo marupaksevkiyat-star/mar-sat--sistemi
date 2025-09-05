@@ -39,35 +39,62 @@ app.use((req, res, next) => {
 (async () => {
   // Database setup - otomatik tablo oluşturma
   try {
-    if (process.env.NODE_ENV === 'production') {
-      const { db } = await import('./db');
-      const { sql } = await import('drizzle-orm');
+    if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+      console.log('🔧 Setting up database...');
       
-      console.log('🔧 Setting up database tables...');
+      // Drizzle kit push ile tabloları oluştur
+      const { spawn } = await import('child_process');
       
-      // Test kullanıcıları oluştur (eğer yoksa)
-      await db.execute(sql`
-        INSERT INTO users (id, email, "firstName", "lastName", role) VALUES 
-        ('admin', 'admin@test.com', 'Admin', 'User', 'admin'),
-        ('murat', 'murat@test.com', 'Murat', 'Kargo', 'shipping'),
-        ('ahmet', 'ahmet@test.com', 'Ahmet', 'Satış', 'sales'),
-        ('ayse', 'ayse@test.com', 'Ayşe', 'Üretim', 'production')
-        ON CONFLICT (id) DO NOTHING
-      `);
+      await new Promise((resolve, reject) => {
+        const pushProcess = spawn('npx', ['drizzle-kit', 'push', '--force'], {
+          stdio: 'inherit',
+          env: { ...process.env }
+        });
+        
+        pushProcess.on('close', (code) => {
+          if (code === 0) {
+            console.log('✅ Database schema pushed successfully!');
+            resolve(true);
+          } else {
+            console.log('⚠️ Schema push failed, continuing...');
+            resolve(true); // Continue even if fails
+          }
+        });
+        
+        pushProcess.on('error', (err) => {
+          console.log('⚠️ Schema push error:', err.message);
+          resolve(true); // Continue even if fails
+        });
+      });
       
-      // Örnek ürünler ekle
-      await db.execute(sql`
-        INSERT INTO products (id, name, unit, price) VALUES 
-        ('prod-1', 'Standart Kutu', 'adet', 10.50),
-        ('prod-2', 'Büyük Kutu', 'adet', 15.75),
-        ('prod-3', 'Özel Kutu', 'adet', 25.00)
-        ON CONFLICT (id) DO NOTHING
-      `);
-      
-      console.log('✅ Database setup completed!');
+      // Test verisi ekle
+      try {
+        const { db } = await import('./db');
+        const { users, products } = await import('../shared/schema');
+        
+        console.log('🔧 Adding test data...');
+        
+        // Test kullanıcıları ekle
+        await db.insert(users).values([
+          { id: 'admin', email: 'admin@test.com', firstName: 'Admin', lastName: 'User', role: 'admin' },
+          { id: 'murat', email: 'murat@test.com', firstName: 'Murat', lastName: 'Kargo', role: 'shipping' },
+          { id: 'ahmet', email: 'ahmet@test.com', firstName: 'Ahmet', lastName: 'Satış', role: 'sales' }
+        ]).onConflictDoNothing();
+        
+        // Test ürünleri ekle
+        await db.insert(products).values([
+          { id: 'prod-1', name: 'Standart Kutu', unit: 'adet', price: '10.50' },
+          { id: 'prod-2', name: 'Büyük Kutu', unit: 'adet', price: '15.75' },
+          { id: 'prod-3', name: 'Özel Kutu', unit: 'adet', price: '25.00' }
+        ]).onConflictDoNothing();
+        
+        console.log('✅ Database setup completed!');
+      } catch (dataError: any) {
+        console.log('⚠️ Test data error:', dataError.message);
+      }
     }
   } catch (error: any) {
-    console.log('⚠️ Database setup error (this is normal on first deploy):', error.message);
+    console.log('⚠️ Database setup error:', error.message);
   }
 
   const server = await registerRoutes(app);
