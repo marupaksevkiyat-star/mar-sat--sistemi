@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import marupakLogo from "@assets/MARUPAK_LOGO_1757065957229.png";
 
 export default function Navigation() {
   const [location] = useLocation();
@@ -135,7 +136,7 @@ export default function Navigation() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center" data-testid="link-home">
-              <img src="/attached_assets/MARUPAK_LOGO_1757030221412.png" alt="MARUPAK Logo" className="w-8 h-8 object-contain" />
+              <img src={marupakLogo} alt="MARUPAK Logo" className="w-8 h-8 object-contain" />
               <h1 className="ml-3 text-xl font-semibold text-foreground">MARUPAK CRM</h1>
             </Link>
           </div>
