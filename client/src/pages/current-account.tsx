@@ -634,6 +634,12 @@ export default function CurrentAccountPage() {
     description: '',
     paymentDate: new Date().toISOString().split('T')[0]
   });
+
+  // Hesap ekstresi için state'ler
+  const [accountStatementDateRange, setAccountStatementDateRange] = useState({
+    startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0], // 1 ay önce
+    endDate: new Date().toISOString().split('T')[0] // Bugün
+  });
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -782,6 +788,105 @@ export default function CurrentAccountPage() {
       lastPayment,
       paymentCount: customerPayments.length
     };
+  };
+
+  // Hesap özeti hesaplama fonksiyonu  
+  const getAccountSummary = (companyName: string) => {
+    if (!companyName || !customerInvoices[companyName]) {
+      return { totalDebit: 0, totalCredit: 0, balance: 0 };
+    }
+    
+    const customerData = customerInvoices[companyName];
+    const totalDebit = customerData.totalAmount || 0;
+    
+    // Bu müşterinin ödemelerini filtrele
+    const customerId = customerData.customer?.id;
+    const customerPayments = (allPayments && Array.isArray(allPayments)) 
+      ? allPayments.filter((payment: any) => payment.customerId === customerId)
+      : [];
+    
+    const totalCredit = customerPayments.reduce((sum: number, payment: any) => 
+      sum + parseFloat(payment.amount || '0'), 0
+    );
+    
+    const balance = totalDebit - totalCredit;
+    
+    return {
+      totalDebit,
+      totalCredit, 
+      balance
+    };
+  };
+
+  // Hesap ekstresi PDF indirme fonksiyonu
+  const handleDownloadAccountStatement = async (companyName: string) => {
+    try {
+      if (!companyName || !customerInvoices[companyName]) {
+        toast({
+          title: "Hata",
+          description: "Müşteri bilgisi bulunamadı",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const customerData = customerInvoices[companyName];
+      const summary = getAccountSummary(companyName);
+      
+      // PDF oluştur
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      // Başlık
+      pdf.setFontSize(18);
+      pdf.text('HESAP EKSTRESİ', 105, 20, { align: 'center' });
+      
+      pdf.setFontSize(12);
+      pdf.text(`Müşteri: ${companyName}`, 20, 40);
+      pdf.text(`Tarih Aralığı: ${accountStatementDateRange.startDate} - ${accountStatementDateRange.endDate}`, 20, 50);
+      
+      // Özet
+      let yPos = 70;
+      pdf.setFontSize(14);
+      pdf.text('ÖZET BİLGİLER', 20, yPos);
+      
+      yPos += 15;
+      pdf.setFontSize(11);
+      pdf.text(`Toplam Borç: ${formatCurrency(summary.totalDebit)}`, 20, yPos);
+      yPos += 8;
+      pdf.text(`Toplam Ödeme: ${formatCurrency(summary.totalCredit)}`, 20, yPos);
+      yPos += 8;
+      pdf.text(`Kalan Bakiye: ${formatCurrency(Math.abs(summary.balance))} ${summary.balance >= 0 ? '(Borçlu)' : '(Alacaklı)'}`, 20, yPos);
+      
+      // Faturalar
+      yPos += 20;
+      pdf.setFontSize(14);
+      pdf.text('FATURALAR', 20, yPos);
+      yPos += 10;
+      
+      pdf.setFontSize(10);
+      customerData.invoices.forEach((invoice: CustomerInvoice) => {
+        pdf.text(`${invoice.invoiceNumber} - ${formatDate(invoice.createdAt)} - ${formatCurrency(parseFloat(invoice.totalAmount || '0'))}`, 20, yPos);
+        yPos += 6;
+        if (yPos > 250) { // Sayfa sonu kontrolü
+          pdf.addPage();
+          yPos = 20;
+        }
+      });
+      
+      pdf.save(`hesap-ekstresi-${companyName}-${accountStatementDateRange.startDate}-${accountStatementDateRange.endDate}.pdf`);
+      
+      toast({
+        title: "Başarılı",
+        description: "Hesap ekstresi indirildi",
+      });
+    } catch (error) {
+      console.error('Hesap ekstresi PDF hatası:', error);
+      toast({
+        title: "Hata", 
+        description: "Hesap ekstresi oluşturulurken hata oluştu",
+        variant: "destructive",
+      });
+    }
   };
 
   console.log("📊 Grouped customer invoices:", customerInvoices);
@@ -1176,6 +1281,81 @@ export default function CurrentAccountPage() {
                           <p className="text-sm">Vadesi yaklaşan fatura yok</p>
                         </div>
                       )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Hesap Ekstresi */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-5 h-5" />
+                        Hesap Ekstresi
+                      </div>
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleDownloadAccountStatement(selectedCustomer)}
+                        className="flex items-center gap-1"
+                      >
+                        <Receipt className="w-4 h-4" />
+                        Ekstre İndir
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Tarih Filtreleme */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium">Başlangıç Tarihi</label>
+                          <Input 
+                            type="date" 
+                            value={accountStatementDateRange.startDate}
+                            onChange={(e) => setAccountStatementDateRange(prev => ({
+                              ...prev,
+                              startDate: e.target.value
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Bitiş Tarihi</label>
+                          <Input 
+                            type="date" 
+                            value={accountStatementDateRange.endDate}
+                            onChange={(e) => setAccountStatementDateRange(prev => ({
+                              ...prev,
+                              endDate: e.target.value
+                            }))}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Özet Bilgiler */}
+                      <div className="grid grid-cols-3 gap-4 p-4 bg-muted/30 rounded">
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-red-600">
+                            {formatCurrency(getAccountSummary(selectedCustomer).totalDebit)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Toplam Borç</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-green-600">
+                            {formatCurrency(getAccountSummary(selectedCustomer).totalCredit)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Toplam Ödeme</div>
+                        </div>
+                        <div className="text-center">
+                          <div className={`text-lg font-bold ${
+                            getAccountSummary(selectedCustomer).balance >= 0 ? 'text-red-600' : 'text-green-600'
+                          }`}>
+                            {formatCurrency(Math.abs(getAccountSummary(selectedCustomer).balance))}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {getAccountSummary(selectedCustomer).balance >= 0 ? 'Kalan Borç' : 'Fazla Ödeme'}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
