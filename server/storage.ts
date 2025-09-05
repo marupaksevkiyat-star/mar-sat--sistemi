@@ -958,16 +958,18 @@ export class DatabaseStorage implements IStorage {
     
     // İrsaliye kalemlerini oluştur
     if (order.items && order.items.length > 0) {
-      const deliverySlipItems = order.items.map((item: any) => ({
+      const deliverySlipItemsData = order.items.map((item: any) => ({
         deliverySlipId: newSlip.id,
         productId: item.productId,
-        productName: item.productName,
+        productName: item.productName || item.product?.name,
         quantity: item.quantity,
+        unit: item.unit || item.product?.unit || 'adet',
+        unitPrice: String(item.unitPrice || '0'),
+        totalPrice: String(item.totalPrice || '0'),
         deliveredQuantity: item.quantity, // Başlangıçta tüm miktar teslim edilecek
-        unit: item.unit,
       }));
       
-      await db.insert(deliverySlipItems).values(deliverySlipItems);
+      await db.insert(deliverySlipItems).values(deliverySlipItemsData);
     }
     
     console.log(`✅ Delivery slip created: ${deliverySlipNumber} for order: ${orderId}`);
