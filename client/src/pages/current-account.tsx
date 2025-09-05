@@ -120,10 +120,10 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       // Boşluk
       yPos = Math.max(yPos + 40, 180);
       
-      // İMZA ALANLARI - RESİMLİ
+      // İMZA ALANLARI
       const signatureStartY = yPos;
       
-      // Sol kutu - Teslim Eden
+      // Sol kutu - Teslim Eden (MARUPAK mührü)
       pdf.rect(25, signatureStartY, 70, 45);
       
       pdf.setFontSize(14);
@@ -132,15 +132,20 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFontSize(16);
       pdf.text('MARUPAK', 30, signatureStartY + 25);
       
-      // MARUPAK logo/mühür alanı (küçük)
+      pdf.setFontSize(10);
+      pdf.text('Imza:', 30, signatureStartY + 35);
+      
+      // MARUPAK mührü/logosu alanı 
       try {
-        pdf.addImage(marupakLogo, 'PNG', 65, signatureStartY + 28, 25, 12);
+        pdf.addImage(marupakLogo, 'PNG', 50, signatureStartY + 28, 30, 15);
       } catch (logoError) {
+        // Logo eklenemezse mühür alanı çiz
+        pdf.rect(50, signatureStartY + 28, 30, 15);
         pdf.setFontSize(8);
-        pdf.text('MUHUR', 70, signatureStartY + 35);
+        pdf.text('MARUPAK MUHUR', 52, signatureStartY + 37);
       }
       
-      // Sağ kutu - Teslim Alan
+      // Sağ kutu - Teslim Alan (MÜŞTERİ İMZASI)
       pdf.rect(105, signatureStartY, 70, 45);
       
       pdf.setFontSize(14);
@@ -148,14 +153,27 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       
       pdf.setFontSize(10);
       pdf.text('Adi Soyadi:', 110, signatureStartY + 22);
-      pdf.text('_________________________', 110, signatureStartY + 28);
+      pdf.text('_________________________', 110, signatureStartY + 26);
       
-      pdf.text('Imza:', 110, signatureStartY + 35);
+      pdf.text('Imza:', 110, signatureStartY + 32);
       
-      // İmza alanı (resim eklenebilir)
-      pdf.rect(130, signatureStartY + 30, 40, 12);
-      pdf.setFontSize(8);
-      pdf.text('IMZA ALANI', 135, signatureStartY + 37);
+      // MÜŞTERİ İMZA ALANI - Sevkiyattan alınan imza buraya gelecek
+      if (slip.customerSignature) {
+        try {
+          // Eğer müşteri imzası varsa onu ekle
+          pdf.addImage(slip.customerSignature, 'PNG', 125, signatureStartY + 30, 40, 12);
+        } catch (signError) {
+          console.log('Müşteri imzası eklenemedi:', signError);
+          pdf.rect(125, signatureStartY + 30, 40, 12);
+          pdf.setFontSize(8);
+          pdf.text('MUSTERI IMZASI', 130, signatureStartY + 37);
+        }
+      } else {
+        // İmza yoksa boş alan
+        pdf.rect(125, signatureStartY + 30, 40, 12);
+        pdf.setFontSize(8);
+        pdf.text('MUSTERI IMZASI', 130, signatureStartY + 37);
+      }
       
       console.log('PDF hazır, indiriliyor...');
       
@@ -166,7 +184,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       
     } catch (error) {
       console.error('PDF HATASI:', error);
-      alert(`PDF hatası: ${error.message}`);
+      alert(`PDF hatası: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
     }
   };
 

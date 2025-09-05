@@ -242,6 +242,7 @@ export const deliverySlips = pgTable("delivery_slips", {
   driverPhone: varchar("driver_phone"),
   vehiclePlate: varchar("vehicle_plate"),
   deliveredAt: timestamp("delivered_at"),
+  customerSignature: text("customer_signature"), // Müşteri imzası - base64 image data
   notes: text("notes"),
   createdBy: varchar("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
