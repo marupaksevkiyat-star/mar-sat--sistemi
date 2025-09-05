@@ -42,14 +42,18 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
   console.log("🚚 Modal irsaliye debug:", { invoiceId, isLoading, deliverySlips });
 
   const handleSlipClick = async (slip: any) => {
+    console.log('🚚 CURRENT-ACCOUNT irsaliye tıklandı:', slip);
     try {
       // Delivery slip'in orderId'sini alıp detayları getir
       const response = await apiRequest('GET', `/api/orders/${slip.orderId}/delivery-slips`);
       const deliverySlips: any[] = await response.json();
+      console.log('📦 CURRENT-ACCOUNT API response:', deliverySlips);
       
       if (Array.isArray(deliverySlips) && deliverySlips.length > 0) {
         // İlgili slip'i bul - shipping modal'ı aç
         const targetSlip = deliverySlips.find(ds => ds.id === slip.id) || deliverySlips[0];
+        console.log('✅ CURRENT-ACCOUNT target slip:', targetSlip);
+        console.log('🎯 CURRENT-ACCOUNT imza var mı?', targetSlip.customerSignature ? 'VAR' : 'YOK');
         setDeliverySlipData(targetSlip);
         
         // Order bilgilerini mock olarak oluştur
@@ -62,13 +66,16 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
           }
         };
         setSelectedOrder(mockOrder);
+        console.log('🚀 CURRENT-ACCOUNT shipping modal açılıyor...');
         setShowDeliverySlipDialog(true);
       } else {
+        console.log('⚠️ CURRENT-ACCOUNT fallback modal');
         // Fallback to existing modal with existing data
         setSelectedSlip(slip);
         setShowDeliverySlipDetail(true);
       }
     } catch (error) {
+      console.error('❌ CURRENT-ACCOUNT hata:', error);
       // Fallback to existing modal with existing data
       setSelectedSlip(slip);
       setShowDeliverySlipDetail(true);
