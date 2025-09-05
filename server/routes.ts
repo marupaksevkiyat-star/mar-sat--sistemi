@@ -496,7 +496,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(groupedData);
     } catch (error) {
       console.error("❌ ERROR:", error);
-      res.status(500).json({ message: "Database error: " + error.message });
+      const message = error instanceof Error ? error.message : "Database error";
+      res.status(500).json({ message: "Database error: " + message });
     }
   });
 
@@ -972,7 +973,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("❌ Toplu faturalama hatası:", error);
-      res.status(500).json({ message: "Toplu faturalama başarısız: " + error.message });
+      const message = error instanceof Error ? error.message : "Toplu faturalama başarısız";
+      res.status(500).json({ message: "Toplu faturalama başarısız: " + message });
     }
   });
 
@@ -1155,7 +1157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           orderId: orderId,
           customerId: customerId,
           status: 'shipping',
-          deliveryAddress: selectedOrders.find(o => o.id === orderId)?.deliveryAddress || 'Adres belirtilmedi',
+          deliveryAddress: selectedOrders.find((o: any) => o.id === orderId)?.deliveryAddress || 'Adres belirtilmedi',
           notes: `Akıllı toplu faturalama ile oluşturulan irsaliye - Sevkiyat bekliyor`,
           createdBy: req.session.user.id,
           customerSignature: null, // İmza daha sonra teslimat sırasında eklenecek
@@ -1200,7 +1202,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("❌ Akıllı toplu faturalama hatası:", error);
-      res.status(500).json({ message: "Akıllı faturalama başarısız: " + error.message });
+      const message = error instanceof Error ? error.message : "Akıllı faturalama başarısız";
+      res.status(500).json({ message: "Akıllı faturalama başarısız: " + message });
     }
   });
 

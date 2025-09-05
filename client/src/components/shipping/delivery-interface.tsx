@@ -32,7 +32,7 @@ export default function DeliveryInterface({
     const finalSignature = signature && signature.length > 100 ? signature : null;
     console.log('✅ Final imza değerlendirmesi:', finalSignature ? 'GERÇEK İMZA GÖNDERİLİYOR' : 'BOŞ İMZA (NULL)');
     
-    onCompleteDelivery(recipient, finalSignature);
+    onCompleteDelivery(recipient, finalSignature || undefined);
     setRecipient("");
     setSignature(undefined);
   };
