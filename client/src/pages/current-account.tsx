@@ -46,126 +46,117 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       const pageWidth = pdf.internal.pageSize.width;
       const pageHeight = pdf.internal.pageSize.height;
       
-      // Türkçe karakter desteği için encoding ayarı
-      pdf.setFont("helvetica");
+      console.log('PDF oluşturuluyor...');
       
+      // Font ayarları
+      pdf.setFont("helvetica", "normal");
+      
+      // ÜST BÖLÜM - BAŞLIK VE BİLGİLER
       let yPos = 20;
       
-      // Sol üst - Müşteri Bilgileri
+      // Sol - Müşteri Bilgileri
       pdf.setFontSize(12);
-      pdf.setFont(undefined, 'bold');
       pdf.text('Musteri Bilgileri', 20, yPos);
       
-      // Gerçek müşteri bilgilerini kullan
       const customerInfo = invoiceData?.customer;
-      
       pdf.setFontSize(10);
-      pdf.setFont(undefined, 'normal');
       yPos += 10;
-      pdf.text(`Firma: ${customerInfo?.companyName || '[Musteri Firma Adi]'}`, 20, yPos);
+      pdf.text(`Firma: ${customerInfo?.companyName || 'Musteri Firma'}`, 20, yPos);
       yPos += 8;
-      pdf.text(`E-posta: ${customerInfo?.email || 'info@marupak.com'}`, 20, yPos);
+      pdf.text(`E-posta: ${customerInfo?.email || 'info@firma.com'}`, 20, yPos);
       yPos += 8;
-      pdf.text(`Telefon: ${customerInfo?.phone || '[Musteri Telefon]'}`, 20, yPos);
+      pdf.text(`Telefon: ${customerInfo?.phone || '0555 123 45 67'}`, 20, yPos);
       
-      // Orta - Teslim Fişi Başlığı
-      pdf.setFontSize(16);
-      pdf.setFont(undefined, 'bold');
-      const centerX = pageWidth / 2;
-      pdf.text('TESLIM FISI', centerX - 20, 25);
-      
-      pdf.setFontSize(12);
-      pdf.setFont(undefined, 'normal');
-      pdf.text(`NO:${slip.deliverySlipNumber.split('-').pop()}`, centerX - 15, 35);
-      
-      // Sağ üst - MARUPAK Logo alanı
+      // Orta - Teslim Fişi
       pdf.setFontSize(18);
-      pdf.setFont(undefined, 'bold');
-      pdf.text('MARUPAK', pageWidth - 60, 25);
+      pdf.text('TESLIM FISI', 85, 25);
+      pdf.setFontSize(12);
+      pdf.text(`NO: ${slip.deliverySlipNumber.split('-').pop()}`, 85, 35);
+      
+      // Sağ - MARUPAK LOGO
+      pdf.setFontSize(20);
+      pdf.text('MARUPAK', 140, 20);
+      pdf.setFontSize(8);
+      pdf.text('www.marupak.com', 140, 28);
       
       // Logo çerçevesi
-      pdf.setLineWidth(2);
-      pdf.rect(pageWidth - 70, 15, 55, 25);
+      pdf.setDrawColor(0, 0, 0);
+      pdf.setLineWidth(1.5);
+      pdf.rect(135, 12, 60, 20);
       
-      pdf.setFontSize(8);
-      pdf.setFont(undefined, 'normal');
-      pdf.text('www.marupak.com', pageWidth - 65, 36);
+      // ÜRÜN TABLOSU
+      yPos = 65;
       
-      yPos = 70;
-      
-      // Ürün tablosu başlığı
+      // Tablo başlığı
       pdf.setFontSize(14);
-      pdf.setFont(undefined, 'bold');
-      const tableHeaderY = yPos;
-      pdf.text('Malzemenin Adi', 50, tableHeaderY);
-      pdf.text('Adet', 150, tableHeaderY);
+      pdf.text('Malzemenin Adi', 30, yPos);
+      pdf.text('Adet', 150, yPos);
       
-      // Alt çizgi
-      pdf.setLineWidth(0.5);
-      pdf.line(20, tableHeaderY + 2, pageWidth - 20, tableHeaderY + 2);
+      // Başlık altı çizgi
+      pdf.setLineWidth(0.8);
+      pdf.line(20, yPos + 3, 190, yPos + 3);
       
       yPos += 15;
       
-      // Ürün listesi
+      // Ürünler
       pdf.setFontSize(11);
-      pdf.setFont(undefined, 'normal');
-      
       if (slip.items && slip.items.length > 0) {
         slip.items.forEach((item: any) => {
-          const productText = `${item.productName} (${item.unit})`;
-          pdf.text(productText, 50, yPos);
+          pdf.text(`${item.productName} (${item.unit})`, 30, yPos);
           pdf.text(String(item.deliveredQuantity || '0'), 150, yPos);
           yPos += 12;
         });
       }
       
-      // Boş satırlar ekle (estetik görünüm için)
-      const currentRows = slip.items?.length || 0;
-      const totalRows = Math.max(6, currentRows + 2); // En az 6 satır
-      while (yPos < 70 + (totalRows * 12)) {
-        yPos += 12;
-      }
+      // Boşluk
+      yPos = Math.max(yPos + 40, 180);
       
-      yPos += 30;
+      // İMZA ALANLARI - BÜYÜK VE BELİRGİN
+      const signatureStartY = yPos;
       
-      // Alt imza bölümü - belirgin çerçeveler
-      const signatureY = Math.max(yPos, pageHeight - 100);
-      
-      // Sol taraf - Teslim Eden (çerçeveli)
-      pdf.setLineWidth(1);
-      pdf.rect(20, signatureY, 80, 50);
-      
-      pdf.setFontSize(12);
-      pdf.setFont(undefined, 'bold');
-      pdf.text('TESLIM EDEN', 25, signatureY + 15);
+      // Sol kutu - Teslim Eden
+      pdf.setLineWidth(2);
+      pdf.setDrawColor(0, 0, 0);
+      pdf.rect(25, signatureStartY, 70, 45);
       
       pdf.setFontSize(14);
-      pdf.setFont(undefined, 'bold');
-      pdf.text('MARUPAK', 25, signatureY + 30);
+      pdf.text('TESLIM EDEN', 30, signatureStartY + 12);
+      
+      pdf.setFontSize(16);
+      pdf.text('MARUPAK', 30, signatureStartY + 25);
       
       pdf.setFontSize(10);
-      pdf.setFont(undefined, 'normal');
-      pdf.text('Imza: ___________________', 25, signatureY + 42);
+      pdf.text('Imza:', 30, signatureStartY + 35);
       
-      // Sağ taraf - Teslim Alan (çerçeveli)
-      pdf.rect(120, signatureY, 80, 50);
+      // İmza çizgisi
+      pdf.setLineWidth(0.5);
+      pdf.line(45, signatureStartY + 38, 85, signatureStartY + 38);
       
-      pdf.setFontSize(12);
-      pdf.setFont(undefined, 'bold');
-      pdf.text('TESLIM ALAN', 125, signatureY + 15);
+      // Sağ kutu - Teslim Alan
+      pdf.setLineWidth(2);
+      pdf.rect(105, signatureStartY, 70, 45);
+      
+      pdf.setFontSize(14);
+      pdf.text('TESLIM ALAN', 110, signatureStartY + 12);
       
       pdf.setFontSize(10);
-      pdf.setFont(undefined, 'normal');
-      pdf.text('ADI SOYADI:', 125, signatureY + 25);
-      pdf.text('_________________________', 125, signatureY + 32);
-      pdf.text('IMZA:', 125, signatureY + 40);
-      pdf.text('_________________________', 125, signatureY + 47);
+      pdf.text('Adi Soyadi:', 110, signatureStartY + 22);
+      pdf.text('Imza:', 110, signatureStartY + 35);
+      
+      // İmza çizgileri
+      pdf.line(135, signatureStartY + 25, 170, signatureStartY + 25);
+      pdf.line(125, signatureStartY + 38, 170, signatureStartY + 38);
+      
+      console.log('PDF hazır, indiriliyor...');
       
       // PDF'i indir
       pdf.save(`teslim-fisi-${slip.deliverySlipNumber}.pdf`);
+      
+      console.log('PDF indirildi!');
+      
     } catch (error) {
-      console.error('PDF oluşturma hatası:', error);
-      alert('PDF oluşturulurken bir hata oluştu.');
+      console.error('PDF HATASI:', error);
+      alert(`PDF hatası: ${error.message}`);
     }
   };
 
