@@ -24,6 +24,8 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
     queryKey: [`/api/invoices/${invoiceId}/delivery-slips`],
     enabled: !!invoiceId,
     retry: false,
+    staleTime: 0, // Always fresh
+    cacheTime: 0, // No cache
   });
 
   // Fatura bilgilerini çek (müşteri bilgileri için)
