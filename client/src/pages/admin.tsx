@@ -591,7 +591,7 @@ export default function Admin() {
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h4 className="font-semibold text-foreground">
-                        {visit.customer?.companyName || 'Bilinmeyen Müşteri'}
+                        {visit.customer?.companyName || visit.customer?.name || 'Bilinmeyen Müşteri'}
                       </h4>
                       <p className="text-sm text-muted-foreground">
                         Satış Elemanı: {visit.salesPerson?.firstName} {visit.salesPerson?.lastName}
@@ -649,13 +649,13 @@ export default function Admin() {
                 .reduce((acc: any[], order: any) => {
                   const existingCustomer = acc.find(item => item.customerId === order.customerId);
                   if (existingCustomer) {
-                    existingCustomer.totalAmount += order.totalAmount;
+                    existingCustomer.totalAmount += parseFloat(order.totalAmount || '0');
                     existingCustomer.orderCount += 1;
                   } else {
                     acc.push({
                       customerId: order.customerId,
                       customerName: order.customer?.companyName || 'Bilinmeyen Müşteri',
-                      totalAmount: order.totalAmount,
+                      totalAmount: parseFloat(order.totalAmount || '0'),
                       orderCount: 1
                     });
                   }
@@ -675,7 +675,7 @@ export default function Admin() {
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold text-green-600">
-                          ₺{customerSale.totalAmount.toLocaleString('tr-TR')}
+                          {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(customerSale.totalAmount)}
                         </p>
                         <p className="text-sm text-muted-foreground">Toplam Satış</p>
                       </div>
@@ -731,7 +731,7 @@ export default function Admin() {
                          'Teslim Edildi'}
                       </Badge>
                       <p className="text-lg font-bold text-foreground mt-1">
-                        ₺{order.totalAmount.toLocaleString('tr-TR')}
+                        {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(parseFloat(order.totalAmount || '0'))}
                       </p>
                     </div>
                   </div>
@@ -746,7 +746,7 @@ export default function Admin() {
                               {item.product?.name || 'Bilinmeyen Ürün'} x {item.quantity}
                             </span>
                             <span className="font-medium">
-                              ₺{item.totalPrice.toLocaleString('tr-TR')}
+                              {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(parseFloat(item.totalPrice || '0'))}
                             </span>
                           </div>
                         ))}

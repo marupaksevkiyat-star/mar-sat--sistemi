@@ -97,7 +97,7 @@ export default function RecentOrders({ orders, isLoading = false }: RecentOrders
                   </div>
                   <div>
                     <p className="font-medium text-foreground" data-testid={`order-customer-${order.id}`}>
-                      {order.customer?.companyName || 'Bilinmeyen Müşteri'}
+                      {order.customer?.companyName || order.customer?.name || 'Bilinmeyen Müşteri'}
                     </p>
                     <p className="text-sm text-muted-foreground" data-testid={`order-items-${order.id}`}>
                       {order.items?.length ? 

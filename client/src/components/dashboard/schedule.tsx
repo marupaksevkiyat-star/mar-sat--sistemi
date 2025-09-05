@@ -63,7 +63,7 @@ export default function Schedule({ appointments, isLoading = false }: SchedulePr
                   data-testid={`appointment-${appointment.id}`}
                 >
                   <p className="font-medium text-foreground" data-testid={`appointment-customer-${appointment.id}`}>
-                    {appointment.customer?.companyName || 'Bilinmeyen Müşteri'}
+                    {appointment.customer?.companyName || appointment.customer?.name || 'Bilinmeyen Müşteri'}
                   </p>
                   <p className="text-sm text-muted-foreground" data-testid={`appointment-time-${appointment.id}`}>
                     {formatTime(appointment.scheduledDate)}
