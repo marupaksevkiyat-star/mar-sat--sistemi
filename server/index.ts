@@ -37,6 +37,39 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Database setup - otomatik tablo oluşturma
+  try {
+    if (process.env.NODE_ENV === 'production') {
+      const { db } = await import('./db');
+      const { sql } = await import('drizzle-orm');
+      
+      console.log('🔧 Setting up database tables...');
+      
+      // Test kullanıcıları oluştur (eğer yoksa)
+      await db.execute(sql`
+        INSERT INTO users (id, email, "firstName", "lastName", role) VALUES 
+        ('admin', 'admin@test.com', 'Admin', 'User', 'admin'),
+        ('murat', 'murat@test.com', 'Murat', 'Kargo', 'shipping'),
+        ('ahmet', 'ahmet@test.com', 'Ahmet', 'Satış', 'sales'),
+        ('ayse', 'ayse@test.com', 'Ayşe', 'Üretim', 'production')
+        ON CONFLICT (id) DO NOTHING
+      `);
+      
+      // Örnek ürünler ekle
+      await db.execute(sql`
+        INSERT INTO products (id, name, unit, price) VALUES 
+        ('prod-1', 'Standart Kutu', 'adet', 10.50),
+        ('prod-2', 'Büyük Kutu', 'adet', 15.75),
+        ('prod-3', 'Özel Kutu', 'adet', 25.00)
+        ON CONFLICT (id) DO NOTHING
+      `);
+      
+      console.log('✅ Database setup completed!');
+    }
+  } catch (error: any) {
+    console.log('⚠️ Database setup error (this is normal on first deploy):', error.message);
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
