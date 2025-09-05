@@ -24,7 +24,7 @@ export default function Schedule({ appointments, isLoading = false }: SchedulePr
     return (
       <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Bugünkü Randevular</CardTitle>
+          <CardTitle>Yaklaşan Randevular</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -45,13 +45,13 @@ export default function Schedule({ appointments, isLoading = false }: SchedulePr
   return (
     <Card className="shadow-sm">
       <CardHeader>
-        <CardTitle>Bugünkü Randevular</CardTitle>
+        <CardTitle>Yaklaşan Randevular</CardTitle>
       </CardHeader>
       <CardContent>
         {!appointments || appointments.length === 0 ? (
           <div className="text-center py-8">
             <i className="fas fa-calendar text-4xl text-muted-foreground mb-4"></i>
-            <p className="text-muted-foreground">Bugün randevu bulunmamaktadır</p>
+            <p className="text-muted-foreground">Yaklaşan randevu bulunmamaktadır</p>
           </div>
         ) : (
           <>
