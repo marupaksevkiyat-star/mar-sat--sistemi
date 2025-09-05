@@ -1,0 +1,56 @@
+2025-09-05T23:45:46.123529612Z 
+2025-09-05T23:45:46.123533142Z To address all issues (including breaking changes), run:
+2025-09-05T23:45:46.123537222Z   npm audit fix --force
+2025-09-05T23:45:46.123540622Z 
+2025-09-05T23:45:46.123544753Z Run `npm audit` for details.
+2025-09-05T23:45:46.319881783Z 
+2025-09-05T23:45:46.319959187Z > rest-express@1.0.0 build
+2025-09-05T23:45:46.319968308Z > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+2025-09-05T23:45:46.319974118Z 
+2025-09-05T23:45:46.534618629Z vite v5.4.19 building for production...
+2025-09-05T23:45:46.589407452Z transforming...
+2025-09-05T23:45:46.832347051Z Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+2025-09-05T23:45:46.832369152Z   npx update-browserslist-db@latest
+2025-09-05T23:45:46.832374803Z   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2025-09-05T23:45:52.386018787Z ✓ 2259 modules transformed.
+2025-09-05T23:45:52.698974431Z rendering chunks...
+2025-09-05T23:45:53.070004078Z computing gzip size...
+2025-09-05T23:45:53.099020808Z ../dist/public/index.html                                          2.25 kB │ gzip:   0.91 kB
+2025-09-05T23:45:53.099041589Z ../dist/public/assets/MARUPAK_LOGO_1757030221412-DlQta4u5.png     80.59 kB
+2025-09-05T23:45:53.099158156Z ../dist/public/assets/index-B8NcCs4s.css                          76.72 kB │ gzip:  13.10 kB
+2025-09-05T23:45:53.099250231Z ../dist/public/assets/purify.es-BFmuJLeH.js                       21.93 kB │ gzip:   8.62 kB
+2025-09-05T23:45:53.099259872Z ../dist/public/assets/index.es-gWZ34Ako.js                       150.53 kB │ gzip:  51.48 kB
+2025-09-05T23:45:53.099282093Z ../dist/public/assets/html2canvas.esm-CBrSDip1.js                201.42 kB │ gzip:  48.03 kB
+2025-09-05T23:45:53.099310145Z ../dist/public/assets/index-8VjKs_HX.js                        1,246.01 kB │ gzip: 358.32 kB
+2025-09-05T23:45:53.099372128Z 
+2025-09-05T23:45:53.099379059Z (!) Some chunks are larger than 500 kB after minification. Consider:
+2025-09-05T23:45:53.099383329Z - Using dynamic import() to code-split the application
+2025-09-05T23:45:53.099386739Z - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+2025-09-05T23:45:53.09940062Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+2025-09-05T23:45:53.09958082Z ✓ built in 6.54s
+2025-09-05T23:45:53.181445931Z 
+2025-09-05T23:45:53.181469382Z   dist/index.js  117.1kb
+2025-09-05T23:45:53.181472493Z 
+2025-09-05T23:45:53.181475043Z ⚡ Done in 10ms
+2025-09-05T23:45:54.372778304Z ==> Uploading build...
+2025-09-05T23:46:04.672156914Z ==> Uploaded in 6.3s. Compression took 4.0s
+2025-09-05T23:46:04.778773089Z ==> Build successful 🎉
+2025-09-05T23:46:10.01578781Z ==> Deploying...
+2025-09-05T23:46:29.655539978Z ==> Running 'npm run start'
+2025-09-05T23:46:30.65539411Z 
+2025-09-05T23:46:30.655425112Z > rest-express@1.0.0 start
+2025-09-05T23:46:30.655430562Z > NODE_ENV=production node dist/index.js
+2025-09-05T23:46:30.655432522Z 
+2025-09-05T23:46:37.143493144Z 🔧 Setting up database tables...
+2025-09-05T23:46:37.443314986Z ⚠️ Database setup error (this is normal on first deploy): connect ECONNREFUSED 10.202.189.57:443
+2025-09-05T23:46:37.445645174Z Warning: connect.session() MemoryStore is not
+2025-09-05T23:46:37.445666975Z designed for a production environment, as it will leak
+2025-09-05T23:46:37.445670125Z memory, and will not scale past a single process.
+2025-09-05T23:46:37.551304347Z 11:46:37 PM [express] serving on port 10000
+2025-09-05T23:46:40.801470938Z ==> Your service is live 🎉
+2025-09-05T23:46:40.959625604Z ==> 
+2025-09-05T23:46:41.11353225Z ==> ///////////////////////////////////////////////////////////
+2025-09-05T23:46:41.267416197Z ==> 
+2025-09-05T23:46:41.424922753Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-05T23:46:41.579680449Z ==> 
+2025-09-05T23:46:41.827528297Z ==> ///////////////////////////////////////////////////////////
