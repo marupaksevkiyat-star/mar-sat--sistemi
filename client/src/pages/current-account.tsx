@@ -148,7 +148,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       }
       
       // Sağ taraf - Teslim Alan İsmi ve İmza
-      const recipientName = slip.recipientName || 'Müşteri Temsilcisi';
+      const recipientName = slip.recipientName;
       
       pdf.setFontSize(14);
       pdf.text('TESLIM ALAN:', 110, signatureStartY + 12);
@@ -159,10 +159,13 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       // MÜŞTERİ İMZA ALANI - Kutu olmadan sadece imza
       if (slip.customerSignature) {
         try {
-          // İmzayı büyük boyutlarda yerleştir
-          pdf.addImage(slip.customerSignature, 'SVG', 110, signatureStartY + 30, 60, 20);
+          console.log('PDF İmzası ekleniyor...');
+          // SVG imzayı PNG olarak ekle - daha uyumlu
+          const imgType = slip.customerSignature.includes('svg') ? 'SVG' : 'PNG';
+          pdf.addImage(slip.customerSignature, imgType, 110, signatureStartY + 30, 65, 25);
+          console.log('PDF İmzası eklendi!');
         } catch (signError) {
-          console.log('Müşteri imzası eklenemedi:', signError);
+          console.error('Müşteri imzası eklenemedi:', signError);
           pdf.setFontSize(10);
           pdf.text('MUSTERI IMZASI', 110, signatureStartY + 40);
         }
@@ -330,21 +333,20 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div><strong>Teslim Alan:</strong> {selectedSlip.recipientName || '[Müşteri Adı]'}</div>
-                  <div className="h-40 border-2 border-solid border-blue-500 rounded bg-blue-50 flex items-center justify-center p-4">
+                  <div><strong>Teslim Alan:</strong> {selectedSlip.recipientName}</div>
+                  <div className="h-56 border-2 border-solid border-blue-500 rounded bg-blue-50 flex items-center justify-center p-4">
                     {selectedSlip.customerSignature ? (
                       <div className="w-full h-full flex flex-col">
-                        <div className="text-base text-green-600 font-medium mb-3">✅ Müşteri İmzası</div>
-                        <div className="flex-1 flex items-center justify-center bg-white border-2 border-gray-300 rounded p-3">
+                        <div className="text-lg text-green-600 font-medium mb-4">✅ Müşteri İmzası</div>
+                        <div className="flex-1 flex items-center justify-center bg-white border-2 border-gray-300 rounded p-4">
                           <img 
                             src={selectedSlip.customerSignature} 
                             alt="Müşteri İmzası" 
-                            className="max-h-24 max-w-full object-contain"
+                            className="h-full w-full object-contain"
                             style={{ 
-                              minHeight: '80px', 
-                              minWidth: '160px', 
-                              filter: 'contrast(1.5) brightness(0.8)',
-                              border: '1px solid #ddd'
+                              minHeight: '120px', 
+                              minWidth: '200px', 
+                              filter: 'contrast(1.5) brightness(0.8)'
                             }}
                             onLoad={() => console.log('İmza yüklendi!')}
                             onError={(e) => console.error('İmza yükleme hatası:', e)}
