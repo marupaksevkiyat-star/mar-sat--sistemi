@@ -2,8 +2,8 @@ import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { orders, invoices, customers, orderItems, products, payments, invoiceItems, deliverySlips, deliverySlipItems } from "@shared/schema";
-import { eq, and, inArray, notInArray, sql } from "drizzle-orm";
+import { orders, invoices, customers, orderItems, products, payments, invoiceItems, deliverySlips, deliverySlipItems, appointments, visits } from "@shared/schema";
+import { eq, and, inArray, notInArray, sql, desc } from "drizzle-orm";
 import { 
   insertCustomerSchema, 
   insertProductSchema,
@@ -578,6 +578,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer history endpoint
+  app.get('/api/customer-history/:customerId', isAuthenticated, async (req: any, res) => {
+    try {
+      const customerId = req.params.customerId;
+      
+      console.log(`📊 Fetching history for customer: ${customerId}`);
+
+      // Get customer appointments
+      const customerAppointments = await db
+        .select()
+        .from(appointments)
+        .where(eq(appointments.customerId, customerId))
+        .orderBy(desc(appointments.scheduledDate));
+
+      // Get customer orders
+      const customerOrders = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.customerId, customerId))
+        .orderBy(desc(orders.createdAt));
+
+      // Get customer visits
+      const customerVisits = await db
+        .select()
+        .from(visits)
+        .where(eq(visits.customerId, customerId))
+        .orderBy(desc(visits.visitDate));
+
+      const history = {
+        appointments: customerAppointments,
+        orders: customerOrders,
+        visits: customerVisits,
+        totalAppointments: customerAppointments.length,
+        totalOrders: customerOrders.length,
+        totalVisits: customerVisits.length,
+      };
+
+      console.log(`✅ Customer history: ${customerAppointments.length} appointments, ${customerOrders.length} orders, ${customerVisits.length} visits`);
+
+      res.json(history);
+    } catch (error) {
+      console.error("❌ Error fetching customer history:", error);
+      res.status(500).json({ message: "Failed to fetch customer history" });
+    }
+  });
+
   // Order routes
   app.post('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
@@ -933,14 +979,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/appointments/:id', isAuthenticated, async (req, res) => {
     try {
       const appointmentId = req.params.id;
-      const { action, customerStatus } = req.body;
+      const { action, customerStatus, status, completedAt, outcome, notes } = req.body;
 
-      console.log(`🎯 Randevu işlemi: ${appointmentId}, Action: ${action}, CustomerStatus: ${customerStatus}`);
+      console.log(`🎯 Randevu işlemi: ${appointmentId}, Action: ${action}, Status: ${status}, Outcome: ${outcome}`);
 
-      // Önce randevuyu güncelle
-      let appointmentUpdate: any = { status: 'completed', completedAt: new Date() };
+      // Build update object based on provided fields
+      let appointmentUpdate: any = {};
       
-      if (action) {
+      if (status) appointmentUpdate.status = status;
+      if (completedAt) appointmentUpdate.completedAt = new Date(completedAt);
+      if (outcome) appointmentUpdate.outcome = outcome;
+      if (notes) appointmentUpdate.notes = notes;
+
+      // Legacy support - if action is provided without outcome, use action as outcome
+      if (action && !outcome) {
         appointmentUpdate.outcome = action;
       }
 
