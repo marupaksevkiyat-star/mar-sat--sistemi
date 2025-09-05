@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import Navigation from "@/components/layout/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -26,8 +27,9 @@ const statusTabs: StatusTabConfig[] = [
   { key: "all", label: "Tümü", icon: "fas fa-list", badgeVariant: "outline" },
   { key: "pending", label: "Bekleyen", statusFilter: "pending", icon: "fas fa-clock", badgeVariant: "secondary" },
   { key: "production", label: "Üretimde", statusFilter: "production", icon: "fas fa-cogs", badgeVariant: "default" },
+  { key: "production_ready", label: "Üretim Hazır", statusFilter: "production_ready", icon: "fas fa-check", badgeVariant: "default" },
   { key: "shipping", label: "Sevkiyatta", statusFilter: "shipping", icon: "fas fa-truck", badgeVariant: "default" },
-  { key: "delivered", label: "Tamamlandı", statusFilter: "delivered", icon: "fas fa-check-circle", badgeVariant: "default" },
+  { key: "delivered", label: "Teslim Edildi", statusFilter: "delivered", icon: "fas fa-check-circle", badgeVariant: "default" },
   { key: "cancelled", label: "İptal Oldu", statusFilter: "cancelled", icon: "fas fa-times-circle", badgeVariant: "destructive" },
 ];
 
@@ -114,9 +116,19 @@ const formatDate = (dateString: string | Date | null) => {
 export default function Orders() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [location] = useLocation();
   const [activeTab, setActiveTab] = useState<string>("all");
   const [selectedOrder, setSelectedOrder] = useState<OrderWithDetails | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+
+  // URL parametresinden status'u al
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.split('?')[1] || '');
+    const statusParam = urlParams.get('status');
+    if (statusParam && statusTabs.find(tab => tab.statusFilter === statusParam)) {
+      setActiveTab(statusParam);
+    }
+  }, [location]);
 
   // Fetch all orders
   const { data: allOrders = [], isLoading, error, refetch } = useQuery<OrderWithDetails[]>({
@@ -212,7 +224,7 @@ export default function Orders() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6" data-testid="orders-tabs">
+          <TabsList className="grid w-full grid-cols-7" data-testid="orders-tabs">
             {statusTabs.map((tab) => (
               <TabsTrigger 
                 key={tab.key} 
