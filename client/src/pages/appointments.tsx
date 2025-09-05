@@ -29,55 +29,28 @@ export default function Appointments() {
     notes: "",
   });
 
-  // URL'den customer parametresini al
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const customerId = urlParams.get('customer');
-    if (customerId) {
-      setNewAppointment(prev => ({ ...prev, customerId }));
-      setShowCreateDialog(true);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Yetkisiz Erişim",
-        description: "Lütfen giriş yapın",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
-
-  // Randevuları çek
-  const { data: appointments, isLoading: appointmentsLoading } = useQuery<any[]>({
-    queryKey: ["/api/appointments"],
-    enabled: !!isAuthenticated,
-    retry: false,
+  // Randevuları getir
+  const { data: appointments, isLoading: appointmentsLoading } = useQuery({
+    queryKey: ['/api/appointments'],
+    enabled: isAuthenticated,
   });
 
-  // Müşterileri çek
-  const { data: customers } = useQuery<any[]>({
-    queryKey: ["/api/customers"],
-    enabled: !!isAuthenticated,
-    retry: false,
+  // Müşterileri getir
+  const { data: customers } = useQuery({
+    queryKey: ['/api/customers'],
+    enabled: isAuthenticated,
   });
 
-  // Randevu oluşturma
+  // Yeni randevu oluşturma mutation
   const createAppointmentMutation = useMutation({
     mutationFn: async (appointmentData: any) => {
-      return await apiRequest("POST", "/api/appointments", appointmentData);
+      return apiRequest('/api/appointments', 'POST', appointmentData);
     },
     onSuccess: () => {
       toast({
         title: "Başarılı",
-        description: "Randevu başarıyla oluşturuldu",
+        description: "Randevu başarıyla oluşturuldu.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       setShowCreateDialog(false);
       setNewAppointment({
         customerId: "",
@@ -86,43 +59,49 @@ export default function Appointments() {
         scheduledTime: "",
         notes: "",
       });
+      queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Hata",
-        description: "Randevu oluşturulurken bir hata oluştu",
+        description: "Randevu oluşturulurken bir hata oluştu.",
         variant: "destructive",
       });
     },
   });
 
-  // Randevu güncelleme (durum değişikliği)
+  // Randevu güncelleme mutation
   const updateAppointmentMutation = useMutation({
-    mutationFn: async ({ appointmentId, action, data }: { appointmentId: string; action: string; data?: any }) => {
-      return await apiRequest("PATCH", `/api/appointments/${appointmentId}`, { action, ...data });
+    mutationFn: async ({ appointmentId, action, data }: any) => {
+      return apiRequest(`/api/appointments/${appointmentId}`, 'PATCH', { action, ...data });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
-      toast({
-        title: "Başarılı",
-        description: "İşlem başarıyla gerçekleştirildi",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Hata",
-        description: "İşlem sırasında bir hata oluştu",
-        variant: "destructive",
-      });
+      queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
     },
   });
 
+  // URL'den customer parametresini al
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const customerId = urlParams.get('customer');
+    if (customerId && customers) {
+      const customer = customers.find((c: any) => c.id === customerId);
+      if (customer) {
+        setSelectedCustomer(customer);
+        setNewAppointment(prev => ({
+          ...prev,
+          customerId: customerId
+        }));
+        setShowCreateDialog(true);
+      }
+    }
+  }, [customers, location]);
+
   const handleCreateAppointment = () => {
-    if (!newAppointment.customerId || !newAppointment.appointmentType || !newAppointment.scheduledDate || !newAppointment.scheduledTime) {
+    if (!newAppointment.customerId || !newAppointment.scheduledDate || !newAppointment.scheduledTime || !newAppointment.appointmentType) {
       toast({
-        title: "Eksik Bilgi",
-        description: "Lütfen tüm zorunlu alanları doldurun",
+        title: "Hata",
+        description: "Lütfen tüm zorunlu alanları doldurun.",
         variant: "destructive",
       });
       return;
@@ -142,15 +121,21 @@ export default function Appointments() {
   const handleAppointmentAction = (appointmentId: string, action: string, customerId?: string) => {
     let updateData = {};
     
-    if (action === 'sale_completed') {
-      // Satış tamamlandı - müşteriyi aktif yap
-      updateData = { customerStatus: 'active' };
-    } else if (action === 'follow_up_needed') {
-      // Takip gerekiyor - müşteriyi potansiyel bırak
-      updateData = { customerStatus: 'potential' };
-    } else if (action === 'not_interested') {
-      // İlgilenmiyor - müşteriyi pasif yap
-      updateData = { customerStatus: 'inactive' };
+    if (action === 'complete') {
+      updateData = { status: 'completed', completedAt: new Date() };
+    } else if (action === 'cancel') {
+      updateData = { status: 'cancelled' };
+    } else if (action === 'reschedule') {
+      updateData = { status: 'rescheduled' };
+    } else if (action === 'call_customer' && customerId) {
+      window.location.href = `tel:${customers?.find((c: any) => c.id === customerId)?.phone}`;
+      return;
+    } else if (action === 'navigate' && customerId) {
+      const customer = customers?.find((c: any) => c.id === customerId);
+      if (customer?.address) {
+        window.open(`https://maps.google.com/maps?q=${encodeURIComponent(customer.address)}`, '_blank');
+      }
+      return;
     }
 
     updateAppointmentMutation.mutate({
@@ -159,6 +144,13 @@ export default function Appointments() {
       data: updateData
     });
   };
+
+  // Filtered appointments with useMemo
+  const filteredAppointments = useMemo(() => {
+    if (!appointments) return [];
+    if (filterStatus === "all") return appointments;
+    return appointments.filter((appointment: any) => appointment.status === filterStatus);
+  }, [appointments, filterStatus]);
 
   if (isLoading || appointmentsLoading) {
     return (
@@ -174,12 +166,6 @@ export default function Appointments() {
   if (!isAuthenticated) {
     return null;
   }
-
-  const filteredAppointments = useMemo(() => {
-    if (!appointments) return [];
-    if (filterStatus === "all") return appointments;
-    return appointments.filter(appointment => appointment.status === filterStatus);
-  }, [appointments, filterStatus]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -221,90 +207,119 @@ export default function Appointments() {
             Geri
           </Button>
         </div>
+        
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Randevular</h1>
             <p className="text-muted-foreground mt-2">
-              Müşteri randevularını yönetin ve takip edin
+              Müşteri randevularınızı planlayın ve yönetin
             </p>
           </div>
           
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2" data-testid="button-create-appointment">
-                <i className="fas fa-plus"></i>
+              <Button className="bg-primary hover:bg-primary/90">
+                <i className="fas fa-plus mr-2"></i>
                 Yeni Randevu
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Yeni Randevu Oluştur</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="customer">Müşteri *</Label>
-                  <Select value={newAppointment.customerId} onValueChange={(value) => 
-                    setNewAppointment(prev => ({ ...prev, customerId: value }))
-                  }>
-                    <SelectTrigger>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="customer" className="text-right">
+                    Müşteri *
+                  </Label>
+                  <Select 
+                    value={newAppointment.customerId} 
+                    onValueChange={(value) => {
+                      setNewAppointment(prev => ({ ...prev, customerId: value }));
+                      const customer = customers?.find((c: any) => c.id === value);
+                      setSelectedCustomer(customer);
+                    }}
+                  >
+                    <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Müşteri seçin" />
                     </SelectTrigger>
                     <SelectContent>
-                      {customers?.map((customer) => (
+                      {customers?.map((customer: any) => (
                         <SelectItem key={customer.id} value={customer.id}>
-                          {customer.companyName} - {customer.contactPerson}
+                          {customer.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div>
-                  <Label htmlFor="type">Randevu Türü *</Label>
-                  <Select value={newAppointment.appointmentType} onValueChange={(value) => 
-                    setNewAppointment(prev => ({ ...prev, appointmentType: value }))
-                  }>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Randevu türü seçin" />
+                
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="type" className="text-right">
+                    Tür *
+                  </Label>
+                  <Select 
+                    value={newAppointment.appointmentType} 
+                    onValueChange={(value) => setNewAppointment(prev => ({ ...prev, appointmentType: value }))}
+                  >
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Randevu türü" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="visit">Ziyaret</SelectItem>
-                      <SelectItem value="call">Telefon Araması</SelectItem>
+                      <SelectItem value="call">Telefon Görüşmesi</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="date">Tarih *</Label>
-                    <Input
-                      type="date"
-                      value={newAppointment.scheduledDate}
-                      onChange={(e) => setNewAppointment(prev => ({ ...prev, scheduledDate: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="time">Saat *</Label>
-                    <Input
-                      type="time"
-                      value={newAppointment.scheduledTime}
-                      onChange={(e) => setNewAppointment(prev => ({ ...prev, scheduledTime: e.target.value }))}
-                    />
-                  </div>
+                
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="date" className="text-right">
+                    Tarih *
+                  </Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    className="col-span-3"
+                    value={newAppointment.scheduledDate}
+                    onChange={(e) => setNewAppointment(prev => ({ ...prev, scheduledDate: e.target.value }))}
+                  />
                 </div>
-
-                <div>
-                  <Label htmlFor="notes">Notlar</Label>
+                
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="time" className="text-right">
+                    Saat *
+                  </Label>
+                  <Input
+                    id="time"
+                    type="time"
+                    className="col-span-3"
+                    value={newAppointment.scheduledTime}
+                    onChange={(e) => setNewAppointment(prev => ({ ...prev, scheduledTime: e.target.value }))}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="notes" className="text-right">
+                    Notlar
+                  </Label>
                   <Textarea
+                    id="notes"
+                    className="col-span-3"
                     placeholder="Randevu ile ilgili notlar..."
                     value={newAppointment.notes}
                     onChange={(e) => setNewAppointment(prev => ({ ...prev, notes: e.target.value }))}
                   />
                 </div>
-
+              </div>
+              
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCreateDialog(false)}
+                >
+                  İptal
+                </Button>
                 <Button 
-                  onClick={handleCreateAppointment} 
-                  className="w-full"
+                  onClick={handleCreateAppointment}
                   disabled={createAppointmentMutation.isPending}
                 >
                   {createAppointmentMutation.isPending ? "Oluşturuluyor..." : "Randevu Oluştur"}
@@ -320,13 +335,13 @@ export default function Appointments() {
               Tümü ({appointments?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="scheduled">
-              Planlandı ({appointments?.filter(a => a.status === 'scheduled')?.length || 0})
+              Planlandı ({appointments?.filter((a: any) => a.status === 'scheduled')?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="completed">
-              Tamamlandı ({appointments?.filter(a => a.status === 'completed')?.length || 0})
+              Tamamlandı ({appointments?.filter((a: any) => a.status === 'completed')?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="cancelled">
-              İptal ({appointments?.filter(a => a.status === 'cancelled')?.length || 0})
+              İptal ({appointments?.filter((a: any) => a.status === 'cancelled')?.length || 0})
             </TabsTrigger>
           </TabsList>
 
@@ -336,26 +351,22 @@ export default function Appointments() {
                 <Card>
                   <CardContent className="text-center py-8">
                     <i className="fas fa-calendar-times text-4xl text-muted-foreground mb-4"></i>
-                    <p className="text-lg text-muted-foreground">Henüz randevu bulunmuyor</p>
-                    <p className="text-sm text-muted-foreground">Yeni randevu oluşturmak için yukarıdaki butonu kullanın</p>
+                    <p className="text-muted-foreground">
+                      {filterStatus === "all" ? "Henüz randevu yok" : `${filterStatus} durumunda randevu bulunamadı`}
+                    </p>
                   </CardContent>
                 </Card>
               ) : (
-                filteredAppointments.map((appointment) => (
+                filteredAppointments.map((appointment: any) => (
                   <Card key={appointment.id} className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg">
-                            {appointment.customer?.companyName}
-                          </CardTitle>
-                          <p className="text-sm text-muted-foreground">
-                            {appointment.customer?.contactPerson}
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          {getAppointmentTypeBadge(appointment.appointmentType)}
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg font-semibold">
+                          {appointment.customer?.name || "Bilinmeyen Müşteri"}
+                        </CardTitle>
+                        <div className="flex items-center gap-2">
                           {getStatusBadge(appointment.status)}
+                          {getAppointmentTypeBadge(appointment.appointmentType)}
                         </div>
                       </div>
                     </CardHeader>
@@ -375,39 +386,75 @@ export default function Appointments() {
                             <span className="text-muted-foreground">{appointment.notes}</span>
                           </div>
                         )}
-
+                        
+                        {appointment.customer?.phone && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <i className="fas fa-phone text-primary"></i>
+                            <span>{appointment.customer.phone}</span>
+                          </div>
+                        )}
+                        
+                        {appointment.customer?.address && (
+                          <div className="flex items-start gap-2 text-sm">
+                            <i className="fas fa-map-marker-alt text-primary mt-1"></i>
+                            <span className="text-muted-foreground">{appointment.customer.address}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-2 mt-4 pt-3 border-t">
                         {appointment.status === 'scheduled' && (
-                          <div className="flex gap-2 pt-3 border-t">
+                          <>
                             <Button
                               size="sm"
+                              onClick={() => handleAppointmentAction(appointment.id, 'complete')}
                               className="bg-green-600 hover:bg-green-700"
-                              onClick={() => handleAppointmentAction(appointment.id, 'sale_completed', appointment.customerId)}
-                              disabled={updateAppointmentMutation.isPending}
                             >
                               <i className="fas fa-check mr-1"></i>
-                              Satış Yap
+                              Tamamla
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
-                              className="border-blue-300 text-blue-600 hover:bg-blue-50"
-                              onClick={() => handleAppointmentAction(appointment.id, 'follow_up_needed')}
-                              disabled={updateAppointmentMutation.isPending}
+                              onClick={() => handleAppointmentAction(appointment.id, 'reschedule')}
                             >
-                              <i className="fas fa-redo mr-1"></i>
-                              Takip Et
+                              <i className="fas fa-calendar-alt mr-1"></i>
+                              Ertele
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
-                              className="border-red-300 text-red-600 hover:bg-red-50"
-                              onClick={() => handleAppointmentAction(appointment.id, 'not_interested')}
-                              disabled={updateAppointmentMutation.isPending}
+                              onClick={() => handleAppointmentAction(appointment.id, 'cancel')}
+                              className="text-red-600 hover:text-red-700"
                             >
                               <i className="fas fa-times mr-1"></i>
-                              İlgilenmez
+                              İptal
                             </Button>
-                          </div>
+                          </>
+                        )}
+                        
+                        {appointment.customer?.phone && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleAppointmentAction(appointment.id, 'call_customer', appointment.customerId)}
+                            className="text-blue-600 hover:text-blue-700"
+                          >
+                            <i className="fas fa-phone mr-1"></i>
+                            Ara
+                          </Button>
+                        )}
+                        
+                        {appointment.customer?.address && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleAppointmentAction(appointment.id, 'navigate', appointment.customerId)}
+                            className="text-green-600 hover:text-green-700"
+                          >
+                            <i className="fas fa-map-marker-alt mr-1"></i>
+                            Yol Tarifi
+                          </Button>
                         )}
                       </div>
                     </CardContent>
