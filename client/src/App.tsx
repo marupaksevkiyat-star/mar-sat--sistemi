@@ -59,7 +59,6 @@ function Router() {
       return <NotFound />;
     }
     
-    console.log(`✅ Access granted for user role: ${(user as any)?.role} to ${requiredRole}`);
     return <Component />;
   };
 
@@ -90,18 +89,10 @@ function Router() {
           <Route path="/appointments">
             <ProtectedRoute component={Appointments} requiredRole="sales" />
           </Route>
-          <Route path="/production">
-            <ProtectedRoute component={Production} requiredRole="production" />
-          </Route>
-          <Route path="/shipping">
-            <ProtectedRoute component={Shipping} requiredRole="shipping" />
-          </Route>
-          <Route path="/sales-reports">
-            <ProtectedRoute component={SalesReports} requiredRole="admin" />
-          </Route>
-          <Route path="/invoices">
-            <ProtectedRoute component={Invoices} requiredRole="accounting" />
-          </Route>
+          <Route path="/production" component={Production} />
+          <Route path="/shipping" component={Shipping} />
+          <Route path="/sales-reports" component={SalesReports} />
+          <Route path="/invoices" component={Invoices} />
           <Route path="/invoices/:id">
             {(params) => (
               <ProtectedRoute 
