@@ -1364,6 +1364,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           driverName: deliverySlips.driverName,
           vehiclePlate: deliverySlips.vehiclePlate,
           notes: deliverySlips.notes,
+          customerSignature: deliverySlips.customerSignature, // BURAYI EKLEDİM
+          recipientName: deliverySlips.recipientName, // BURAYI EKLEDİM
         })
         .from(deliverySlips)
         .where(eq(deliverySlips.invoiceId, invoiceId));
