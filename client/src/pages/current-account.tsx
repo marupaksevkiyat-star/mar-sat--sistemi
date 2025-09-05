@@ -522,12 +522,19 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
                         <div>
                           <div className="text-blue-700 font-semibold text-sm mb-2">ALICI İMZASI</div>
                           <div className="flex flex-col items-center">
-                            <img 
-                              src={deliverySlipData.customerSignature} 
-                              alt="Müşteri İmzası" 
-                              className="max-w-[150px] max-h-[60px] border border-gray-300 rounded"
-                              onError={(e) => console.error('İmza yükleme hatası:', e)}
-                            />
+                            <div className="w-[150px] h-[60px] border border-gray-300 rounded bg-white flex items-center justify-center">
+                              <img 
+                                src={deliverySlipData.customerSignature} 
+                                alt="Müşteri İmzası" 
+                                className="max-w-full max-h-full object-contain"
+                                style={{ imageRendering: 'crisp-edges' }}
+                                onLoad={() => console.log('✅ İmza yüklendi')}
+                                onError={(e) => {
+                                  console.error('❌ İmza yükleme hatası:', e);
+                                  console.log('🔍 İmza data:', deliverySlipData.customerSignature?.substring(0, 50) + '...');
+                                }}
+                              />
+                            </div>
                             <div className="text-xs text-blue-600 mt-2">
                               {deliverySlipData.recipientName || 'Teslim Alan'}
                             </div>
