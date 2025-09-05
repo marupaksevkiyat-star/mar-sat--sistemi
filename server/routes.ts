@@ -43,6 +43,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     secret: 'demo-secret',
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      secure: false, // HTTPS için true yapılmalı production'da
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 saat
+    }
   }));
 
   // Simple login route
