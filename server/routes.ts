@@ -1088,6 +1088,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("📦 İrsaliye bilgileri kaydedildi:", invoiceItemsToInsert.length, "kalem");
       }
 
+      // Her sipariş için delivery slip oluştur
+      for (const orderId of orderIds) {
+        console.log(`🚚 Sipariş ${orderId} için irsaliye oluşturuluyor...`);
+        
+        // Bu siparişe ait ürünleri getir
+        const orderItemsForSlip = await db
+          .select({
+            productId: orderItems.productId,
+            productName: products.name,
+            quantity: orderItems.quantity,
+            unit: products.unit
+          })
+          .from(orderItems)
+          .innerJoin(products, eq(orderItems.productId, products.id))
+          .where(eq(orderItems.orderId, orderId));
+
+        // Delivery slip oluştur
+        const deliverySlipNumber = `IRS-${finalInvoiceNumber}-${orderIds.indexOf(orderId) + 1}`.substring(0, 50);
+        
+        const deliverySlipData = {
+          deliverySlipNumber: deliverySlipNumber,
+          invoiceId: savedInvoice.id,
+          orderId: orderId,
+          customerId: customerId,
+          status: 'delivered',
+          deliveryAddress: selectedOrders.find(o => o.id === orderId)?.deliveryAddress || 'Adres belirtilmedi',
+          deliveredAt: new Date(),
+          notes: `Akıllı toplu faturalama ile oluşturulan irsaliye`,
+          createdBy: req.session.user.id,
+        };
+
+        const [savedDeliverySlip] = await db
+          .insert(deliverySlips)
+          .values(deliverySlipData)
+          .returning();
+
+        // Delivery slip items oluştur
+        const deliverySlipItemsData = orderItemsForSlip.map(item => ({
+          deliverySlipId: savedDeliverySlip.id,
+          productId: item.productId,
+          productName: item.productName,
+          quantity: item.quantity,
+          unit: item.unit,
+        }));
+
+        await db
+          .insert(deliverySlipItems)
+          .values(deliverySlipItemsData);
+
+        console.log(`✅ İrsaliye oluşturuldu: ${deliverySlipNumber} (${orderItemsForSlip.length} kalem)`);
+      }
+
       console.log("🎉 Akıllı toplu fatura oluşturuldu:", savedInvoice.invoiceNumber);
 
       // Response
