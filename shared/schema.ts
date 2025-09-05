@@ -441,6 +441,11 @@ export const insertVisitSchema = createInsertSchema(visits).omit({
 export const insertAppointmentSchema = createInsertSchema(appointments).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
+}).extend({
+  scheduledDate: z.union([z.string(), z.date()]).transform(
+    val => val === null ? null : (typeof val === 'string' ? new Date(val) : val)
+  ),
 });
 
 export const insertInvoiceSchema = createInsertSchema(invoices).omit({

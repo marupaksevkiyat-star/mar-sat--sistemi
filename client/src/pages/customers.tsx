@@ -385,11 +385,11 @@ export default function Customers() {
                           variant="outline"
                           size="sm"
                           onClick={() => window.location.href = `/appointments?customer=${customer.id}`}
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-blue-600 hover:text-blue-700 border-blue-300"
                           data-testid={`button-appointment-${customer.id}`}
                           title="Randevu Ver"
                         >
-                          <i className="fas fa-calendar-plus w-4 h-4"></i>
+                          📅
                         </Button>
                         
                         <Button
