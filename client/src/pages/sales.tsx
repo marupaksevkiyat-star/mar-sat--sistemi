@@ -455,7 +455,7 @@ export default function Sales() {
           {/* Daily Appointments */}
           <DailyAppointments onStartVisit={handleSelectCustomer} />
 
-          {/* Daily Stats + Map */}
+          {/* Daily Stats + Map + Not Interested */}
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -481,6 +481,46 @@ export default function Sales() {
                       {todayStats.followUps}
                     </span>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>İlgilenmeyen Müşteriler</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {allCustomers?.filter((customer: any) => customer.status === 'not_interested').length === 0 ? (
+                    <div className="text-center py-4">
+                      <i className="fas fa-check-circle text-2xl text-green-500 mb-2"></i>
+                      <p className="text-sm text-muted-foreground">İlgilenmeyen müşteri yok</p>
+                    </div>
+                  ) : (
+                    <div className="max-h-48 overflow-y-auto space-y-2">
+                      {allCustomers?.filter((customer: any) => customer.status === 'not_interested').map((customer: any) => (
+                        <div key={customer.id} className="flex items-center justify-between p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-red-700 dark:text-red-300" data-testid={`not-interested-company-${customer.id}`}>
+                              {customer.companyName}
+                            </p>
+                            <p className="text-xs text-red-600 dark:text-red-400">
+                              {customer.contactPerson}
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-700 hover:text-red-900 dark:text-red-300 dark:hover:text-red-100"
+                            onClick={() => handleSelectCustomer(customer)}
+                            data-testid={`retry-customer-${customer.id}`}
+                          >
+                            <i className="fas fa-redo text-xs"></i>
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

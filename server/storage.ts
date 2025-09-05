@@ -1016,6 +1016,55 @@ export class DatabaseStorage implements IStorage {
       console.log(`✅ Updated delivery slip ${slip.deliverySlipNumber} for order: ${orderId}`);
     }
   }
+
+  async getAppointmentsByCustomer(customerId: string) {
+    try {
+      const customerAppointments = await db
+        .select()
+        .from(appointments)
+        .leftJoin(customers, eq(appointments.customerId, customers.id))
+        .where(eq(appointments.customerId, customerId))
+        .orderBy(desc(appointments.scheduledDate));
+      
+      return customerAppointments.map(row => ({
+        ...row.appointments,
+        customer: row.customers
+      }));
+    } catch (error) {
+      console.error("Error fetching appointments by customer:", error);
+      return [];
+    }
+  }
+
+  async getOrdersByCustomer(customerId: string) {
+    try {
+      const customerOrders = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.customerId, customerId))
+        .orderBy(desc(orders.createdAt));
+      
+      return customerOrders;
+    } catch (error) {
+      console.error("Error fetching orders by customer:", error);
+      return [];
+    }
+  }
+
+  async getVisitsByCustomer(customerId: string) {
+    try {
+      const customerVisits = await db
+        .select()
+        .from(visits)
+        .where(eq(visits.customerId, customerId))
+        .orderBy(desc(visits.visitDate));
+      
+      return customerVisits;
+    } catch (error) {
+      console.error("Error fetching visits by customer:", error);
+      return [];
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

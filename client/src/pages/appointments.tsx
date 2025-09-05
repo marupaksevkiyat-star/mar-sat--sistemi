@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocation } from "wouter";
 import Navigation from "@/components/layout/navigation";
+import OrderModal from "@/components/modals/order-modal";
 
 export default function Appointments() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -22,6 +23,15 @@ export default function Appointments() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [filterStatus, setFilterStatus] = useState("all");
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [showSalesModal, setShowSalesModal] = useState(false);
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [rescheduleData, setRescheduleData] = useState({
+    scheduledDate: "",
+    scheduledTime: "",
+    notes: ""
+  });
   const [newAppointment, setNewAppointment] = useState({
     customerId: "",
     appointmentType: "",
@@ -145,6 +155,8 @@ export default function Appointments() {
       updateData = { status: 'cancelled' };
     } else if (action === 'reschedule') {
       updateData = { status: 'rescheduled' };
+    } else if (action === 'not_interested') {
+      updateData = { status: 'completed', outcome: 'not_interested', completedAt: new Date() };
     } else if (action === 'call_customer' && customerId) {
       window.location.href = `tel:${customers?.find((c: any) => c.id === customerId)?.phone}`;
       return;
@@ -161,6 +173,40 @@ export default function Appointments() {
       action,
       data: updateData
     });
+  };
+
+  const handleRescheduleAppointment = () => {
+    if (!rescheduleData.scheduledDate || !rescheduleData.scheduledTime) {
+      toast({
+        title: "Hata",
+        description: "Lütfen tarih ve saat seçin.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const appointmentDateTime = new Date(`${rescheduleData.scheduledDate}T${rescheduleData.scheduledTime}:00`);
+    
+    const appointmentData = {
+      customerId: selectedAppointment?.customerId,
+      appointmentType: selectedAppointment?.appointmentType || 'visit',
+      scheduledDate: appointmentDateTime,
+      notes: rescheduleData.notes,
+      salesPersonId: user?.id,
+    };
+
+    // Önce mevcut randevuyu tamamla
+    updateAppointmentMutation.mutate({
+      appointmentId: selectedAppointment?.id,
+      action: 'complete',
+      data: { status: 'completed', outcome: 'rescheduled', completedAt: new Date() }
+    });
+
+    // Sonra yeni randevu oluştur
+    createAppointmentMutation.mutate(appointmentData);
+    
+    setShowRescheduleModal(false);
+    setRescheduleData({ scheduledDate: "", scheduledTime: "", notes: "" });
   };
 
   // Filtered appointments with useMemo
@@ -381,7 +427,7 @@ export default function Appointments() {
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-lg font-semibold">
-                          {appointment.customer?.name || "Bilinmeyen Müşteri"}
+                          {appointment.customer?.companyName || appointment.customer?.name || "Bilinmeyen Müşteri"}
                         </CardTitle>
                         <div className="flex items-center gap-2">
                           {getStatusBadge(appointment.status)}
@@ -426,7 +472,10 @@ export default function Appointments() {
                           <>
                             <Button
                               size="sm"
-                              onClick={() => handleAppointmentAction(appointment.id, 'complete')}
+                              onClick={() => {
+                                setSelectedAppointment(appointment);
+                                setShowCompletionDialog(true);
+                              }}
                               className="bg-green-600 hover:bg-green-700"
                             >
                               <i className="fas fa-check mr-1"></i>
@@ -484,6 +533,127 @@ export default function Appointments() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Randevu Tamamlama Modal */}
+      <Dialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Randevu Sonucu</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              {selectedAppointment?.customer?.companyName || "Müşteri"} ile yapılan randevu sonucunu seçin:
+            </p>
+            
+            <div className="grid gap-3">
+              <Button
+                onClick={() => {
+                  setShowCompletionDialog(false);
+                  setShowSalesModal(true);
+                }}
+                className="bg-green-600 hover:bg-green-700 text-white justify-start"
+              >
+                <i className="fas fa-shopping-cart mr-3"></i>
+                Satış Yapıldı
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  setShowCompletionDialog(false);
+                  setRescheduleData({
+                    scheduledDate: "",
+                    scheduledTime: "",
+                    notes: ""
+                  });
+                  setShowRescheduleModal(true);
+                }}
+                variant="outline"
+                className="justify-start"
+              >
+                <i className="fas fa-calendar-plus mr-3"></i>
+                Tekrar Randevu Al
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  // İlgilenmiyor olarak işaretle
+                  handleAppointmentAction(selectedAppointment?.id, 'not_interested');
+                  setShowCompletionDialog(false);
+                }}
+                variant="outline"
+                className="text-orange-600 hover:text-orange-700 justify-start"
+              >
+                <i className="fas fa-times-circle mr-3"></i>
+                İlgilenmiyor
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tekrar Randevu Modal */}
+      <Dialog open={showRescheduleModal} onOpenChange={setShowRescheduleModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tekrar Randevu</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="reschedule-date" className="text-right">Tarih</Label>
+              <Input
+                id="reschedule-date"
+                type="date"
+                className="col-span-3"
+                value={rescheduleData.scheduledDate}
+                onChange={(e) => setRescheduleData(prev => ({ ...prev, scheduledDate: e.target.value }))}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="reschedule-time" className="text-right">Saat</Label>
+              <Input
+                id="reschedule-time"
+                type="time"
+                className="col-span-3"
+                value={rescheduleData.scheduledTime}
+                onChange={(e) => setRescheduleData(prev => ({ ...prev, scheduledTime: e.target.value }))}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="reschedule-notes" className="text-right">Not</Label>
+              <Textarea
+                id="reschedule-notes"
+                className="col-span-3"
+                placeholder="Tekrar randevu ile ilgili notlar..."
+                value={rescheduleData.notes}
+                onChange={(e) => setRescheduleData(prev => ({ ...prev, notes: e.target.value }))}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setShowRescheduleModal(false)}>
+              İptal
+            </Button>
+            <Button onClick={handleRescheduleAppointment}>
+              Randevu Oluştur
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Satış Modal */}
+      {selectedAppointment && (
+        <OrderModal
+          isOpen={showSalesModal}
+          onClose={() => {
+            setShowSalesModal(false);
+            // Randevuyu satış yapıldı olarak tamamla
+            if (selectedAppointment) {
+              handleAppointmentAction(selectedAppointment.id, 'complete');
+            }
+          }}
+          customer={selectedAppointment.customer}
+        />
+      )}
     </div>
   );
 }
