@@ -559,8 +559,32 @@ export default function Shipping() {
         {/* Delivery History */}
         <div className="mt-8">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Teslim Edilenler</CardTitle>
+              <Button 
+                onClick={async () => {
+                  try {
+                    const response = await apiRequest('/api/orders/sync-invoiced-deliveries', 'POST');
+                    toast({
+                      title: "Başarılı",
+                      description: response.message || "İrsaliyeler senkronize edildi",
+                    });
+                    // Sayfayı yenile
+                    queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+                  } catch (error) {
+                    toast({
+                      title: "Hata",
+                      description: "Senkronizasyon sırasında bir hata oluştu",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                variant="outline" 
+                size="sm"
+                className="ml-auto"
+              >
+                İrsaliyeleri Senkronize Et
+              </Button>
             </CardHeader>
             <CardContent>
               {deliveredLoading ? (
@@ -600,7 +624,10 @@ export default function Shipping() {
                             {order.customer.companyName}
                           </td>
                           <td className="py-3 px-4 text-sm text-muted-foreground">
-                            {order.deliveredAt ? new Date(order.deliveredAt).toLocaleDateString('tr-TR') : '-'}
+                            {order.deliveredAt && order.deliveredAt !== '1970-01-01T00:00:00.000Z' 
+                              ? new Date(order.deliveredAt).toLocaleDateString('tr-TR')
+                              : 'Teslim tarihi belirtilmemiş'
+                            }
                           </td>
                           <td className="py-3 px-4 text-sm text-muted-foreground">
                             {order.deliveryRecipient || '-'}
