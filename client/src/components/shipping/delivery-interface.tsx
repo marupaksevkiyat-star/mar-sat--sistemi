@@ -79,10 +79,16 @@ export default function DeliveryInterface({
                       <p className="font-medium text-sm text-foreground">
                         {item.product?.name || item.productName || 'Bilinmeyen Ürün'}
                       </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(parseFloat(item.unitPrice || '0'))} / {item.unit || 'adet'}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-sm text-foreground">
                         {item.quantity} {item.unit || 'adet'}
+                      </p>
+                      <p className="text-xs text-primary font-medium">
+                        {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(parseFloat(item.totalPrice || '0'))}
                       </p>
                     </div>
                   </div>

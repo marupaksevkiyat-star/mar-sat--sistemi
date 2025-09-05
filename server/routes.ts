@@ -1144,7 +1144,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             productId: orderItems.productId,
             productName: products.name,
             quantity: orderItems.quantity,
-            unit: products.unit
+            unit: products.unit,
+            unitPrice: orderItems.unitPrice,
+            totalPrice: orderItems.totalPrice
           })
           .from(orderItems)
           .innerJoin(products, eq(orderItems.productId, products.id))
@@ -1162,8 +1164,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           deliveryAddress: selectedOrders.find(o => o.id === orderId)?.deliveryAddress || 'Adres belirtilmedi',
           notes: `Akıllı toplu faturalama ile oluşturulan irsaliye - Sevkiyat bekliyor`,
           createdBy: req.session.user.id,
-          customerSignature: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGA4GqRjQAAAABJRU5ErkJggg==', // BASIT İMZA RESMİ
-          recipientName: 'Müşteri Temsilcisi' // İMZALAYAN KİŞİ ADI
+          customerSignature: null, // İmza daha sonra teslimat sırasında eklenecek
+          recipientName: null // Teslim alan kişi adı teslimat sırasında eklenecek
         };
 
         const [savedDeliverySlip] = await db
@@ -1177,8 +1179,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           productId: item.productId,
           productName: item.productName,
           quantity: item.quantity,
-          deliveredQuantity: item.quantity, // BURAYI EKLEDİM - teslim edilen miktar = sipariş miktarı
           unit: item.unit,
+          unitPrice: String(item.unitPrice || '0'),
+          totalPrice: String(item.totalPrice || '0'),
+          deliveredQuantity: item.quantity, // Teslim edilen miktar = sipariş miktarı
         }));
 
         await db

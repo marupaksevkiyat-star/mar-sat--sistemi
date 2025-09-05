@@ -260,6 +260,8 @@ export const deliverySlipItems = pgTable("delivery_slip_items", {
   productName: varchar("product_name").notNull(), // Ürün adının kopyası
   quantity: integer("quantity").notNull(),
   unit: varchar("unit").notNull(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull().default("0"), // Birim fiyat
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull().default("0"), // Toplam fiyat
   deliveredQuantity: integer("delivered_quantity").notNull().default(0), // Gerçekte teslim edilen miktar
   notes: text("notes"), // Kalem notları
   createdAt: timestamp("created_at").defaultNow(),
