@@ -308,9 +308,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/customers', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session.user.id;
       const userRole = req.session.user.role;
-      const salesPersonId = userRole === 'admin' ? undefined : userId;
+      // Admin ve production tüm müşterileri görebilir, sales sadece kendine atanmış olanları
+      let salesPersonId = undefined;
+      if (userRole === 'sales') {
+        // Sales kullanıcıları için 'admin' sales person id'li müşterileri göster
+        salesPersonId = 'admin';
+      }
+      
       const customers = await storage.getCustomers(salesPersonId);
       res.json(customers);
     } catch (error) {
