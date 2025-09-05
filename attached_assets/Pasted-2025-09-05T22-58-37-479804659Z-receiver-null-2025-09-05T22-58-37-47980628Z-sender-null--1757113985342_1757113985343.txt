@@ -1,0 +1,63 @@
+2025-09-05T22:58:37.479804659Z     _receiver: null,
+2025-09-05T22:58:37.47980628Z     _sender: null,
+2025-09-05T22:58:37.47980789Z     _socket: null,
+2025-09-05T22:58:37.47980951Z     _bufferedAmount: 0,
+2025-09-05T22:58:37.47981115Z     _isServer: false,
+2025-09-05T22:58:37.47981282Z     _redirects: 0,
+2025-09-05T22:58:37.47981446Z     _autoPong: true,
+2025-09-05T22:58:37.47981626Z     _url: 'wss://dpg-d2tmgih5pdvs739nfogg-a/v2',
+2025-09-05T22:58:37.47981794Z     _req: null,
+2025-09-05T22:58:37.4798196Z     [Symbol(shapeMode)]: false,
+2025-09-05T22:58:37.47982128Z     [Symbol(kCapture)]: false
+2025-09-05T22:58:37.47982293Z   },
+2025-09-05T22:58:37.4798246Z   [Symbol(kType)]: 'error',
+2025-09-05T22:58:37.47982678Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.189.57:443
+2025-09-05T22:58:37.47982857Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-05T22:58:37.47983023Z     errno: -111,
+2025-09-05T22:58:37.47983217Z     code: 'ECONNREFUSED',
+2025-09-05T22:58:37.47983386Z     syscall: 'connect',
+2025-09-05T22:58:37.47983554Z     address: '10.202.189.57',
+2025-09-05T22:58:37.47983722Z     port: 443
+2025-09-05T22:58:37.47983888Z   },
+2025-09-05T22:58:37.4798413Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.189.57:443'
+2025-09-05T22:58:37.47984299Z }
+2025-09-05T22:58:37.480324069Z 10:58:37 PM [express] GET /api/customers 500 in 4ms :: {"message":"Failed to fetch customers"}
+2025-09-05T22:58:37.482317764Z 10:58:37 PM [express] GET /api/visits/2025-09-05 304 in 1ms
+2025-09-05T23:01:32.907846701Z ==> Deploying...
+2025-09-05T23:01:51.538680562Z ==> Running 'npm run start'
+2025-09-05T23:01:52.636718864Z 
+2025-09-05T23:01:52.636745675Z > rest-express@1.0.0 start
+2025-09-05T23:01:52.636751555Z > NODE_ENV=production node dist/index.js
+2025-09-05T23:01:52.636754935Z 
+2025-09-05T23:01:59.336457623Z Warning: connect.session() MemoryStore is not
+2025-09-05T23:01:59.336483064Z designed for a production environment, as it will leak
+2025-09-05T23:01:59.336485954Z memory, and will not scale past a single process.
+2025-09-05T23:01:59.530722836Z 11:01:59 PM [express] serving on port 10000
+2025-09-05T23:02:03.658541142Z ==> Your service is live 🎉
+2025-09-05T23:02:03.817496568Z ==> 
+2025-09-05T23:02:03.972463785Z ==> ///////////////////////////////////////////////////////////
+2025-09-05T23:02:04.12831897Z ==> 
+2025-09-05T23:02:04.286822137Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-05T23:02:04.442258043Z ==> 
+2025-09-05T23:02:04.631881996Z ==> ///////////////////////////////////////////////////////////
+2025-09-05T23:07:05.007237725Z ==> Detected service running on port 10000
+2025-09-05T23:07:05.342772515Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-05T23:12:13.570707236Z ==> Deploying...
+2025-09-05T23:12:34.996740947Z ==> Running 'npm run start'
+2025-09-05T23:12:36.10014864Z 
+2025-09-05T23:12:36.100178661Z > rest-express@1.0.0 start
+2025-09-05T23:12:36.100186491Z > NODE_ENV=production node dist/index.js
+2025-09-05T23:12:36.100191371Z 
+2025-09-05T23:12:42.503512999Z 🔧 Setting up database tables...
+2025-09-05T23:12:42.992148856Z ⚠️ Database setup error (this is normal on first deploy): connect ECONNREFUSED 10.202.189.57:443
+2025-09-05T23:12:42.993935226Z Warning: connect.session() MemoryStore is not
+2025-09-05T23:12:42.993946396Z designed for a production environment, as it will leak
+2025-09-05T23:12:42.993949526Z memory, and will not scale past a single process.
+2025-09-05T23:12:43.104328764Z 11:12:43 PM [express] serving on port 10000
+2025-09-05T23:12:44.361499719Z ==> Your service is live 🎉
+2025-09-05T23:12:44.542651253Z ==> 
+2025-09-05T23:12:44.69692674Z ==> ///////////////////////////////////////////////////////////
+2025-09-05T23:12:44.849454526Z ==> 
+2025-09-05T23:12:45.002259203Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-05T23:12:45.160696919Z ==> 
+2025-09-05T23:12:45.314727855Z ==> ///////////////////////////////////////////////////////////
