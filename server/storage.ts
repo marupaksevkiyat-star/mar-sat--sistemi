@@ -684,7 +684,7 @@ export class DatabaseStorage implements IStorage {
       .from(orders)
       .leftJoin(customers, eq(orders.customerId, customers.id))
       .leftJoin(users, eq(orders.salesPersonId, users.id))
-      .orderBy(desc(orders.createdAt))
+      .orderBy(desc(orders.updatedAt))
       .limit(limit);
 
     const ordersWithItems = await Promise.all(
