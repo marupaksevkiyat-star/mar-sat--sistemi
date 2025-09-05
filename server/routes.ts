@@ -434,15 +434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/orders/delivered-by-customer', isAuthenticated, async (req, res) => {
     console.log("🚀 ÇALIŞTI: delivered-by-customer endpoint");
     try {
-      // Önce faturalaşmış siparişleri tespit et
-      const invoicedOrderIds = await db
-        .select({ orderId: invoices.orderId })
-        .from(invoices);
-      
-      const invoicedIds = invoicedOrderIds.map(inv => inv.orderId);
-      console.log("📋 Toplam faturalaşmış sipariş sayısı:", invoicedIds.length);
-
-      // Müşteriyi de dahil ederek delivered ama faturalaşmamış orderları getir
+      // Delivered ama faturalaşmamış orderları getir (EXISTS subquery ile)
       const result = await db
         .select({
           orderId: orders.id,
@@ -459,12 +451,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(
           and(
             eq(orders.status, 'delivered'),
-            // Faturalaşmamış siparişleri getir
-            invoicedIds.length > 0 ? notInArray(orders.id, invoicedIds) : undefined
+            // EXISTS subquery ile faturalaşmamış siparişleri bul
+            sql`NOT EXISTS (SELECT 1 FROM invoices WHERE invoices.order_id = orders.id)`
           )
         );
-      
-      console.log("📦 Raw delivered orders:", result.length);
+
+      console.log("📦 Faturalaşmamış delivered orders:", result.length);
       
       if (result.length === 0) {
         return res.json([]);
@@ -514,13 +506,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { customerId } = req.params;
       console.log("📋 Cari hesap detayları istendi:", customerId);
 
-      // Önce faturalaşmış siparişleri tespit et
-      const invoicedOrderIds = await db
-        .select({ orderId: invoices.orderId })
-        .from(invoices);
-      
-      const invoicedIds = invoicedOrderIds.map(inv => inv.orderId);
-
       // Bekleyen irsaliyeler (delivered ama henüz faturalanmamış)
       const pendingInvoices = await db
         .select({
@@ -535,8 +520,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           and(
             eq(orders.customerId, customerId),
             eq(orders.status, 'delivered'),
-            // Faturalaşmamış siparişleri getir
-            invoicedIds.length > 0 ? notInArray(orders.id, invoicedIds) : undefined
+            // EXISTS subquery ile faturalaşmamış siparişleri bul
+            sql`NOT EXISTS (SELECT 1 FROM invoices WHERE invoices.order_id = orders.id)`
           )
         );
 
