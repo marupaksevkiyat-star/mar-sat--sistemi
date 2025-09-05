@@ -735,6 +735,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delivery Slips for Orders
+  app.get('/api/orders/:id/delivery-slips', isAuthenticated, async (req, res) => {
+    try {
+      const orderId = req.params.id;
+      console.log(`🚚 Fetching delivery slips for order: ${orderId}`);
+      
+      // Get delivery slips with items
+      const slips = await db
+        .select({
+          id: deliverySlips.id,
+          deliverySlipNumber: deliverySlips.deliverySlipNumber,
+          status: deliverySlips.status,
+          deliveryAddress: deliverySlips.deliveryAddress,
+          recipientName: deliverySlips.recipientName,
+          driverName: deliverySlips.driverName,
+          vehiclePlate: deliverySlips.vehiclePlate,
+          deliveredAt: deliverySlips.deliveredAt,
+          notes: deliverySlips.notes,
+          customerSignature: deliverySlips.customerSignature,
+          createdAt: deliverySlips.createdAt,
+        })
+        .from(deliverySlips)
+        .where(eq(deliverySlips.orderId, orderId));
+
+      // Get items for each delivery slip
+      const slipsWithItems = await Promise.all(
+        slips.map(async (slip) => {
+          const items = await db
+            .select({
+              id: deliverySlipItems.id,
+              productName: deliverySlipItems.productName,
+              quantity: deliverySlipItems.quantity,
+              deliveredQuantity: deliverySlipItems.deliveredQuantity,
+              unit: deliverySlipItems.unit,
+              unitPrice: deliverySlipItems.unitPrice,
+              totalPrice: deliverySlipItems.totalPrice,
+            })
+            .from(deliverySlipItems)
+            .where(eq(deliverySlipItems.deliverySlipId, slip.id));
+
+          return {
+            ...slip,
+            items
+          };
+        })
+      );
+
+      console.log(`📦 Found ${slipsWithItems.length} delivery slips for order: ${orderId}`);
+      res.json(slipsWithItems);
+    } catch (error) {
+      console.error(`❌ Error fetching delivery slips for order ${req.params.id}:`, error);
+      res.status(500).json({ message: "Failed to fetch delivery slips" });
+    }
+  });
+
   // Visit routes
   app.post('/api/visits', isAuthenticated, async (req: any, res) => {
     try {
