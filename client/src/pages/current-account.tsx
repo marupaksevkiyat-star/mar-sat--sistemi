@@ -336,16 +336,16 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
                 </div>
                 <div className="space-y-3">
                   <div><strong>Teslim Alan:</strong> {selectedSlip.recipientName || '[Müşteri Adı]'}</div>
-                  <div className="h-20 border-2 border-solid border-blue-500 rounded bg-blue-50 flex items-center justify-center p-2">
+                  <div className="h-32 border-2 border-solid border-blue-500 rounded bg-blue-50 flex items-center justify-center p-3">
                     {selectedSlip.customerSignature ? (
                       <div className="w-full h-full flex flex-col">
-                        <div className="text-xs text-green-600 mb-1">✅ Müşteri İmzası</div>
-                        <div className="flex-1 flex items-center justify-center">
+                        <div className="text-sm text-green-600 font-medium mb-2">✅ Müşteri İmzası</div>
+                        <div className="flex-1 flex items-center justify-center bg-white border-2 border-gray-300 rounded p-2">
                           <img 
                             src={selectedSlip.customerSignature} 
                             alt="Müşteri İmzası" 
-                            className="max-h-12 max-w-full object-contain border border-gray-300 bg-white p-1 rounded"
-                            style={{ minHeight: '30px', minWidth: '60px' }}
+                            className="max-h-20 max-w-full object-contain"
+                            style={{ minHeight: '60px', minWidth: '120px', filter: 'contrast(1.2)' }}
                           />
                         </div>
                       </div>
