@@ -898,7 +898,11 @@ export default function CurrentAccountPage() {
       pdf.text(formatCurrency(summary.totalCredit), 80, yPos + 8);
       
       // Bakiye rengi
-      pdf.setTextColor(summary.balance >= 0 ? [220, 53, 69] : [40, 167, 69]);
+      if (summary.balance >= 0) {
+        pdf.setTextColor(220, 53, 69); // Kırmızı borç
+      } else {
+        pdf.setTextColor(40, 167, 69); // Yeşil alacak
+      }
       pdf.text(`${formatCurrency(Math.abs(summary.balance))} ${summary.balance >= 0 ? '(B)' : '(A)'}`, 140, yPos + 8);
       
       yPos += 25;
@@ -930,7 +934,11 @@ export default function CurrentAccountPage() {
       
       customerData.invoices.forEach((invoice: CustomerInvoice, index: number) => {
         // Alternating row colors
-        pdf.setFillColor(rowColor ? 249, 249, 249 : 255, 255, 255);
+        if (rowColor) {
+          pdf.setFillColor(249, 249, 249);
+        } else {
+          pdf.setFillColor(255, 255, 255);
+        }
         pdf.rect(15, yPos, pageWidth - 30, 8, 'F');
         
         pdf.setFontSize(9);
