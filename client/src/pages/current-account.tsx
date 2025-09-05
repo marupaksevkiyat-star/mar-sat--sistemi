@@ -462,7 +462,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
         <Dialog open={showDeliverySlipDialog} onOpenChange={setShowDeliverySlipDialog}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>İrsaliye Detayları - {deliverySlipData.deliverySlipNumber}</DialogTitle>
+              <DialogTitle>Teslim Fişi - {deliverySlipData.deliverySlipNumber}</DialogTitle>
             </DialogHeader>
             
             <div className="space-y-6">
