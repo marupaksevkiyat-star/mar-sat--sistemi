@@ -131,12 +131,15 @@ export const appointments = pgTable("appointments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   salesPersonId: varchar("sales_person_id").notNull().references(() => users.id),
   customerId: varchar("customer_id").notNull().references(() => customers.id),
-  scheduledDate: timestamp("scheduled_date").notNull(),
+  scheduledAt: timestamp("scheduled_at").notNull(), // Renamed from scheduledDate for consistency
+  appointmentType: varchar("appointment_type").notNull(), // visit, call
   title: varchar("title"),
   notes: text("notes"),
-  status: varchar("status").notNull().default("scheduled"), // scheduled, completed, cancelled
+  status: varchar("status").notNull().default("scheduled"), // scheduled, completed, cancelled, rescheduled
+  outcome: varchar("outcome"), // sale_completed, follow_up_needed, not_interested
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Invoices table for shipping management

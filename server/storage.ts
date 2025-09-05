@@ -222,6 +222,15 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
+  async updateCustomerStatus(id: string, status: 'active' | 'potential' | 'inactive'): Promise<Customer> {
+    const [updated] = await db
+      .update(customers)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(customers.id, id))
+      .returning();
+    return updated;
+  }
+
   async getNearbyCustomers(lat: number, lng: number, radiusKm: number = 5): Promise<CustomerWithSalesPerson[]> {
     // Simplified distance calculation - in production, use PostGIS
     const results = await db

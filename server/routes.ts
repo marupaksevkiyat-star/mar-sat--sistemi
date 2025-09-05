@@ -850,6 +850,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Randevu işlem endpoint'i - Satış yap, takip et, ilgilenmiyor
+  app.patch('/api/appointments/:id', isAuthenticated, async (req, res) => {
+    try {
+      const appointmentId = req.params.id;
+      const { action, customerStatus } = req.body;
+
+      console.log(`🎯 Randevu işlemi: ${appointmentId}, Action: ${action}, CustomerStatus: ${customerStatus}`);
+
+      // Önce randevuyu güncelle
+      let appointmentUpdate: any = { status: 'completed', completedAt: new Date() };
+      
+      if (action) {
+        appointmentUpdate.outcome = action;
+      }
+
+      const appointment = await storage.updateAppointment(appointmentId, appointmentUpdate);
+
+      // Müşteri durumunu güncelle
+      if (customerStatus && appointment.customerId) {
+        try {
+          await storage.updateCustomerStatus(appointment.customerId, customerStatus);
+          console.log(`✅ Müşteri durumu güncellendi: ${appointment.customerId} -> ${customerStatus}`);
+        } catch (customerError) {
+          console.error("Müşteri durumu güncellenirken hata:", customerError);
+        }
+      }
+
+      res.json({ success: true, appointment });
+    } catch (error) {
+      console.error("Error processing appointment action:", error);
+      res.status(400).json({ message: "Failed to process appointment action" });
+    }
+  });
+
   // Invoice routes
   app.post('/api/invoices', isAuthenticated, async (req, res) => {
     try {

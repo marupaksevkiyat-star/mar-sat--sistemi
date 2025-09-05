@@ -44,6 +44,7 @@ export default function Navigation() {
         { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
         { path: "/customers", label: "Müşteriler", icon: "fas fa-building" },
         { path: "/sales", label: "Satış", icon: "fas fa-users" },
+        { path: "/appointments", label: "Randevular", icon: "fas fa-calendar-alt" },
         { path: "/sales-reports", label: "Satış Raporları", icon: "fas fa-chart-bar" },
         { path: "/invoices", label: "İrsaliyeler", icon: "fas fa-file-invoice" },
         { path: "/current-account", label: "Cari Hesap", icon: "fas fa-file-text" },
@@ -60,6 +61,7 @@ export default function Navigation() {
         { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
         { path: "/customers", label: "Müşteriler", icon: "fas fa-building" },
         { path: "/sales", label: "Satış", icon: "fas fa-users" },
+        { path: "/appointments", label: "Randevular", icon: "fas fa-calendar-alt" },
       ];
     }
     
