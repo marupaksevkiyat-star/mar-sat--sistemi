@@ -66,9 +66,16 @@ export default function SignaturePad({ onSignatureChange }: SignaturePadProps) {
     ctx.stroke();
     setHasSignature(true);
 
-    // Convert to base64 and notify parent
-    const signature = canvas.toDataURL();
-    onSignatureChange(signature);
+    // Canvas-based async Promise ile SVG → PNG dönüşümü
+    setTimeout(() => {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        // High quality PNG conversion
+        const signature = canvas.toDataURL('image/png', 1.0);
+        onSignatureChange(signature);
+        console.log('İmza oluşturuldu:', signature.substring(0, 50) + '...');
+      }
+    }, 100);
   };
 
   const stopDrawing = () => {
@@ -85,7 +92,8 @@ export default function SignaturePad({ onSignatureChange }: SignaturePadProps) {
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     setHasSignature(false);
-    onSignatureChange(undefined);
+    onSignatureChange(null);
+    console.log('İmza temizlendi');
   };
 
   return (
