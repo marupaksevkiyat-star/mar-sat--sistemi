@@ -582,7 +582,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.session.user.id;
+      const userRole = req.session.user.role;
       const { customerId, totalAmount, status, notes, items } = req.body;
+      
+      console.log('🛍️ Creating order:', {
+        userId,
+        userRole,
+        customerId,
+        totalAmount,
+        itemCount: items?.length || 0
+      });
       
       // customerId kontrolü
       if (!customerId) {
@@ -599,8 +608,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         salesPersonId: userId,
       };
       
+      console.log('📦 Order data to create:', orderData);
+      
       // Create order first to get orderId
       const createdOrder = await storage.createOrder(orderData, []);
+      console.log('✅ Order created successfully:', createdOrder.id);
       
       // Prepare items for order creation with orderId
       const orderItems = Array.isArray(items) ? items.map((item: any) => ({
@@ -613,13 +625,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update order with items if any exist
       if (orderItems.length > 0) {
+        console.log('📝 Adding order items:', orderItems.length);
         await storage.updateOrderItems(createdOrder.id, orderItems);
       }
       
       res.json({ success: true, order: createdOrder });
     } catch (error) {
-      console.error("Sipariş oluşturma hatası:", error);
-      res.status(400).json({ message: "Sipariş oluşturulamadı" });
+      console.error("❌ Sipariş oluşturma hatası:", error);
+      res.status(400).json({ message: "Sipariş oluşturulamadı", error: (error as Error).message });
     }
   });
 
@@ -866,7 +879,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(appointment);
     } catch (error) {
       console.error("❌ Error creating appointment:", error);
-      res.status(400).json({ message: "Failed to create appointment", error: error.message });
+      res.status(400).json({ message: "Failed to create appointment", error: (error as Error).message });
     }
   });
 
