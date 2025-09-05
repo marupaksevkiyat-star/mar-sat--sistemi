@@ -67,13 +67,10 @@ export default function SignaturePad({ onSignatureChange }: SignaturePadProps) {
     setHasSignature(true);
 
     // Immediate signature update for better responsiveness
-    const canvas = canvasRef.current;
-    if (canvas) {
-      // High quality PNG conversion
-      const signature = canvas.toDataURL('image/png', 1.0);
-      onSignatureChange(signature);
-      console.log('🖋️ İmza canvastan alındı:', signature ? signature.substring(0, 50) + '...' : 'NULL');
-    }
+    // High quality PNG conversion
+    const signature = canvas.toDataURL('image/png', 1.0);
+    onSignatureChange(signature);
+    console.log('🖋️ İmza canvastan alındı:', signature ? signature.substring(0, 50) + '...' : 'NULL');
   };
 
   const stopDrawing = () => {
@@ -90,7 +87,7 @@ export default function SignaturePad({ onSignatureChange }: SignaturePadProps) {
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     setHasSignature(false);
-    onSignatureChange(null);
+    onSignatureChange(undefined);
     console.log('İmza temizlendi');
   };
 
