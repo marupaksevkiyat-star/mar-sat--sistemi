@@ -147,34 +147,29 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
         pdf.text('MARUPAK MUHUR', 52, signatureStartY + 37);
       }
       
-      // Sağ kutu - Teslim Alan (MÜŞTERİ İMZASI)
-      pdf.rect(105, signatureStartY, 70, 45);
+      // Sağ taraf - Teslim Alan İsmi ve İmza
+      const recipientName = slip.recipientName || 'Müşteri Temsilcisi';
       
       pdf.setFontSize(14);
-      pdf.text('TESLIM ALAN', 110, signatureStartY + 12);
+      pdf.text('TESLIM ALAN:', 110, signatureStartY + 12);
       
-      pdf.setFontSize(10);
-      pdf.text('Adi Soyadi:', 110, signatureStartY + 22);
-      pdf.text('_________________________', 110, signatureStartY + 26);
+      pdf.setFontSize(12);
+      pdf.text(recipientName, 110, signatureStartY + 25);
       
-      pdf.text('Imza:', 110, signatureStartY + 32);
-      
-      // MÜŞTERİ İMZA ALANI - Sevkiyattan alınan imza buraya gelecek
+      // MÜŞTERİ İMZA ALANI - Kutu olmadan sadece imza
       if (slip.customerSignature) {
         try {
-          // Eğer müşteri imzası varsa onu ekle
-          pdf.addImage(slip.customerSignature, 'PNG', 125, signatureStartY + 30, 40, 12);
+          // İmzayı büyük boyutlarda yerleştir
+          pdf.addImage(slip.customerSignature, 'SVG', 110, signatureStartY + 30, 60, 20);
         } catch (signError) {
           console.log('Müşteri imzası eklenemedi:', signError);
-          pdf.rect(125, signatureStartY + 30, 40, 12);
-          pdf.setFontSize(8);
-          pdf.text('MUSTERI IMZASI', 130, signatureStartY + 37);
+          pdf.setFontSize(10);
+          pdf.text('MUSTERI IMZASI', 110, signatureStartY + 40);
         }
       } else {
-        // İmza yoksa boş alan
-        pdf.rect(125, signatureStartY + 30, 40, 12);
-        pdf.setFontSize(8);
-        pdf.text('MUSTERI IMZASI', 130, signatureStartY + 37);
+        // İmza yoksa boş
+        pdf.setFontSize(10);
+        pdf.text('MUSTERI IMZASI', 110, signatureStartY + 40);
       }
       
       console.log('PDF hazır, indiriliyor...');
@@ -336,18 +331,18 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
                 </div>
                 <div className="space-y-3">
                   <div><strong>Teslim Alan:</strong> {selectedSlip.recipientName || '[Müşteri Adı]'}</div>
-                  <div className="h-32 border-2 border-solid border-blue-500 rounded bg-blue-50 flex items-center justify-center p-3">
+                  <div className="h-40 border-2 border-solid border-blue-500 rounded bg-blue-50 flex items-center justify-center p-4">
                     {selectedSlip.customerSignature ? (
                       <div className="w-full h-full flex flex-col">
-                        <div className="text-sm text-green-600 font-medium mb-2">✅ Müşteri İmzası</div>
-                        <div className="flex-1 flex items-center justify-center bg-white border-2 border-gray-300 rounded p-2">
+                        <div className="text-base text-green-600 font-medium mb-3">✅ Müşteri İmzası</div>
+                        <div className="flex-1 flex items-center justify-center bg-white border-2 border-gray-300 rounded p-3">
                           <img 
                             src={selectedSlip.customerSignature} 
                             alt="Müşteri İmzası" 
-                            className="max-h-20 max-w-full object-contain"
+                            className="max-h-24 max-w-full object-contain"
                             style={{ 
-                              minHeight: '60px', 
-                              minWidth: '120px', 
+                              minHeight: '80px', 
+                              minWidth: '160px', 
                               filter: 'contrast(1.5) brightness(0.8)',
                               border: '1px solid #ddd'
                             }}
