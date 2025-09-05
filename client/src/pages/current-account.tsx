@@ -751,10 +751,10 @@ export default function CurrentAccountPage() {
 
   const formatCurrency = (amount: number | string) => {
     const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY'
-    }).format(numAmount);
+    return numAmount.toLocaleString('tr-TR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + ' TL';
   };
 
   const formatDate = (dateString: string) => {
@@ -913,29 +913,54 @@ export default function CurrentAccountPage() {
       // Reset text color
       pdf.setTextColor(0, 0, 0);
       
-      // Faturalar tablosu
+      // Birleşik tablo
       pdf.setFontSize(12);
-      pdf.text('FATURA DETAYLARI', 20, yPos);
-      yPos += 10;
+      pdf.text('ISLEM DETAYLARI', 20, yPos);
+      yPos += 15;
       
-      // Fatura tablo başlıkları
+      // Tablo başlıkları
       pdf.setFillColor(52, 73, 94);
       pdf.rect(15, yPos, pageWidth - 30, 10, 'F');
       
       pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(9);
-      pdf.text('FATURA NO', 20, yPos + 7);
-      pdf.text('TARIH', 80, yPos + 7);
-      pdf.text('TUTAR', 130, yPos + 7);
-      pdf.text('DURUM', 165, yPos + 7);
+      pdf.setFontSize(10);
+      pdf.text('TARIH', 20, yPos + 7);
+      pdf.text('ACIKLAMA', 70, yPos + 7);
+      pdf.text('BORC', 130, yPos + 7);
+      pdf.text('ALACAK', 155, yPos + 7);
+      pdf.text('KALAN', 180, yPos + 7);
       
       yPos += 10;
       
-      // Fatura satırları
+      // Tüm işlemleri birleştir ve tarihe göre sırala
       pdf.setTextColor(0, 0, 0);
+      
+      const customerId = customerData.invoices[0]?.customerId;
+      const customerPayments = (allPayments && Array.isArray(allPayments)) 
+        ? allPayments.filter((payment: any) => payment.customerId === customerId)
+        : [];
+      
+      const allTransactions = [
+        // Faturalar
+        ...customerData.invoices.map((invoice: any) => ({
+          date: invoice.createdAt,
+          description: `FATURA ${invoice.invoiceNumber}`,
+          type: 'invoice',
+          amount: parseFloat(invoice.totalAmount || '0')
+        })),
+        // Ödemeler
+        ...customerPayments.map((payment: any) => ({
+          date: payment.paymentDate,
+          description: 'TAHSILAT BANKASI',
+          type: 'payment',
+          amount: parseFloat(payment.amount || '0')
+        }))
+      ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      
+      let runningBalance = 0;
       let rowColor = true;
       
-      customerData.invoices.forEach((invoice: CustomerInvoice, index: number) => {
+      allTransactions.forEach((transaction) => {
         // Alternating row colors
         if (rowColor) {
           pdf.setFillColor(249, 249, 249);
@@ -945,14 +970,26 @@ export default function CurrentAccountPage() {
         pdf.rect(15, yPos, pageWidth - 30, 8, 'F');
         
         pdf.setFontSize(9);
-        pdf.text(invoice.invoiceNumber, 20, yPos + 6);
-        pdf.text(formatDate(invoice.createdAt), 80, yPos + 6);
-        pdf.text(formatCurrency(parseFloat(invoice.totalAmount || '0')), 130, yPos + 6);
+        pdf.text(formatDate(transaction.date), 20, yPos + 6);
+        pdf.text(transaction.description, 70, yPos + 6);
         
-        // Status
-        const status = invoice.status === 'generated' ? 'Olusturuldu' : 
-                      invoice.status === 'paid' ? 'Odendi' : invoice.status;
-        pdf.text(status, 165, yPos + 6);
+        if (transaction.type === 'invoice') {
+          // Borç (fatura)
+          runningBalance += transaction.amount;
+          const amount = transaction.amount.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+          pdf.text(amount, 130, yPos + 6);
+          pdf.text('-', 155, yPos + 6);
+        } else {
+          // Alacak (ödeme)
+          runningBalance -= transaction.amount;
+          pdf.text('-', 130, yPos + 6);
+          const amount = transaction.amount.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+          pdf.text(amount, 155, yPos + 6);
+        }
+        
+        // Kalan bakiye
+        const balance = runningBalance.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        pdf.text(balance, 180, yPos + 6);
         
         yPos += 8;
         rowColor = !rowColor;
@@ -964,78 +1001,6 @@ export default function CurrentAccountPage() {
           rowColor = true;
         }
       });
-      
-      yPos += 15;
-      
-      // Ödemeler tablosu
-      const customerId = customerData.invoices[0]?.customerId;
-      const customerPayments = (allPayments && Array.isArray(allPayments)) 
-        ? allPayments.filter((payment: any) => payment.customerId === customerId)
-        : [];
-      
-      if (customerPayments.length > 0) {
-        // Sayfa sonu kontrolü ödemeler için
-        if (yPos > pageHeight - 100) {
-          pdf.addPage();
-          yPos = 30;
-        }
-        
-        pdf.setFontSize(12);
-        pdf.text('ODEME DETAYLARI', 20, yPos);
-        yPos += 10;
-        
-        // Ödeme tablo başlıkları
-        pdf.setFillColor(40, 167, 69);
-        pdf.rect(15, yPos, pageWidth - 30, 10, 'F');
-        
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(9);
-        pdf.text('ODEME TARIHI', 20, yPos + 7);
-        pdf.text('TUTAR', 80, yPos + 7);
-        pdf.text('YONTEM', 130, yPos + 7);
-        pdf.text('ACIKLAMA', 165, yPos + 7);
-        
-        yPos += 10;
-        
-        // Ödeme satırları
-        pdf.setTextColor(0, 0, 0);
-        rowColor = true;
-        
-        customerPayments.forEach((payment: any) => {
-          // Alternating row colors
-          if (rowColor) {
-            pdf.setFillColor(240, 248, 255);
-          } else {
-            pdf.setFillColor(255, 255, 255);
-          }
-          pdf.rect(15, yPos, pageWidth - 30, 8, 'F');
-          
-          pdf.setFontSize(9);
-          pdf.text(formatDate(payment.paymentDate), 20, yPos + 6);
-          pdf.text(formatCurrency(parseFloat(payment.amount || '0')), 80, yPos + 6);
-          
-          // Ödeme yöntemi
-          const method = payment.paymentMethod === 'cash' ? 'Nakit' :
-                        payment.paymentMethod === 'transfer' ? 'Havale' :
-                        payment.paymentMethod === 'credit_card' ? 'Kredi Karti' :
-                        payment.paymentMethod === 'check' ? 'Cek' : payment.paymentMethod;
-          pdf.text(method, 130, yPos + 6);
-          
-          // Açıklama (kısa)
-          const description = payment.description ? payment.description.substring(0, 20) + '...' : '-';
-          pdf.text(description, 165, yPos + 6);
-          
-          yPos += 8;
-          rowColor = !rowColor;
-          
-          // Sayfa sonu kontrolü
-          if (yPos > pageHeight - 50) {
-            pdf.addPage();
-            yPos = 30;
-            rowColor = true;
-          }
-        });
-      }
       
       // Footer
       const footerY = pageHeight - 20;
