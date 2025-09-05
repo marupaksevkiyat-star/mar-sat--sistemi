@@ -1,0 +1,16 @@
+[Warning] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}. (chunk-EMIZX3C5.js, line 337)
+[Log] 🔄 handleCreateAppointment called with: – {customerId: "c0b7fb9d-de25-4afa-9ac4-c26d21fa93a0", appointmentType: "call", scheduledDate: "2025-09-06", …} (appointments.tsx, line 117)
+{customerId: "c0b7fb9d-de25-4afa-9ac4-c26d21fa93a0", appointmentType: "call", scheduledDate: "2025-09-06", scheduledTime: "08:06", notes: ""}Object
+[Log] 👤 Current user: – {id: "sales_staff", firstName: "Ayşe", lastName: "Demir", …} (appointments.tsx, line 118)
+{id: "sales_staff", firstName: "Ayşe", lastName: "Demir", email: "ayse@company.com", role: "sales"}Object
+[Log] 📤 Sending appointment data: – {customerId: "c0b7fb9d-de25-4afa-9ac4-c26d21fa93a0", appointmentType: "call", scheduledDate: Sat Sep 06 2025 08:06:00 GMT+0300 (GMT+03:00), …} (appointments.tsx, line 136)
+{customerId: "c0b7fb9d-de25-4afa-9ac4-c26d21fa93a0", appointmentType: "call", scheduledDate: Sat Sep 06 2025 08:06:00 GMT+0300 (GMT+03:00), notes: "", salesPersonId: "sales_staff"}Object
+[Log] 📅 Creating appointment with data: – {customerId: "c0b7fb9d-de25-4afa-9ac4-c26d21fa93a0", appointmentType: "call", scheduledDate: Sat Sep 06 2025 08:06:00 GMT+0300 (GMT+03:00), …} (appointments.tsx, line 59)
+{customerId: "c0b7fb9d-de25-4afa-9ac4-c26d21fa93a0", appointmentType: "call", scheduledDate: Sat Sep 06 2025 08:06:00 GMT+0300 (GMT+03:00), notes: "", salesPersonId: "sales_staff"}Object
+[Error] ❌ Appointment creation failed: – TypeError: Method is not a valid HTTP token. — https://0dc7f29e-5092-4105-98f1-c0c2626c8717-00-t7…m81zhrv9.picard.replit.dev/src/lib/queryClient.ts:8
+TypeError: Method is not a valid HTTP token. — https://0dc7f29e-5092-4105-98f1-c0c2626c8717-00-t7…m81zhrv9.picard.replit.dev/src/lib/queryClient.ts:8
+	(anonim işlev) (appointments.tsx:65)
+[Error] ❌ Appointment mutation error: – TypeError: Method is not a valid HTTP token. — https://0dc7f29e-5092-4105-98f1-c0c2626c8717-00-t7…m81zhrv9.picard.replit.dev/src/lib/queryClient.ts:8
+TypeError: Method is not a valid HTTP token. — https://0dc7f29e-5092-4105-98f1-c0c2626c8717-00-t7…m81zhrv9.picard.replit.dev/src/lib/queryClient.ts:8
+	onError (appointments.tsx:85)
+	(anonim işlev) (@tanstack_react-query.js:1254)
