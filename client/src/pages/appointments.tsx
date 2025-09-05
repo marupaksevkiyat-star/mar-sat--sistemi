@@ -45,7 +45,15 @@ export default function Appointments() {
   // Yeni randevu oluşturma mutation
   const createAppointmentMutation = useMutation({
     mutationFn: async (appointmentData: any) => {
-      return apiRequest('/api/appointments', 'POST', appointmentData);
+      console.log('📅 Creating appointment with data:', appointmentData);
+      try {
+        const result = await apiRequest('/api/appointments', 'POST', appointmentData);
+        console.log('✅ Appointment created successfully:', result);
+        return result;
+      } catch (error) {
+        console.error('❌ Appointment creation failed:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({
@@ -63,9 +71,10 @@ export default function Appointments() {
       queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
     },
     onError: (error: any) => {
+      console.error('❌ Appointment mutation error:', error);
       toast({
         title: "Hata",
-        description: "Randevu oluşturulurken bir hata oluştu.",
+        description: `Randevu oluşturulurken bir hata oluştu: ${error.message || 'Bilinmeyen hata'}`,
         variant: "destructive",
       });
     },
@@ -99,7 +108,11 @@ export default function Appointments() {
   }, [customers, location]);
 
   const handleCreateAppointment = () => {
+    console.log('🔄 handleCreateAppointment called with:', newAppointment);
+    console.log('👤 Current user:', user);
+
     if (!newAppointment.customerId || !newAppointment.scheduledDate || !newAppointment.scheduledTime || !newAppointment.appointmentType) {
+      console.log('❌ Validation failed - missing required fields');
       toast({
         title: "Hata",
         description: "Lütfen tüm zorunlu alanları doldurun.",
@@ -110,13 +123,17 @@ export default function Appointments() {
 
     const appointmentDateTime = new Date(`${newAppointment.scheduledDate}T${newAppointment.scheduledTime}:00`);
     
-    createAppointmentMutation.mutate({
+    const appointmentData = {
       customerId: newAppointment.customerId,
       appointmentType: newAppointment.appointmentType,
       scheduledDate: appointmentDateTime,
       notes: newAppointment.notes,
       salesPersonId: user?.id,
-    });
+    };
+    
+    console.log('📤 Sending appointment data:', appointmentData);
+    
+    createAppointmentMutation.mutate(appointmentData);
   };
 
   const handleAppointmentAction = (appointmentId: string, action: string, customerId?: string) => {
