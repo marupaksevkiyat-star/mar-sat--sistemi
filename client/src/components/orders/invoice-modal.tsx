@@ -44,7 +44,7 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
   // Mail gönderme mutation (mailto: link yaklaşımı)
   const sendEmailMutation = useMutation({
     mutationFn: async (emailData: { to: string; subject: string; message: string; orderHtml: string }) => {
-      return await apiRequest("POST", "/api/orders/send-invoice", emailData);
+      return await apiRequest("/api/orders/send-invoice", "POST", emailData);
     },
     onSuccess: (data: any) => {
       // Kullanıcının varsayılan e-posta uygulamasını aç

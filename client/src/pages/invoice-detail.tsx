@@ -160,7 +160,7 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
         dueDate: paymentForm.paymentDate,
         status: 'completed'
       };
-      return await apiRequest('POST', '/api/payments', paymentData);
+      return await apiRequest('/api/payments', 'POST', paymentData);
     },
     onSuccess: () => {
       toast({
@@ -241,7 +241,7 @@ export default function InvoiceDetailPage({ invoiceId }: InvoiceDetailProps) {
   // İrsaliye görüntüleme
   const handleViewDeliverySlip = async (deliverySlip: DeliverySlip) => {
     try {
-      const response = await apiRequest('GET', `/api/delivery-slips/${deliverySlip.id}`);
+      const response = await apiRequest(`/api/delivery-slips/${deliverySlip.id}`, 'GET');
       setSelectedDeliverySlip(response);
       setShowDeliverySlipDialog(true);
     } catch (error) {

@@ -120,7 +120,7 @@ export default function InvoicesPage() {
       ) || [];
       
       // Ürün bazında gruplama yapmak için API'ye gönder
-      return await apiRequest('POST', '/api/invoices/bulk-smart', {
+      return await apiRequest('/api/invoices/bulk-smart', 'POST', {
         customerId: selectedCustomer.customerId,
         orderIds: selectedInvoices,
         selectedOrders: selectedOrders,

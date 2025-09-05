@@ -97,7 +97,7 @@ export default function Admin() {
   // Add user mutation
   const addUserMutation = useMutation({
     mutationFn: async (userData: any) => {
-      return await apiRequest('POST', '/api/users', userData);
+      return await apiRequest('/api/users', 'POST', userData);
     },
     onSuccess: () => {
       toast({
@@ -121,7 +121,7 @@ export default function Admin() {
   const editUserMutation = useMutation({
     mutationFn: async (userData: any) => {
       console.log("Updating user:", userData);
-      return await apiRequest('PUT', `/api/users/${userData.id}`, userData);
+      return await apiRequest(`/api/users/${userData.id}`, 'PUT', userData);
     },
     onSuccess: () => {
       toast({
@@ -145,7 +145,7 @@ export default function Admin() {
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest('DELETE', `/api/users/${userId}`);
+      return await apiRequest(`/api/users/${userId}`, 'DELETE');
     },
     onSuccess: () => {
       toast({
@@ -166,7 +166,7 @@ export default function Admin() {
   // Toggle user status mutation
   const toggleStatusMutation = useMutation({
     mutationFn: async ({ userId, status }: { userId: string, status: string }) => {
-      return await apiRequest('PATCH', `/api/users/${userId}/status`, { status });
+      return await apiRequest(`/api/users/${userId}/status`, 'PATCH', { status });
     },
     onSuccess: () => {
       toast({
@@ -187,7 +187,7 @@ export default function Admin() {
   // Add product mutation
   const addProductMutation = useMutation({
     mutationFn: async (productData: any) => {
-      return await apiRequest("POST", "/api/products", productData);
+      return await apiRequest("/api/products", "POST", productData);
     },
     onSuccess: () => {
       toast({
@@ -210,7 +210,7 @@ export default function Admin() {
   // Edit product mutation
   const editProductMutation = useMutation({
     mutationFn: async (productData: any) => {
-      return await apiRequest("PUT", `/api/products/${productData.id}`, productData);
+      return await apiRequest(`/api/products/${productData.id}`, "PUT", productData);
     },
     onSuccess: () => {
       toast({
@@ -233,7 +233,7 @@ export default function Admin() {
   // Delete product mutation
   const deleteProductMutation = useMutation({
     mutationFn: async (productId: string) => {
-      return await apiRequest("DELETE", `/api/products/${productId}`);
+      return await apiRequest(`/api/products/${productId}`, "DELETE");
     },
     onSuccess: () => {
       toast({
@@ -332,7 +332,7 @@ export default function Admin() {
               size="sm"
               onClick={async () => {
                 try {
-                  await apiRequest('POST', '/api/logout');
+                  await apiRequest('/api/logout', 'POST');
                   window.location.href = '/';
                 } catch (error) {
                   console.error('Logout error:', error);
