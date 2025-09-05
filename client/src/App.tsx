@@ -27,25 +27,25 @@ function Router() {
   const canAccess = (requiredRole: string) => {
     const userRole = (user as any)?.role || '';
     
-    // Admin her şeye erişebilir  
-    if (userRole === 'admin' || userRole === 'Admin' || userRole.includes('Admin')) {
+    // Admin her şeye erişebilir - daha kapsamlı kontrol
+    if (userRole === 'admin' || userRole === 'Admin' || userRole.toLowerCase() === 'admin' || userRole.includes('admin') || userRole.includes('Admin')) {
       return true;
     }
     
     // Unified role mapping - hem İngilizce hem Türkçe rolleri destekler
     const roleMap = {
       sales: ['sales', 'sales_staff', 'Satış', 'Satış Personeli'],
-      production: ['production', 'production_staff', 'Üretim', 'Üretim Personeli'],
-      shipping: ['shipping', 'shipping_staff', 'Sevkiyat', 'Sevkiyat Personeli'],
+      production: ['production', 'production_staff', 'Üretim', 'Üretim Personeli', 'admin', 'Admin'],
+      shipping: ['shipping', 'shipping_staff', 'Sevkiyat', 'Sevkiyat Personeli', 'admin', 'Admin'],
       admin: ['admin', 'Admin'],
-      accounting: ['accounting', 'accounting_staff', 'Muhasebe', 'Muhasebe Personeli']
+      accounting: ['accounting', 'accounting_staff', 'Muhasebe', 'Muhasebe Personeli', 'admin', 'Admin']
     };
     
     // Check if user role matches any of the allowed roles for the required permission
     const allowedRoles = roleMap[requiredRole as keyof typeof roleMap] || [];
     
     const hasAccess = allowedRoles.some(role => 
-      userRole === role || userRole.includes(role)
+      userRole === role || userRole.includes(role) || userRole.toLowerCase() === role.toLowerCase()
     );
     
     return hasAccess;
@@ -89,10 +89,18 @@ function Router() {
           <Route path="/appointments">
             <ProtectedRoute component={Appointments} requiredRole="sales" />
           </Route>
-          <Route path="/production" component={Production} />
-          <Route path="/shipping" component={Shipping} />
-          <Route path="/sales-reports" component={SalesReports} />
-          <Route path="/invoices" component={Invoices} />
+          <Route path="/production">
+            <ProtectedRoute component={Production} requiredRole="production" />
+          </Route>
+          <Route path="/shipping">
+            <ProtectedRoute component={Shipping} requiredRole="shipping" />
+          </Route>
+          <Route path="/sales-reports">
+            <ProtectedRoute component={SalesReports} requiredRole="admin" />
+          </Route>
+          <Route path="/invoices">
+            <ProtectedRoute component={Invoices} requiredRole="accounting" />
+          </Route>
           <Route path="/invoices/:id">
             {(params) => (
               <ProtectedRoute 
