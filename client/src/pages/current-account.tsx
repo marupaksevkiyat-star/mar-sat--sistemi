@@ -835,43 +835,134 @@ export default function CurrentAccountPage() {
       
       // PDF oluştur
       const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.width;
+      const pageHeight = pdf.internal.pageSize.height;
       
-      // Başlık
-      pdf.setFontSize(18);
-      pdf.text('HESAP EKSTRESİ', 105, 20, { align: 'center' });
+      // Header - Firma bilgisi ve logo alanı
+      pdf.setFillColor(41, 128, 185); // Mavi başlık
+      pdf.rect(0, 0, pageWidth, 30, 'F');
+      
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(20);
+      pdf.text('MARUPAK', pageWidth / 2, 12, { align: 'center' });
+      
+      pdf.setFontSize(14);
+      pdf.text('HESAP EKSTRESİ', pageWidth / 2, 22, { align: 'center' });
+      
+      // Reset text color
+      pdf.setTextColor(0, 0, 0);
+      
+      let yPos = 45;
+      
+      // Müşteri bilgileri kutusu
+      pdf.setFillColor(245, 245, 245);
+      pdf.rect(15, yPos, pageWidth - 30, 25, 'F');
+      pdf.rect(15, yPos, pageWidth - 30, 25, 'S');
       
       pdf.setFontSize(12);
-      pdf.text(`Müşteri: ${companyName}`, 20, 40);
-      pdf.text(`Tarih Aralığı: ${accountStatementDateRange.startDate} - ${accountStatementDateRange.endDate}`, 20, 50);
-      
-      // Özet
-      let yPos = 70;
-      pdf.setFontSize(14);
-      pdf.text('ÖZET BİLGİLER', 20, yPos);
-      
-      yPos += 15;
+      pdf.text('MÜŞTERİ BİLGİLERİ', 20, yPos + 8);
       pdf.setFontSize(11);
-      pdf.text(`Toplam Borç: ${formatCurrency(summary.totalDebit)}`, 20, yPos);
-      yPos += 8;
-      pdf.text(`Toplam Ödeme: ${formatCurrency(summary.totalCredit)}`, 20, yPos);
-      yPos += 8;
-      pdf.text(`Kalan Bakiye: ${formatCurrency(Math.abs(summary.balance))} ${summary.balance >= 0 ? '(Borçlu)' : '(Alacaklı)'}`, 20, yPos);
+      pdf.text(`Firma Adı: ${companyName}`, 20, yPos + 16);
+      pdf.text(`Ekstre Tarihi: ${formatDate(new Date().toISOString())}`, 120, yPos + 16);
+      pdf.text(`Dönem: ${accountStatementDateRange.startDate} / ${accountStatementDateRange.endDate}`, 20, yPos + 22);
       
-      // Faturalar
-      yPos += 20;
-      pdf.setFontSize(14);
-      pdf.text('FATURALAR', 20, yPos);
+      yPos += 40;
+      
+      // Özet bilgiler tablosu
+      pdf.setFontSize(12);
+      pdf.text('FİNANSAL ÖZET', 20, yPos);
       yPos += 10;
       
+      // Tablo başlıkları
+      pdf.setFillColor(52, 73, 94);
+      pdf.rect(15, yPos, pageWidth - 30, 10, 'F');
+      
+      pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(10);
-      customerData.invoices.forEach((invoice: CustomerInvoice) => {
-        pdf.text(`${invoice.invoiceNumber} - ${formatDate(invoice.createdAt)} - ${formatCurrency(parseFloat(invoice.totalAmount || '0'))}`, 20, yPos);
-        yPos += 6;
-        if (yPos > 250) { // Sayfa sonu kontrolü
+      pdf.text('TOPLAM BORÇ', 20, yPos + 7);
+      pdf.text('TOPLAM ÖDEME', 80, yPos + 7);
+      pdf.text('KALAN BAKİYE', 140, yPos + 7);
+      
+      yPos += 10;
+      
+      // Tablo verileri
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(15, yPos, pageWidth - 30, 12, 'F');
+      pdf.rect(15, yPos, pageWidth - 30, 12, 'S');
+      
+      pdf.setTextColor(220, 53, 69); // Kırmızı borç
+      pdf.setFontSize(11);
+      pdf.text(formatCurrency(summary.totalDebit), 20, yPos + 8);
+      
+      pdf.setTextColor(40, 167, 69); // Yeşil ödeme
+      pdf.text(formatCurrency(summary.totalCredit), 80, yPos + 8);
+      
+      // Bakiye rengi
+      pdf.setTextColor(summary.balance >= 0 ? [220, 53, 69] : [40, 167, 69]);
+      pdf.text(`${formatCurrency(Math.abs(summary.balance))} ${summary.balance >= 0 ? '(B)' : '(A)'}`, 140, yPos + 8);
+      
+      yPos += 25;
+      
+      // Reset text color
+      pdf.setTextColor(0, 0, 0);
+      
+      // Faturalar tablosu
+      pdf.setFontSize(12);
+      pdf.text('FATURA DETAYLARI', 20, yPos);
+      yPos += 10;
+      
+      // Fatura tablo başlıkları
+      pdf.setFillColor(52, 73, 94);
+      pdf.rect(15, yPos, pageWidth - 30, 10, 'F');
+      
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(9);
+      pdf.text('FATURA NO', 20, yPos + 7);
+      pdf.text('TARİH', 80, yPos + 7);
+      pdf.text('TUTAR', 130, yPos + 7);
+      pdf.text('DURUM', 165, yPos + 7);
+      
+      yPos += 10;
+      
+      // Fatura satırları
+      pdf.setTextColor(0, 0, 0);
+      let rowColor = true;
+      
+      customerData.invoices.forEach((invoice: CustomerInvoice, index: number) => {
+        // Alternating row colors
+        pdf.setFillColor(rowColor ? 249, 249, 249 : 255, 255, 255);
+        pdf.rect(15, yPos, pageWidth - 30, 8, 'F');
+        
+        pdf.setFontSize(9);
+        pdf.text(invoice.invoiceNumber, 20, yPos + 6);
+        pdf.text(formatDate(invoice.createdAt), 80, yPos + 6);
+        pdf.text(formatCurrency(parseFloat(invoice.totalAmount || '0')), 130, yPos + 6);
+        
+        // Status
+        const status = invoice.status === 'generated' ? 'Oluşturuldu' : 
+                      invoice.status === 'paid' ? 'Ödendi' : invoice.status;
+        pdf.text(status, 165, yPos + 6);
+        
+        yPos += 8;
+        rowColor = !rowColor;
+        
+        // Sayfa sonu kontrolü
+        if (yPos > pageHeight - 30) {
           pdf.addPage();
-          yPos = 20;
+          yPos = 30;
+          rowColor = true;
         }
       });
+      
+      // Footer
+      const footerY = pageHeight - 20;
+      pdf.setFillColor(41, 128, 185);
+      pdf.rect(0, footerY, pageWidth, 20, 'F');
+      
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(8);
+      pdf.text('MARUPAK Satış ve Üretim Yönetim Sistemi', pageWidth / 2, footerY + 10, { align: 'center' });
+      pdf.text(`Oluşturma Tarihi: ${formatDate(new Date().toISOString())}`, pageWidth / 2, footerY + 15, { align: 'center' });
       
       pdf.save(`hesap-ekstresi-${companyName}-${accountStatementDateRange.startDate}-${accountStatementDateRange.endDate}.pdf`);
       
