@@ -12,6 +12,7 @@ import {
   payments,
   accountTransactions,
   deliverySlips,
+  deliverySlipItems,
   type User,
   type UpsertUser,
   type InsertCustomer,
@@ -904,6 +905,65 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Delivery Slip işlemleri
+  async createDeliverySlipForOrder(orderId: string): Promise<void> {
+    console.log(`🚚 Creating delivery slip for order: ${orderId}`);
+    
+    // Siparişi al
+    const order = await this.getOrder(orderId);
+    if (!order) {
+      throw new Error(`Order not found: ${orderId}`);
+    }
+    
+    // Bu sipariş için zaten irsaliye var mı kontrol et
+    const existingSlips = await db
+      .select()
+      .from(deliverySlips)
+      .where(eq(deliverySlips.orderId, orderId));
+    
+    if (existingSlips.length > 0) {
+      console.log(`⚠️ Delivery slip already exists for order: ${orderId}`);
+      return;
+    }
+    
+    // İrsaliye numarası oluştur
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '');
+    const deliverySlipNumber = `IRS-${dateStr}-${timeStr}`;
+    
+    // İrsaliye oluştur
+    const [newSlip] = await db
+      .insert(deliverySlips)
+      .values({
+        deliverySlipNumber,
+        orderId,
+        customerId: order.customerId,
+        status: 'pending' as const,
+        deliveryAddress: order.customer?.address || 'Adres belirtilmedi',
+        notes: 'Sevkiyat sırasında oluşturulan irsaliye',
+        createdBy: 'shipping_staff',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    
+    // İrsaliye kalemlerini oluştur
+    if (order.items && order.items.length > 0) {
+      const deliverySlipItems = order.items.map((item: any) => ({
+        deliverySlipId: newSlip.id,
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        deliveredQuantity: item.quantity, // Başlangıçta tüm miktar teslim edilecek
+        unit: item.unit,
+      }));
+      
+      await db.insert(deliverySlipItems).values(deliverySlipItems);
+    }
+    
+    console.log(`✅ Delivery slip created: ${deliverySlipNumber} for order: ${orderId}`);
+  }
+
   async updateDeliverySlipSignature(orderId: string, signatureData: {
     customerSignature?: string;
     recipientName?: string;

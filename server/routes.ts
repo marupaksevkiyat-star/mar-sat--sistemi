@@ -680,6 +680,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { status, deliveryRecipient, deliverySignature, ...updates } = req.body;
       const order = await storage.updateOrderStatus(req.params.id, status, updates);
       
+      // Eğer sipariş "shipping" durumuna geçtiyse İRSALİYE OLUŞTUR
+      if (status === 'shipping') {
+        console.log(`🚚 Creating delivery slip for order: ${req.params.id}`);
+        try {
+          await storage.createDeliverySlipForOrder(req.params.id);
+          console.log(`✅ Delivery slip created for order: ${req.params.id}`);
+        } catch (deliverySlipError) {
+          console.error(`❌ Failed to create delivery slip for order ${req.params.id}:`, deliverySlipError instanceof Error ? deliverySlipError.message : 'Unknown error');
+          // İrsaliye oluşturulamazsa da sipariş durumu güncellensin
+        }
+      }
+      
       // Eğer sipariş "delivered" durumuna geçtiyse
       if (status === 'delivered') {
         console.log(`📦 Order delivered: ${req.params.id}`);
