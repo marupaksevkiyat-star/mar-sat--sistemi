@@ -135,10 +135,8 @@ export default function Navigation() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center" data-testid="link-home">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <i className="fas fa-industry text-primary-foreground"></i>
-              </div>
-              <h1 className="ml-3 text-xl font-semibold text-foreground">Üretim Sistemi</h1>
+              <img src="/attached_assets/MARUPAK_LOGO_1757030221412.png" alt="MARUPAK Logo" className="w-8 h-8 object-contain" />
+              <h1 className="ml-3 text-xl font-semibold text-foreground">MARUPAK CRM</h1>
             </Link>
           </div>
           
