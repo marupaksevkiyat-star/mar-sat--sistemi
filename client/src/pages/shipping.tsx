@@ -162,7 +162,8 @@ export default function Shipping() {
     try {
       console.log('🚚 İrsaliye isteniyor, sipariş ID:', order.id);
       // Delivery slip bilgilerini fetch et
-      const deliverySlips: any[] = await apiRequest('GET', `/api/orders/${order.id}/delivery-slips`);
+      const response = await apiRequest('GET', `/api/orders/${order.id}/delivery-slips`);
+      const deliverySlips: any[] = await response.json();
       console.log('📦 API Response:', deliverySlips);
       console.log('📊 Array kontrolü:', Array.isArray(deliverySlips), 'Length:', deliverySlips?.length);
       
