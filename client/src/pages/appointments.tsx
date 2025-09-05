@@ -20,13 +20,6 @@ export default function Appointments() {
   const { toast } = useToast();
   const [location] = useLocation();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [showCompleteDialog, setShowCompleteDialog] = useState(false);
-  const [completingAppointment, setCompletingAppointment] = useState<any>(null);
-  const [appointmentOutcome, setAppointmentOutcome] = useState({
-    outcome: '',
-    notes: '',
-    followUpDate: '',
-  });
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [filterStatus, setFilterStatus] = useState("all");
   const [newAppointment, setNewAppointment] = useState({
@@ -147,11 +140,7 @@ export default function Appointments() {
     let updateData = {};
     
     if (action === 'complete') {
-      // Complete action opens a dialog instead of directly completing
-      const appointment = appointments.find((apt: any) => apt.id === appointmentId);
-      setCompletingAppointment(appointment);
-      setShowCompleteDialog(true);
-      return;
+      updateData = { status: 'completed', completedAt: new Date() };
     } else if (action === 'cancel') {
       updateData = { status: 'cancelled' };
     } else if (action === 'reschedule') {
@@ -171,39 +160,6 @@ export default function Appointments() {
       appointmentId,
       action,
       data: updateData
-    });
-  };
-
-  const handleCompleteAppointment = () => {
-    if (!completingAppointment || !appointmentOutcome.outcome) {
-      toast({
-        title: "Hata",
-        description: "Lütfen randevu sonucunu seçin.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const updateData = {
-      status: 'completed',
-      completedAt: new Date(),
-      outcome: appointmentOutcome.outcome,
-      notes: appointmentOutcome.notes
-    };
-
-    updateAppointmentMutation.mutate({
-      appointmentId: completingAppointment.id,
-      action: 'complete',
-      data: updateData
-    });
-
-    // Reset form and close dialog
-    setShowCompleteDialog(false);
-    setCompletingAppointment(null);
-    setAppointmentOutcome({
-      outcome: '',
-      notes: '',
-      followUpDate: '',
     });
   };
 
@@ -425,7 +381,7 @@ export default function Appointments() {
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-lg font-semibold">
-                          {appointment.customer?.companyName || "Bilinmeyen Müşteri"}
+                          {appointment.customer?.name || "Bilinmeyen Müşteri"}
                         </CardTitle>
                         <div className="flex items-center gap-2">
                           {getStatusBadge(appointment.status)}
@@ -527,80 +483,6 @@ export default function Appointments() {
             </div>
           </TabsContent>
         </Tabs>
-
-        {/* Complete Appointment Dialog */}
-        <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Randevuyu Tamamla</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label>Müşteri</Label>
-                <div className="text-sm font-medium">
-                  {completingAppointment?.customer?.companyName || 'Bilinmeyen Müşteri'}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="outcome">Randevu Sonucu *</Label>
-                <Select
-                  value={appointmentOutcome.outcome}
-                  onValueChange={(value) => setAppointmentOutcome(prev => ({ ...prev, outcome: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sonuç seçin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sale_completed">Satış Yapıldı</SelectItem>
-                    <SelectItem value="follow_up_needed">Tekrar Randevu Gerekli</SelectItem>
-                    <SelectItem value="not_interested">İlgilenmiyor</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notes">Notlar</Label>
-                <Textarea
-                  id="notes"
-                  value={appointmentOutcome.notes}
-                  onChange={(e) => setAppointmentOutcome(prev => ({ ...prev, notes: e.target.value }))}
-                  placeholder="Randevu ile ilgili notlarınızı yazın..."
-                  className="resize-none"
-                  rows={3}
-                />
-              </div>
-
-              {(appointmentOutcome.outcome === 'follow_up_needed' || appointmentOutcome.outcome === 'not_interested') && (
-                <div className="space-y-2">
-                  <Label htmlFor="followUpDate">Takip Tarihi</Label>
-                  <Input
-                    id="followUpDate"
-                    type="date"
-                    value={appointmentOutcome.followUpDate}
-                    onChange={(e) => setAppointmentOutcome(prev => ({ ...prev, followUpDate: e.target.value }))}
-                  />
-                </div>
-              )}
-
-              <div className="flex gap-2 pt-4">
-                <Button
-                  onClick={() => setShowCompleteDialog(false)}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  İptal
-                </Button>
-                <Button
-                  onClick={handleCompleteAppointment}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                >
-                  Tamamla
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       </main>
     </div>
   );

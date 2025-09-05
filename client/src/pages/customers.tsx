@@ -30,15 +30,6 @@ interface Customer {
   createdAt?: string;
 }
 
-interface CustomerHistory {
-  appointments: any[];
-  orders: any[];
-  visits: any[];
-  totalAppointments: number;
-  totalOrders: number;
-  totalVisits: number;
-}
-
 export default function Customers() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
@@ -47,18 +38,11 @@ export default function Customers() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedCustomerHistory, setSelectedCustomerHistory] = useState<Customer | null>(null);
 
   // Müşteri verileri
   const { data: customers = [], isLoading: customersLoading } = useQuery({
     queryKey: ['/api/customers'],
     enabled: isAuthenticated,
-  });
-
-  // Müşteri geçmişi verileri
-  const { data: customerHistory } = useQuery<CustomerHistory>({
-    queryKey: ['/api/customer-history', selectedCustomerHistory?.id],
-    enabled: !!selectedCustomerHistory,
   });
 
   const customersArray = Array.isArray(customers) ? customers : [];
@@ -400,17 +384,6 @@ export default function Customers() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setSelectedCustomerHistory(customer)}
-                          className="text-green-600 hover:text-green-700 border-green-300"
-                          data-testid={`button-history-${customer.id}`}
-                          title="Geçmiş"
-                        >
-                          📊
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
                           onClick={() => window.location.href = `/appointments?customer=${customer.id}`}
                           className="text-blue-600 hover:text-blue-700 border-blue-300"
                           data-testid={`button-appointment-${customer.id}`}
@@ -615,131 +588,6 @@ export default function Customers() {
           </DialogContent>
         </Dialog>
       </main>
-
-      {/* Customer History Dialog */}
-      <Dialog open={!!selectedCustomerHistory} onOpenChange={() => setSelectedCustomerHistory(null)}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {selectedCustomerHistory?.companyName} - Müşteri Geçmişi
-            </DialogTitle>
-          </DialogHeader>
-          
-          {customerHistory && (
-            <div className="space-y-6">
-              {/* Summary Cards */}
-              <div className="grid grid-cols-3 gap-4">
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {customerHistory.totalAppointments}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Randevular</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-green-600">
-                      {customerHistory.totalOrders}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Siparişler</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {customerHistory.totalVisits}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Ziyaretler</div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Appointments History */}
-              {customerHistory.appointments && customerHistory.appointments.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Randevular</h3>
-                  <div className="space-y-2">
-                    {customerHistory.appointments.map((appointment: any) => (
-                      <div key={appointment.id} className="border rounded-lg p-3 bg-blue-50">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="font-medium">
-                              {appointment.appointmentType === 'call' ? '📞 Telefon' : '🏢 Ziyaret'}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {new Date(appointment.scheduledDate).toLocaleDateString('tr-TR')}
-                            </div>
-                            {appointment.outcome && (
-                              <div className="text-sm mt-1">
-                                <span className="font-medium">Sonuç:</span> {
-                                  appointment.outcome === 'sale_completed' ? 'Satış Yapıldı' :
-                                  appointment.outcome === 'follow_up_needed' ? 'Tekrar Randevu Gerekli' :
-                                  appointment.outcome === 'not_interested' ? 'İlgilenmiyor' :
-                                  appointment.outcome
-                                }
-                              </div>
-                            )}
-                            {appointment.notes && (
-                              <div className="text-sm text-muted-foreground mt-1">
-                                {appointment.notes}
-                              </div>
-                            )}
-                          </div>
-                          <Badge variant={appointment.status === 'completed' ? 'default' : 'secondary'}>
-                            {appointment.status === 'completed' ? 'Tamamlandı' : 
-                             appointment.status === 'scheduled' ? 'Planlandı' :
-                             appointment.status === 'cancelled' ? 'İptal' : 
-                             appointment.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Orders History */}
-              {customerHistory.orders && customerHistory.orders.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Siparişler</h3>
-                  <div className="space-y-2">
-                    {customerHistory.orders.map((order: any) => (
-                      <div key={order.id} className="border rounded-lg p-3 bg-green-50">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="font-medium">Sipariş #{order.orderNumber}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {new Date(order.createdAt).toLocaleDateString('tr-TR')}
-                            </div>
-                            <div className="text-sm">
-                              <span className="font-medium">Tutar:</span> {order.totalAmount} TL
-                            </div>
-                          </div>
-                          <Badge variant={order.status === 'delivered' ? 'default' : 'secondary'}>
-                            {order.status === 'pending' ? 'Bekliyor' :
-                             order.status === 'production' ? 'Üretimde' :
-                             order.status === 'shipping' ? 'Kargoda' :
-                             order.status === 'delivered' ? 'Teslim Edildi' :
-                             order.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* No Data Message */}
-              {customerHistory.totalAppointments === 0 && customerHistory.totalOrders === 0 && customerHistory.totalVisits === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  Bu müşteri için henüz geçmiş bulunmuyor.
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
