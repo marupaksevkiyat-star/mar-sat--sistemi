@@ -43,6 +43,11 @@ export default function Shipping() {
     retry: false,
   });
 
+  // Debug: Log orders to see their status
+  if (readyOrders) {
+    console.log('🚚 Ready Orders:', readyOrders.map((o: any) => ({ id: o.id, orderNumber: o.orderNumber, status: o.status })));
+  }
+
   const { data: shippingOrders, isLoading: shippingLoading } = useQuery({
     queryKey: ["/api/orders", "status", "shipping"],
     queryFn: () => fetch("/api/orders?status=shipping", { credentials: "include" }).then(res => res.json()),
@@ -54,6 +59,11 @@ export default function Shipping() {
     queryFn: () => fetch("/api/orders?status=delivered", { credentials: "include" }).then(res => res.json()),
     retry: false,
   });
+
+  // Debug: Log delivered orders to see their status  
+  if (deliveredOrders) {
+    console.log('✅ Delivered Orders:', deliveredOrders.map((o: any) => ({ id: o.id, orderNumber: o.orderNumber, status: o.status })));
+  }
 
   const createDeliveryNoteMutation = useMutation({
     mutationFn: async ({ orderId }: { orderId: string }) => {
