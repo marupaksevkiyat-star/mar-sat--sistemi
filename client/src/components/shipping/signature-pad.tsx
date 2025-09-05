@@ -66,16 +66,14 @@ export default function SignaturePad({ onSignatureChange }: SignaturePadProps) {
     ctx.stroke();
     setHasSignature(true);
 
-    // Canvas-based async Promise ile SVG → PNG dönüşümü
-    setTimeout(() => {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        // High quality PNG conversion
-        const signature = canvas.toDataURL('image/png', 1.0);
-        onSignatureChange(signature);
-        console.log('İmza oluşturuldu:', signature.substring(0, 50) + '...');
-      }
-    }, 100);
+    // Immediate signature update for better responsiveness
+    const canvas = canvasRef.current;
+    if (canvas) {
+      // High quality PNG conversion
+      const signature = canvas.toDataURL('image/png', 1.0);
+      onSignatureChange(signature);
+      console.log('🖋️ İmza canvastan alındı:', signature ? signature.substring(0, 50) + '...' : 'NULL');
+    }
   };
 
   const stopDrawing = () => {
