@@ -73,20 +73,21 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFontSize(12);
       pdf.text(`NO: ${slip.deliverySlipNumber.split('-').pop()}`, 85, 35);
       
-      // Sağ - MARUPAK LOGO
-      pdf.setFontSize(20);
-      pdf.text('MARUPAK', 140, 20);
-      pdf.setFontSize(8);
-      pdf.text('www.marupak.com', 140, 28);
-      
-      // Logo çerçevesi - ASCII karakterlerle
-      pdf.setFontSize(8);
-      pdf.text('┌─────────────────────────┐', 135, 15);
-      pdf.text('│                         │', 135, 19);
-      pdf.text('│        MARUPAK          │', 135, 23);
-      pdf.text('│    www.marupak.com      │', 135, 27);
-      pdf.text('│                         │', 135, 31);
-      pdf.text('└─────────────────────────┘', 135, 35);
+      // Sağ - MARUPAK LOGO RESMİ
+      try {
+        // Logo resmini PDF'e ekle
+        pdf.addImage(marupakLogo, 'PNG', 140, 15, 50, 20);
+      } catch (logoError) {
+        console.log('Logo eklenemedi, metin kullanılıyor:', logoError);
+        // Logo eklenemezse metin kullan
+        pdf.setFontSize(18);
+        pdf.text('MARUPAK', 140, 25);
+        pdf.setFontSize(8);
+        pdf.text('www.marupak.com', 140, 30);
+        
+        // Çerçeve
+        pdf.rect(135, 15, 60, 20);
+      }
       
       // ÜRÜN TABLOSU
       yPos = 65;
@@ -119,14 +120,11 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       // Boşluk
       yPos = Math.max(yPos + 40, 180);
       
-      // İMZA ALANLARI - BASIT ÇİZGİLERLE
+      // İMZA ALANLARI - RESİMLİ
       const signatureStartY = yPos;
       
-      // Sol kutu - Teslim Eden (4 çizgi ile kutu)
-      pdf.line(25, signatureStartY, 95, signatureStartY); // üst
-      pdf.line(25, signatureStartY + 45, 95, signatureStartY + 45); // alt
-      pdf.line(25, signatureStartY, 25, signatureStartY + 45); // sol
-      pdf.line(95, signatureStartY, 95, signatureStartY + 45); // sağ
+      // Sol kutu - Teslim Eden
+      pdf.rect(25, signatureStartY, 70, 45);
       
       pdf.setFontSize(14);
       pdf.text('TESLIM EDEN', 30, signatureStartY + 12);
@@ -134,28 +132,30 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFontSize(16);
       pdf.text('MARUPAK', 30, signatureStartY + 25);
       
-      pdf.setFontSize(10);
-      pdf.text('Imza:', 30, signatureStartY + 35);
+      // MARUPAK logo/mühür alanı (küçük)
+      try {
+        pdf.addImage(marupakLogo, 'PNG', 65, signatureStartY + 28, 25, 12);
+      } catch (logoError) {
+        pdf.setFontSize(8);
+        pdf.text('MUHUR', 70, signatureStartY + 35);
+      }
       
-      // İmza çizgisi
-      pdf.line(45, signatureStartY + 38, 85, signatureStartY + 38);
-      
-      // Sağ kutu - Teslim Alan (4 çizgi ile kutu)
-      pdf.line(105, signatureStartY, 175, signatureStartY); // üst
-      pdf.line(105, signatureStartY + 45, 175, signatureStartY + 45); // alt
-      pdf.line(105, signatureStartY, 105, signatureStartY + 45); // sol
-      pdf.line(175, signatureStartY, 175, signatureStartY + 45); // sağ
+      // Sağ kutu - Teslim Alan
+      pdf.rect(105, signatureStartY, 70, 45);
       
       pdf.setFontSize(14);
       pdf.text('TESLIM ALAN', 110, signatureStartY + 12);
       
       pdf.setFontSize(10);
       pdf.text('Adi Soyadi:', 110, signatureStartY + 22);
+      pdf.text('_________________________', 110, signatureStartY + 28);
+      
       pdf.text('Imza:', 110, signatureStartY + 35);
       
-      // İmza çizgileri
-      pdf.line(135, signatureStartY + 25, 170, signatureStartY + 25);
-      pdf.line(125, signatureStartY + 38, 170, signatureStartY + 38);
+      // İmza alanı (resim eklenebilir)
+      pdf.rect(130, signatureStartY + 30, 40, 12);
+      pdf.setFontSize(8);
+      pdf.text('IMZA ALANI', 135, signatureStartY + 37);
       
       console.log('PDF hazır, indiriliyor...');
       
