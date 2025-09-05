@@ -40,8 +40,19 @@ export default function CustomerForm({
 
   const createCustomerMutation = useMutation({
     mutationFn: async (customerData: any) => {
-      const response = await apiRequest("POST", "/api/customers", customerData);
-      return response;
+      const response = await fetch("/api/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(customerData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('🔍 Raw API Response:', result);
+      return result;
     },
     onSuccess: (newCustomer: any) => {
       console.log('✅ Customer saved response:', newCustomer);
