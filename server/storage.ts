@@ -507,7 +507,7 @@ export class DatabaseStorage implements IStorage {
       .from(appointments)
       .leftJoin(customers, eq(appointments.customerId, customers.id))
       .leftJoin(users, eq(appointments.salesPersonId, users.id))
-      .orderBy(appointments.scheduledDate);
+      .orderBy(appointments.scheduledAt);
 
     if (salesPersonId) {
       query = query.where(eq(appointments.salesPersonId, salesPersonId));
@@ -521,8 +521,8 @@ export class DatabaseStorage implements IStorage {
       
       query = query.where(
         and(
-          gte(appointments.scheduledDate, startOfDay),
-          lte(appointments.scheduledDate, endOfDay)
+          gte(appointments.scheduledAt, startOfDay),
+          lte(appointments.scheduledAt, endOfDay)
         )
       );
     }
