@@ -53,7 +53,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
     
     try {
       // Delivery slip'in orderId'sini alıp detayları getir
-      const response = await apiRequest('GET', `/api/orders/${slip.orderId}/delivery-slips`);
+      const response = await apiRequest(`/api/orders/${slip.orderId}/delivery-slips`, 'GET');
       const deliverySlips: any[] = await response.json();
       console.log('📦 CURRENT-ACCOUNT API response:', deliverySlips);
       
@@ -689,7 +689,7 @@ export default function CurrentAccountPage() {
         dueDate: paymentForm.paymentDate,
         status: 'completed'
       };
-      return await apiRequest('POST', '/api/payments', paymentData);
+      return await apiRequest('/api/payments', 'POST', paymentData);
     },
     onSuccess: () => {
       toast({

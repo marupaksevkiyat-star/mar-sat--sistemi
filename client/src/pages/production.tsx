@@ -49,7 +49,7 @@ export default function Production() {
 
   const startProductionMutation = useMutation({
     mutationFn: async ({ orderId }: { orderId: string }) => {
-      return await apiRequest('PUT', `/api/orders/${orderId}/status`, { status: "production" });
+      return await apiRequest(`/api/orders/${orderId}/status`, 'PUT', { status: "production" });
     },
     onSuccess: () => {
       toast({
@@ -86,9 +86,9 @@ export default function Production() {
 
   const updateProductionMutation = useMutation({
     mutationFn: async ({ orderId, items, notes }: { orderId: string; items: any[]; notes?: string }) => {
-      await apiRequest("PUT", `/api/orders/${orderId}/items`, items);
+      await apiRequest(`/api/orders/${orderId}/items`, "PUT", items);
       if (notes) {
-        await apiRequest("PUT", `/api/orders/${orderId}/status`, {
+        await apiRequest(`/api/orders/${orderId}/status`, "PUT", {
           status: "production",
           productionNotes: notes,
         });
@@ -129,7 +129,7 @@ export default function Production() {
 
   const completeProductionMutation = useMutation({
     mutationFn: async ({ orderId }: { orderId: string }) => {
-      return await apiRequest('PUT', `/api/orders/${orderId}/status`, { status: "production_ready" });
+      return await apiRequest(`/api/orders/${orderId}/status`, 'PUT', { status: "production_ready" });
     },
     onSuccess: () => {
       toast({

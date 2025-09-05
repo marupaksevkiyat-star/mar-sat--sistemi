@@ -39,7 +39,7 @@ export default function OrderModal({ isOpen, onClose, customer }: OrderModalProp
 
   const createOrderMutation = useMutation({
     mutationFn: async (orderData: any) => {
-      return await apiRequest("POST", "/api/orders", orderData);
+      return await apiRequest("/api/orders", "POST", orderData);
     },
     onSuccess: () => {
       toast({

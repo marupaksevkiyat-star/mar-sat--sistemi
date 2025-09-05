@@ -57,7 +57,7 @@ export default function Shipping() {
 
   const createDeliveryNoteMutation = useMutation({
     mutationFn: async ({ orderId }: { orderId: string }) => {
-      return await apiRequest('PUT', `/api/orders/${orderId}/status`, { status: "shipping" });
+      return await apiRequest(`/api/orders/${orderId}/status`, 'PUT', { status: "shipping" });
     },
     onSuccess: (data, variables) => {
       toast({
@@ -99,7 +99,7 @@ export default function Shipping() {
 
   const completeDeliveryMutation = useMutation({
     mutationFn: async ({ orderId, recipient, signature }: { orderId: string; recipient: string; signature?: string }) => {
-      return await apiRequest("PUT", `/api/orders/${orderId}/status`, {
+      return await apiRequest(`/api/orders/${orderId}/status`, "PUT", {
         status: "delivered",
         deliveryRecipient: recipient,
         deliverySignature: signature,
@@ -161,7 +161,7 @@ export default function Shipping() {
   const handleViewDeliverySlip = async (order: any) => {
     try {
       // Delivery slip bilgilerini fetch et
-      const response = await apiRequest('GET', `/api/orders/${order.id}/delivery-slips`);
+      const response = await apiRequest(`/api/orders/${order.id}/delivery-slips`, 'GET');
       const deliverySlips: any[] = await response.json();
       
       if (Array.isArray(deliverySlips) && deliverySlips.length > 0) {

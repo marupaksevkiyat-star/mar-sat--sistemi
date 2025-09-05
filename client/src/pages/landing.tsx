@@ -17,7 +17,7 @@ export default function Landing() {
     setIsLoading(true);
 
     try {
-      await apiRequest("POST", "/api/login", { username, password });
+      await apiRequest("/api/login", "POST", { username, password });
       window.location.reload();
     } catch (error) {
       toast({

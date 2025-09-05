@@ -58,7 +58,7 @@ export default function Sales() {
 
   const createCustomerMutation = useMutation({
     mutationFn: async (customerData: any) => {
-      return await apiRequest("POST", "/api/customers", customerData);
+      return await apiRequest("/api/customers", "POST", customerData);
     },
     onSuccess: () => {
       toast({
@@ -90,7 +90,7 @@ export default function Sales() {
 
   const createOrderMutation = useMutation({
     mutationFn: async (orderData: any) => {
-      return await apiRequest("POST", "/api/orders", orderData);
+      return await apiRequest("/api/orders", "POST", orderData);
     },
     onSuccess: () => {
       toast({
@@ -121,7 +121,7 @@ export default function Sales() {
 
   const createAppointmentMutation = useMutation({
     mutationFn: async (appointmentData: any) => {
-      return await apiRequest("POST", "/api/appointments", appointmentData);
+      return await apiRequest("/api/appointments", "POST", appointmentData);
     },
     onSuccess: () => {
       toast({
@@ -152,7 +152,7 @@ export default function Sales() {
 
   const createVisitMutation = useMutation({
     mutationFn: async (visitData: any) => {
-      return await apiRequest("POST", "/api/visits", visitData);
+      return await apiRequest("/api/visits", "POST", visitData);
     },
     onSuccess: () => {
       toast({
