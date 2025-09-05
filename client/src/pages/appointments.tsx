@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocation } from "wouter";
+import Navigation from "@/components/layout/navigation";
 
 export default function Appointments() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -30,13 +31,13 @@ export default function Appointments() {
   });
 
   // Randevuları getir
-  const { data: appointments = [], isLoading: appointmentsLoading } = useQuery({
+  const { data: appointments = [], isLoading: appointmentsLoading } = useQuery<any[]>({
     queryKey: ['/api/appointments'],
     enabled: isAuthenticated,
   });
 
   // Müşterileri getir
-  const { data: customers = [] } = useQuery({
+  const { data: customers = [] } = useQuery<any[]>({
     queryKey: ['/api/customers'],
     enabled: isAuthenticated,
   });
@@ -195,7 +196,8 @@ export default function Appointments() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4">
+      <Navigation />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Mobile Navigation */}
         <div className="flex items-center justify-between mb-6 md:hidden">
           <Button
@@ -464,7 +466,7 @@ export default function Appointments() {
             </div>
           </TabsContent>
         </Tabs>
-      </div>
+      </main>
     </div>
   );
 }
