@@ -149,7 +149,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFontSize(18);
       pdf.text('TESLIM FISI', 85, 25);
       pdf.setFontSize(12);
-      pdf.text(`NO: ${String(slip.deliverySlipNumber || '').split('-').pop() || 'N/A'}`, 85, 35);
+      pdf.text(`NO: ${String(slip.deliverySlipNumber || 'N/A')}`, 85, 35);
       
       // Sağ - MARUPAK LOGO RESMİ
       try {
@@ -536,18 +536,29 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
                         <div>
                           <div className="text-blue-700 font-semibold text-sm mb-2">ALICI İMZASI</div>
                           <div className="flex flex-col items-center">
-                            <div className="w-[150px] h-[60px] border border-gray-300 rounded bg-white flex items-center justify-center">
-                              <img 
-                                src={deliverySlipData.customerSignature} 
-                                alt="Müşteri İmzası" 
-                                className="max-w-full max-h-full object-contain"
-                                style={{ imageRendering: 'crisp-edges' }}
-                                onLoad={() => console.log('✅ İmza yüklendi')}
-                                onError={(e) => {
-                                  console.error('❌ İmza yükleme hatası:', e);
-                                  console.log('🔍 İmza data:', deliverySlipData.customerSignature?.substring(0, 50) + '...');
-                                }}
-                              />
+                            <div className="w-[150px] h-[60px] border border-gray-300 rounded bg-white flex items-center justify-center overflow-hidden">
+                              {deliverySlipData.customerSignature && deliverySlipData.customerSignature.length > 200 ? (
+                                <img 
+                                  src={deliverySlipData.customerSignature} 
+                                  alt="Müşteri İmzası" 
+                                  className="max-w-full max-h-full object-contain"
+                                  style={{ 
+                                    imageRendering: 'crisp-edges',
+                                    filter: 'contrast(1.2) brightness(0.9)'
+                                  }}
+                                  onLoad={() => console.log('✅ İmza yüklendi')}
+                                  onError={(e) => {
+                                    console.error('❌ İmza yükleme hatası:', e);
+                                    console.log('🔍 İmza data uzunluk:', deliverySlipData.customerSignature?.length);
+                                  }}
+                                />
+                              ) : (
+                                <div className="text-xs text-gray-400 text-center">
+                                  <div>⚠️</div>
+                                  <div>Geçersiz İmza</div>
+                                  <div className="text-[10px]">({deliverySlipData.customerSignature?.length || 0} byte)</div>
+                                </div>
+                              )}
                             </div>
                             <div className="text-xs text-blue-600 mt-2">
                               {deliverySlipData.recipientName || 'Teslim Alan'}
