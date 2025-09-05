@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -175,10 +175,11 @@ export default function Appointments() {
     return null;
   }
 
-  const filteredAppointments = appointments?.filter(appointment => {
-    if (filterStatus === "all") return true;
-    return appointment.status === filterStatus;
-  }) || [];
+  const filteredAppointments = useMemo(() => {
+    if (!appointments) return [];
+    if (filterStatus === "all") return appointments;
+    return appointments.filter(appointment => appointment.status === filterStatus);
+  }, [appointments, filterStatus]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -313,23 +314,23 @@ export default function Appointments() {
           </Dialog>
         </div>
 
-        <Tabs defaultValue="all" className="w-full">
+        <Tabs value={filterStatus} onValueChange={setFilterStatus} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all" onClick={() => setFilterStatus("all")}>
+            <TabsTrigger value="all">
               Tümü ({appointments?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="scheduled" onClick={() => setFilterStatus("scheduled")}>
+            <TabsTrigger value="scheduled">
               Planlandı ({appointments?.filter(a => a.status === 'scheduled')?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="completed" onClick={() => setFilterStatus("completed")}>
+            <TabsTrigger value="completed">
               Tamamlandı ({appointments?.filter(a => a.status === 'completed')?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="cancelled" onClick={() => setFilterStatus("cancelled")}>
+            <TabsTrigger value="cancelled">
               İptal ({appointments?.filter(a => a.status === 'cancelled')?.length || 0})
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all" className="mt-6">
+          <TabsContent value={filterStatus} className="mt-6">
             <div className="grid gap-4">
               {filteredAppointments.length === 0 ? (
                 <Card>
