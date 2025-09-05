@@ -26,11 +26,8 @@ function Router() {
   const canAccess = (requiredRole: string) => {
     const userRole = (user as any)?.role || '';
     
-    console.log(`🔒 ROLE CHECK: userRole="${userRole}", requiredRole="${requiredRole}"`);
-    
     // Admin her şeye erişebilir  
     if (userRole === 'admin' || userRole === 'Admin' || userRole.includes('Admin')) {
-      console.log(`✅ ADMIN ACCESS GRANTED`);
       return true;
     }
     
@@ -46,13 +43,9 @@ function Router() {
     // Check if user role matches any of the allowed roles for the required permission
     const allowedRoles = roleMap[requiredRole as keyof typeof roleMap] || [];
     
-    console.log(`🎯 ALLOWED ROLES for "${requiredRole}":`, allowedRoles);
-    
     const hasAccess = allowedRoles.some(role => 
       userRole === role || userRole.includes(role)
     );
-    
-    console.log(`🔑 ACCESS RESULT: ${hasAccess ? 'GRANTED ✅' : 'DENIED ❌'}`);
     
     return hasAccess;
   };
