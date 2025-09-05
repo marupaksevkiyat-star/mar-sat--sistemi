@@ -19,6 +19,10 @@ import marupakLogo from "@assets/MARUPAK_LOGO_1757030221412.png";
 const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
   const [showDeliverySlipDetail, setShowDeliverySlipDetail] = useState(false);
   const [selectedSlip, setSelectedSlip] = useState<any>(null);
+  // Shipping modal states
+  const [showDeliverySlipDialog, setShowDeliverySlipDialog] = useState(false);
+  const [deliverySlipData, setDeliverySlipData] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
   
   const { data: deliverySlips, isLoading } = useQuery<any[]>({
     queryKey: [`/api/invoices/${invoiceId}/delivery-slips`],
@@ -44,11 +48,25 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       const deliverySlips: any[] = await response.json();
       
       if (Array.isArray(deliverySlips) && deliverySlips.length > 0) {
-        // İlgili slip'i bul
+        // İlgili slip'i bul - shipping modal'ı aç
         const targetSlip = deliverySlips.find(ds => ds.id === slip.id) || deliverySlips[0];
-        setSelectedSlip(targetSlip);
-        setShowDeliverySlipDetail(true);
+        setDeliverySlipData(targetSlip);
+        
+        // Order bilgilerini mock olarak oluştur
+        const mockOrder = {
+          customer: {
+            companyName: invoiceData?.customer?.companyName || 'Müşteri',
+            email: invoiceData?.customer?.email || '',
+            phone: invoiceData?.customer?.phone || '',
+            address: invoiceData?.customer?.address || ''
+          }
+        };
+        setSelectedOrder(mockOrder);
+        setShowDeliverySlipDialog(true);
       } else {
+        // Fallback to existing modal with existing data
+        setSelectedSlip(slip);
+        setShowDeliverySlipDetail(true);
       }
     } catch (error) {
       // Fallback to existing modal with existing data
@@ -417,6 +435,121 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
         </DialogContent>
       </Dialog>
     )}
+      {/* Shipping Modal - İrsaliye Dialog */}
+      {showDeliverySlipDialog && deliverySlipData && (
+        <Dialog open={showDeliverySlipDialog} onOpenChange={setShowDeliverySlipDialog}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>İrsaliye Detayları - {deliverySlipData.deliverySlipNumber}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              {/* Müşteri Bilgileri */}
+              <div className="bg-muted rounded-lg p-4">
+                <h3 className="font-medium mb-2">Müşteri Bilgileri</h3>
+                <p><strong>Firma:</strong> {selectedOrder?.customer?.companyName}</p>
+                <p><strong>E-posta:</strong> {selectedOrder?.customer?.email}</p>
+                <p><strong>Telefon:</strong> {selectedOrder?.customer?.phone}</p>
+                <p><strong>Adres:</strong> {selectedOrder?.customer?.address}</p>
+              </div>
+
+              {/* İrsaliye Durumu */}
+              <div className="flex items-center space-x-4">
+                <div>
+                  <span className="text-sm font-medium">Durum: </span>
+                  <Badge className={`${
+                    deliverySlipData.status === 'delivered' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {deliverySlipData.status === 'delivered' ? 'Teslim Edildi' : 'Sevkiyatta'}
+                  </Badge>
+                </div>
+                {deliverySlipData.deliveredAt && (
+                  <div>
+                    <span className="text-sm font-medium">Teslimat Tarihi: </span>
+                    <span className="text-sm">{new Date(deliverySlipData.deliveredAt).toLocaleDateString('tr-TR')}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Ürün Listesi */}
+              <div>
+                <h3 className="font-medium mb-2">Teslim Edilen Ürünler</h3>
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="text-left py-2 px-4 font-medium">Ürün Adı</th>
+                        <th className="text-left py-2 px-4 font-medium">Miktar</th>
+                        <th className="text-left py-2 px-4 font-medium">Birim</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {deliverySlipData.items?.map((item: any, index: number) => (
+                        <tr key={index} className="border-t">
+                          <td className="py-2 px-4">{item.productName}</td>
+                          <td className="py-2 px-4">{item.deliveredQuantity || item.quantity}</td>
+                          <td className="py-2 px-4">{item.unit}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* İmza Alanı */}
+              {deliverySlipData.status === 'delivered' && (
+                <div>
+                  <h3 className="font-medium mb-2">Teslim Bilgileri</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="border rounded-lg p-4 text-center">
+                      <div className="text-blue-700 font-semibold text-sm mb-2">TESLIM EDEN</div>
+                      <div className="text-lg font-bold text-blue-800">MARUPAK</div>
+                      <div className="text-xs text-blue-600 mt-2">www.marupak.com</div>
+                    </div>
+                    
+                    <div className="border rounded-lg p-4 text-center">
+                      {deliverySlipData.customerSignature ? (
+                        <div>
+                          <div className="text-blue-700 font-semibold text-sm mb-2">ALICI İMZASI</div>
+                          <div className="flex flex-col items-center">
+                            <img 
+                              src={deliverySlipData.customerSignature} 
+                              alt="Müşteri İmzası" 
+                              className="max-w-[150px] max-h-[60px] border border-gray-300 rounded"
+                              onError={(e) => console.error('İmza yükleme hatası:', e)}
+                            />
+                            <div className="text-xs text-blue-600 mt-2">
+                              {deliverySlipData.recipientName || 'Teslim Alan'}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <div className="text-blue-700 font-semibold text-sm mb-1">ALICI İMZASI</div>
+                          <div className="text-xs text-blue-600">İmza alanı</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button variant="outline" onClick={() => setShowDeliverySlipDialog(false)}>
+                Kapat
+              </Button>
+              {deliverySlipData.status === 'delivered' && (
+                <Button onClick={() => handlePdfDownload(deliverySlipData)}>
+                  PDF İndir
+                </Button>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };
