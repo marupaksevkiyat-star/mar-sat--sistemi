@@ -248,7 +248,7 @@ export default function Appointments() {
                     <SelectContent>
                       {customers?.map((customer: any) => (
                         <SelectItem key={customer.id} value={customer.id}>
-                          {customer.name}
+                          {customer.companyName || customer.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
