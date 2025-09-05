@@ -79,11 +79,14 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFontSize(8);
       pdf.text('www.marupak.com', 140, 28);
       
-      // Logo çerçevesi - basit çizgilerle
-      pdf.line(135, 12, 195, 12); // üst
-      pdf.line(135, 32, 195, 32); // alt
-      pdf.line(135, 12, 135, 32); // sol
-      pdf.line(195, 12, 195, 32); // sağ
+      // Logo çerçevesi - ASCII karakterlerle
+      pdf.setFontSize(8);
+      pdf.text('┌─────────────────────────┐', 135, 15);
+      pdf.text('│                         │', 135, 19);
+      pdf.text('│        MARUPAK          │', 135, 23);
+      pdf.text('│    www.marupak.com      │', 135, 27);
+      pdf.text('│                         │', 135, 31);
+      pdf.text('└─────────────────────────┘', 135, 35);
       
       // ÜRÜN TABLOSU
       yPos = 65;
