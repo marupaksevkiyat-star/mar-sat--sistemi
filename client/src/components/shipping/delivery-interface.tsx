@@ -25,14 +25,12 @@ export default function DeliveryInterface({
       return;
     }
     
-    console.log('Teslimat tamamlanıyor - İmza:', signature ? 'VAR' : 'YOK');
+    console.log('🚚 Teslimat tamamlanıyor - İmza state:', signature ? 'VAR' : 'YOK');
+    console.log('🖋️ İmza içeriği:', signature ? signature.substring(0, 80) + '...' : 'EMPTY');
     
-    // Canvas-based async Promise ile güvenli imza transfer
-    const finalSignature = signature && signature !== 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGA4GqRjQAAAABJRU5ErkJggg==' 
-      ? signature 
-      : null;
-      
-    console.log('Final imza:', finalSignature ? 'GERÇEK İMZA' : 'BOŞ İMZA');
+    // Canvas-based güvenli imza transfer
+    const finalSignature = signature && signature.length > 100 ? signature : null;
+    console.log('✅ Final imza değerlendirmesi:', finalSignature ? 'GERÇEK İMZA GÖNDERİLİYOR' : 'BOŞ İMZA (NULL)');
     
     onCompleteDelivery(recipient, finalSignature);
     setRecipient("");
