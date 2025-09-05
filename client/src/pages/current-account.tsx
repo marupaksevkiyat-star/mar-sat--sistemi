@@ -88,17 +88,17 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       const customerInfo = invoiceData?.customer;
       pdf.setFontSize(10);
       yPos += 10;
-      pdf.text(`Firma: ${customerInfo?.companyName || 'Musteri Firma'}`, 20, yPos);
+      pdf.text(`Firma: ${String(customerInfo?.companyName || 'Musteri Firma')}`, 20, yPos);
       yPos += 8;
-      pdf.text(`E-posta: ${customerInfo?.email || 'info@firma.com'}`, 20, yPos);
+      pdf.text(`E-posta: ${String(customerInfo?.email || 'info@firma.com')}`, 20, yPos);
       yPos += 8;
-      pdf.text(`Telefon: ${customerInfo?.phone || '0555 123 45 67'}`, 20, yPos);
+      pdf.text(`Telefon: ${String(customerInfo?.phone || '0555 123 45 67')}`, 20, yPos);
       
       // Orta - Teslim Fişi
       pdf.setFontSize(18);
       pdf.text('TESLIM FISI', 85, 25);
       pdf.setFontSize(12);
-      pdf.text(`NO: ${slip.deliverySlipNumber.split('-').pop()}`, 85, 35);
+      pdf.text(`NO: ${String(slip.deliverySlipNumber || '').split('-').pop() || 'N/A'}`, 85, 35);
       
       // Sağ - MARUPAK LOGO RESMİ
       try {
@@ -138,7 +138,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
           const productName = (item.productName || '').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c');
           const unit = (item.unit || '').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c');
           
-          pdf.text(`${productName} (${unit})`, 30, yPos);
+          pdf.text(String(`${productName} (${unit})`), 30, yPos);
           pdf.text(String(item.deliveredQuantity || '0'), 150, yPos);
           yPos += 12;
         });
@@ -179,7 +179,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.text('TESLIM ALAN:', 110, signatureStartY + 12);
       
       pdf.setFontSize(12);
-      pdf.text(recipientName, 110, signatureStartY + 25);
+      pdf.text(String(recipientName || 'Teslim Alan'), 110, signatureStartY + 25);
       
       // MÜŞTERİ İMZA ALANI - Hazırlanan imzayı ekle
       if (signatureImage) {
