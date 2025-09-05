@@ -950,7 +950,7 @@ export class DatabaseStorage implements IStorage {
         status: 'pending' as const,
         deliveryAddress: order.customer?.address || 'Adres belirtilmedi',
         notes: 'Sevkiyat sırasında oluşturulan irsaliye',
-        createdBy: 'shipping_staff',
+        createdBy: 'admin',
         createdAt: new Date(),
         updatedAt: new Date(),
       })
