@@ -43,6 +43,14 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
 
   const handleSlipClick = async (slip: any) => {
     console.log('🚚 CURRENT-ACCOUNT irsaliye tıklandı:', slip);
+    console.log('📋 CURRENT-ACCOUNT slip data:', {
+      id: slip.id,
+      deliverySlipNumber: slip.deliverySlipNumber,
+      status: slip.status,
+      customerSignature: slip.customerSignature ? 'VAR' : 'YOK',
+      signatureLength: slip.customerSignature?.length || 0
+    });
+    
     try {
       // Delivery slip'in orderId'sini alıp detayları getir
       const response = await apiRequest('GET', `/api/orders/${slip.orderId}/delivery-slips`);
@@ -53,7 +61,9 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
         // İlgili slip'i bul - shipping modal'ı aç
         const targetSlip = deliverySlips.find(ds => ds.id === slip.id) || deliverySlips[0];
         console.log('✅ CURRENT-ACCOUNT target slip:', targetSlip);
-        console.log('🎯 CURRENT-ACCOUNT imza var mı?', targetSlip.customerSignature ? 'VAR' : 'YOK');
+        console.log('🎯 CURRENT-ACCOUNT target imza var mı?', targetSlip.customerSignature ? 'VAR' : 'YOK');
+        console.log('📏 CURRENT-ACCOUNT imza uzunluk:', targetSlip.customerSignature?.length || 0);
+        console.log('🔍 CURRENT-ACCOUNT imza başlangıç:', targetSlip.customerSignature?.substring(0, 100));
         setDeliverySlipData(targetSlip);
         
         // Order bilgilerini mock olarak oluştur
