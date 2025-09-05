@@ -29,7 +29,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
     enabled: !!invoiceId,
     retry: false,
     staleTime: 0, // Always fresh
-    cacheTime: 0, // No cache
+    gcTime: 0, // No cache
   });
 
   // Fatura bilgilerini çek (müşteri bilgileri için)
@@ -86,6 +86,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
           canvas.width = 200;
           canvas.height = 80;
           const ctx = canvas.getContext('2d');
+          if (!ctx) return resolve(null);
           
           const img = new Image();
           img.onload = function() {
@@ -253,7 +254,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
     );
   }
 
-  if (!deliverySlips || deliverySlips.length === 0) {
+  if (!deliverySlips || !Array.isArray(deliverySlips) || deliverySlips.length === 0) {
     return (
       <div className="text-center py-4 text-muted-foreground">
         <Package className="w-6 h-6 mx-auto mb-2 opacity-50" />
@@ -273,7 +274,7 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
   return (
     <>
       <div className="space-y-3">
-        {deliverySlips.map((slip) => (
+        {deliverySlips.map((slip: any) => (
           <div key={slip.id} className="border rounded-lg p-3 bg-muted/20">
             <div className="flex justify-between items-start mb-2">
               <div>
