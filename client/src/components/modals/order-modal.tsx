@@ -143,21 +143,31 @@ export default function OrderModal({ isOpen, onClose, customer }: OrderModalProp
       return;
     }
 
+    // Check if customer exists and has id
+    console.log('🏢 Customer data in OrderModal:', customer);
+    if (!customer || !customer.id) {
+      console.error('❌ Customer validation failed:', { customer, hasId: !!customer?.id });
+      toast({
+        title: "Hata", 
+        description: "Müşteri bilgisi eksik. Lütfen müşteriyi seçin.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const orderData = {
-      order: {
-        customerId: customer.id,
-        totalAmount: calculateTotal(),
-        taxAmount: calculateTax(),
-        deliveryAddress: customer.address,
-      },
+      customerId: customer.id,
+      totalAmount: calculateTotal().toString(),
+      status: 'pending',
+      notes: `${selectedItems.length} ürün siparişi`,
       items: selectedItems.map(item => ({
         productId: item.productId,
         quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        totalPrice: item.totalPrice,
+        unitPrice: item.unitPrice.toString(),
       })),
     };
 
+    console.log('📦 OrderModal submitting order:', orderData);
     createOrderMutation.mutate(orderData);
   };
 
