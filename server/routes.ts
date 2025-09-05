@@ -1124,14 +1124,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           invoiceId: savedInvoice.id,
           orderId: orderId,
           customerId: customerId,
-          status: 'delivered',
+          status: 'shipping',
           deliveryAddress: selectedOrders.find(o => o.id === orderId)?.deliveryAddress || 'Adres belirtilmedi',
-          deliveredAt: new Date(),
-          notes: `Akıllı toplu faturalama ile oluşturulan irsaliye`,
-          createdBy: req.session.user.id,
-          // Akıllı faturalama = teslimat tamamlanmış, örnek imza ekle
-          recipientName: 'Müşteri Temsilcisi',
-          customerSignature: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', // Minimal dummy signature
+          notes: `Akıllı toplu faturalama ile oluşturulan irsaliye - Sevkiyat bekliyor`,
+          createdBy: req.session.user.id
         };
 
         const [savedDeliverySlip] = await db
