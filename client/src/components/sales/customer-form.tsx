@@ -45,8 +45,11 @@ export default function CustomerForm({
     },
     onSuccess: (newCustomer: any) => {
       console.log('✅ Customer saved response:', newCustomer);
-      // Server direkt customer objesi döndürüyor, wrapper objesi değil
-      setSavedCustomer(newCustomer);
+      // Check if response has the customer data properly
+      const customerData = newCustomer?.customer || newCustomer;
+      console.log('✅ Processed customer data:', customerData);
+      
+      setSavedCustomer(customerData);
       setIsCustomerSaved(true);
       toast({
         title: "Başarılı",
