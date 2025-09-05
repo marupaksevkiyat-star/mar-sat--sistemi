@@ -833,14 +833,13 @@ export default function CurrentAccountPage() {
       const customerData = customerInvoices[companyName];
       const summary = getAccountSummary(companyName);
       
-      // PDF oluştur - Türkçe karakter desteği için font ayarla
+      // PDF oluştur
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.width;
       const pageHeight = pdf.internal.pageSize.height;
       
-      // Türkçe karakter desteği için Unicode font kullan
-      pdf.addFont('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.woff2', 'Roboto', 'normal');
-      pdf.setFont('Roboto', 'normal');
+      // Font ayarları - varsayılan helvetica kullan
+      pdf.setFont('helvetica', 'normal');
       
       // Header - Firma bilgisi ve logo alanı
       pdf.setFillColor(41, 128, 185); // Mavi başlık
@@ -864,7 +863,7 @@ export default function CurrentAccountPage() {
       pdf.rect(15, yPos, pageWidth - 30, 25, 'S');
       
       pdf.setFontSize(12);
-      pdf.text('MÜŞTERİ BİLGİLERİ', 20, yPos + 8);
+      pdf.text('MUSTERI BILGILERI', 20, yPos + 8);
       pdf.setFontSize(11);
       pdf.text(`Firma Adı: ${companyName}`, 20, yPos + 16);
       pdf.text(`Ekstre Tarihi: ${formatDate(new Date().toISOString())}`, 120, yPos + 16);
@@ -874,7 +873,7 @@ export default function CurrentAccountPage() {
       
       // Özet bilgiler tablosu
       pdf.setFontSize(12);
-      pdf.text('FİNANSAL ÖZET', 20, yPos);
+      pdf.text('FINANSAL OZET', 20, yPos);
       yPos += 10;
       
       // Tablo başlıkları
@@ -883,9 +882,9 @@ export default function CurrentAccountPage() {
       
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(10);
-      pdf.text('TOPLAM BORÇ', 20, yPos + 7);
-      pdf.text('TOPLAM ÖDEME', 80, yPos + 7);
-      pdf.text('KALAN BAKİYE', 140, yPos + 7);
+      pdf.text('TOPLAM BORC', 20, yPos + 7);
+      pdf.text('TOPLAM ODEME', 80, yPos + 7);
+      pdf.text('KALAN BAKIYE', 140, yPos + 7);
       
       yPos += 10;
       
@@ -951,8 +950,8 @@ export default function CurrentAccountPage() {
         pdf.text(formatCurrency(parseFloat(invoice.totalAmount || '0')), 130, yPos + 6);
         
         // Status
-        const status = invoice.status === 'generated' ? 'Oluşturuldu' : 
-                      invoice.status === 'paid' ? 'Ödendi' : invoice.status;
+        const status = invoice.status === 'generated' ? 'Olusturuldu' : 
+                      invoice.status === 'paid' ? 'Odendi' : invoice.status;
         pdf.text(status, 165, yPos + 6);
         
         yPos += 8;
@@ -982,7 +981,7 @@ export default function CurrentAccountPage() {
         }
         
         pdf.setFontSize(12);
-        pdf.text('ÖDEME DETAYLARI', 20, yPos);
+        pdf.text('ODEME DETAYLARI', 20, yPos);
         yPos += 10;
         
         // Ödeme tablo başlıkları
@@ -991,10 +990,10 @@ export default function CurrentAccountPage() {
         
         pdf.setTextColor(255, 255, 255);
         pdf.setFontSize(9);
-        pdf.text('ÖDEME TARİHİ', 20, yPos + 7);
+        pdf.text('ODEME TARIHI', 20, yPos + 7);
         pdf.text('TUTAR', 80, yPos + 7);
-        pdf.text('YÖNTEM', 130, yPos + 7);
-        pdf.text('AÇIKLAMA', 165, yPos + 7);
+        pdf.text('YONTEM', 130, yPos + 7);
+        pdf.text('ACIKLAMA', 165, yPos + 7);
         
         yPos += 10;
         
@@ -1018,8 +1017,8 @@ export default function CurrentAccountPage() {
           // Ödeme yöntemi
           const method = payment.paymentMethod === 'cash' ? 'Nakit' :
                         payment.paymentMethod === 'transfer' ? 'Havale' :
-                        payment.paymentMethod === 'credit_card' ? 'Kredi Kartı' :
-                        payment.paymentMethod === 'check' ? 'Çek' : payment.paymentMethod;
+                        payment.paymentMethod === 'credit_card' ? 'Kredi Karti' :
+                        payment.paymentMethod === 'check' ? 'Cek' : payment.paymentMethod;
           pdf.text(method, 130, yPos + 6);
           
           // Açıklama (kısa)
