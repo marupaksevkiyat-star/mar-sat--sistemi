@@ -156,16 +156,51 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFontSize(12);
       pdf.text(recipientName, 110, signatureStartY + 25);
       
-      // MÜŞTERİ İMZA ALANI - Kutu olmadan sadece imza
+      // MÜŞTERİ İMZA ALANI - İmzayı canvas'a çevir ve PDF'ye ekle
       if (slip.customerSignature) {
         try {
-          console.log('PDF İmzası ekleniyor...');
-          // SVG imzayı PNG olarak ekle - daha uyumlu
-          const imgType = slip.customerSignature.includes('svg') ? 'SVG' : 'PNG';
-          pdf.addImage(slip.customerSignature, imgType, 110, signatureStartY + 30, 65, 25);
-          console.log('PDF İmzası eklendi!');
+          console.log('PDF İmzası ekleniyor...', slip.customerSignature.substring(0, 50));
+          
+          // Canvas oluştur ve imzayı çiz
+          const canvas = document.createElement('canvas');
+          canvas.width = 200;
+          canvas.height = 80;
+          const ctx = canvas.getContext('2d');
+          
+          const img = new Image();
+          img.onload = function() {
+            // Canvas'ı temizle
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // İmzayı çiz
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Canvas'tan PNG data al
+            const pngData = canvas.toDataURL('image/png');
+            
+            try {
+              // PNG olarak PDF'ye ekle
+              pdf.addImage(pngData, 'PNG', 110, signatureStartY + 30, 65, 25);
+              console.log('PDF İmzası başarıyla eklendi!');
+            } catch (pdfError) {
+              console.error('PDF imza ekleme hatası:', pdfError);
+              pdf.setFontSize(10);
+              pdf.text('MUSTERI IMZASI', 110, signatureStartY + 40);
+            }
+          };
+          
+          img.onerror = function() {
+            console.error('İmza resmi yüklenemedi');
+            pdf.setFontSize(10);
+            pdf.text('MUSTERI IMZASI', 110, signatureStartY + 40);
+          };
+          
+          img.src = slip.customerSignature;
+          
         } catch (signError) {
-          console.error('Müşteri imzası eklenemedi:', signError);
+          console.error('Müşteri imzası işlenemedi:', signError);
           pdf.setFontSize(10);
           pdf.text('MUSTERI IMZASI', 110, signatureStartY + 40);
         }
