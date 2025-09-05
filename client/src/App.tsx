@@ -26,11 +26,11 @@ function Router() {
   const canAccess = (requiredRole: string) => {
     const userRole = (user as any)?.role || '';
     
-    console.log(`🔒 DEBUG: userRole="${userRole}", requiredRole="${requiredRole}"`);
+    console.log(`🔒 ROLE CHECK: userRole="${userRole}", requiredRole="${requiredRole}"`);
     
-    // Admin her şeye erişebilir
+    // Admin her şeye erişebilir  
     if (userRole === 'admin' || userRole === 'Admin' || userRole.includes('Admin')) {
-      console.log(`✅ ADMIN ACCESS`);
+      console.log(`✅ ADMIN ACCESS GRANTED`);
       return true;
     }
     
