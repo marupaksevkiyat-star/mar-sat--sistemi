@@ -54,6 +54,11 @@ export default function Shipping() {
     retry: false,
   });
 
+  // Debug: Log shipping orders
+  if (shippingOrders) {
+    console.log('🚛 Shipping Orders:', shippingOrders.map((o: any) => ({ id: o.id, orderNumber: o.orderNumber, status: o.status })));
+  }
+
   const { data: deliveredOrders, isLoading: deliveredLoading } = useQuery({
     queryKey: ["/api/orders", "status", "delivered"],
     queryFn: () => fetch("/api/orders?status=delivered", { credentials: "include" }).then(res => res.json()),
