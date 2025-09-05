@@ -79,10 +79,11 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.setFontSize(8);
       pdf.text('www.marupak.com', 140, 28);
       
-      // Logo çerçevesi
-      pdf.setDrawColor(0, 0, 0);
-      pdf.setLineWidth(1.5);
-      pdf.rect(135, 12, 60, 20);
+      // Logo çerçevesi - basit çizgilerle
+      pdf.line(135, 12, 195, 12); // üst
+      pdf.line(135, 32, 195, 32); // alt
+      pdf.line(135, 12, 135, 32); // sol
+      pdf.line(195, 12, 195, 32); // sağ
       
       // ÜRÜN TABLOSU
       yPos = 65;
@@ -115,13 +116,14 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       // Boşluk
       yPos = Math.max(yPos + 40, 180);
       
-      // İMZA ALANLARI - BÜYÜK VE BELİRGİN
+      // İMZA ALANLARI - BASIT ÇİZGİLERLE
       const signatureStartY = yPos;
       
-      // Sol kutu - Teslim Eden
-      pdf.setLineWidth(2);
-      pdf.setDrawColor(0, 0, 0);
-      pdf.rect(25, signatureStartY, 70, 45);
+      // Sol kutu - Teslim Eden (4 çizgi ile kutu)
+      pdf.line(25, signatureStartY, 95, signatureStartY); // üst
+      pdf.line(25, signatureStartY + 45, 95, signatureStartY + 45); // alt
+      pdf.line(25, signatureStartY, 25, signatureStartY + 45); // sol
+      pdf.line(95, signatureStartY, 95, signatureStartY + 45); // sağ
       
       pdf.setFontSize(14);
       pdf.text('TESLIM EDEN', 30, signatureStartY + 12);
@@ -133,12 +135,13 @@ const InvoiceDeliverySlips = ({ invoiceId }: { invoiceId: string }) => {
       pdf.text('Imza:', 30, signatureStartY + 35);
       
       // İmza çizgisi
-      pdf.setLineWidth(0.5);
       pdf.line(45, signatureStartY + 38, 85, signatureStartY + 38);
       
-      // Sağ kutu - Teslim Alan
-      pdf.setLineWidth(2);
-      pdf.rect(105, signatureStartY, 70, 45);
+      // Sağ kutu - Teslim Alan (4 çizgi ile kutu)
+      pdf.line(105, signatureStartY, 175, signatureStartY); // üst
+      pdf.line(105, signatureStartY + 45, 175, signatureStartY + 45); // alt
+      pdf.line(105, signatureStartY, 105, signatureStartY + 45); // sol
+      pdf.line(175, signatureStartY, 175, signatureStartY + 45); // sağ
       
       pdf.setFontSize(14);
       pdf.text('TESLIM ALAN', 110, signatureStartY + 12);
