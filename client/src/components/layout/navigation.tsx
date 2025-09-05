@@ -87,7 +87,7 @@ export default function Navigation() {
       return [
         { path: "/", label: "Dashboard", icon: "fas fa-chart-pie" },
         { path: "/orders", label: "Siparişler", icon: "fas fa-clipboard-list" },
-        { path: "/invoices", label: "Muhasebe", icon: "fas fa-calculator" },
+        { path: "/invoices", label: "İrsaliyeler", icon: "fas fa-file-invoice" },
         { path: "/current-account", label: "Cari Hesap", icon: "fas fa-file-text" },
       ];
     }

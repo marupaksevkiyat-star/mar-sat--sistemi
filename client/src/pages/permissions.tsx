@@ -174,6 +174,7 @@ const DEFAULT_PERMISSIONS: Record<string, Record<string, string[]>> = {
   accounting: {
     dashboard: ['read', 'export'],
     orders: ['read', 'export'],
+    invoices: ['create', 'read', 'update', 'delete', 'approve', 'export'],
     'sales-reports': ['read', 'export']
   }
 };
