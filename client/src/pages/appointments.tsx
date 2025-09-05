@@ -30,13 +30,13 @@ export default function Appointments() {
   });
 
   // Randevuları getir
-  const { data: appointments, isLoading: appointmentsLoading } = useQuery({
+  const { data: appointments = [], isLoading: appointmentsLoading } = useQuery({
     queryKey: ['/api/appointments'],
     enabled: isAuthenticated,
   });
 
   // Müşterileri getir
-  const { data: customers } = useQuery({
+  const { data: customers = [] } = useQuery({
     queryKey: ['/api/customers'],
     enabled: isAuthenticated,
   });
@@ -147,7 +147,7 @@ export default function Appointments() {
 
   // Filtered appointments with useMemo
   const filteredAppointments = useMemo(() => {
-    if (!appointments) return [];
+    if (!appointments || appointments.length === 0) return [];
     if (filterStatus === "all") return appointments;
     return appointments.filter((appointment: any) => appointment.status === filterStatus);
   }, [appointments, filterStatus]);
@@ -332,16 +332,16 @@ export default function Appointments() {
         <Tabs value={filterStatus} onValueChange={setFilterStatus} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="all">
-              Tümü ({appointments?.length || 0})
+              Tümü ({appointments.length})
             </TabsTrigger>
             <TabsTrigger value="scheduled">
-              Planlandı ({appointments?.filter((a: any) => a.status === 'scheduled')?.length || 0})
+              Planlandı ({appointments.filter((a: any) => a.status === 'scheduled').length})
             </TabsTrigger>
             <TabsTrigger value="completed">
-              Tamamlandı ({appointments?.filter((a: any) => a.status === 'completed')?.length || 0})
+              Tamamlandı ({appointments.filter((a: any) => a.status === 'completed').length})
             </TabsTrigger>
             <TabsTrigger value="cancelled">
-              İptal ({appointments?.filter((a: any) => a.status === 'cancelled')?.length || 0})
+              İptal ({appointments.filter((a: any) => a.status === 'cancelled').length})
             </TabsTrigger>
           </TabsList>
 
