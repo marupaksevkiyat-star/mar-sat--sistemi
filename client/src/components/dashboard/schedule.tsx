@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLocation } from "wouter";
 
 interface ScheduleProps {
   appointments: any[];
@@ -8,6 +9,8 @@ interface ScheduleProps {
 }
 
 export default function Schedule({ appointments, isLoading = false }: ScheduleProps) {
+  const [, setLocation] = useLocation();
+
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleTimeString('tr-TR', {
       hour: '2-digit',
@@ -78,6 +81,7 @@ export default function Schedule({ appointments, isLoading = false }: SchedulePr
             <Button 
               variant="secondary" 
               className="w-full mt-6" 
+              onClick={() => setLocation('/appointments')}
               data-testid="button-view-all-appointments"
             >
               Tüm Randevular
