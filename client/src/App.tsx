@@ -55,9 +55,11 @@ function Router() {
     if (!requiredRole) return <Component />;
     
     if (!canAccess(requiredRole)) {
+      console.log(`🚫 Access denied for user role: ${(user as any)?.role} to ${requiredRole}`);
       return <NotFound />;
     }
     
+    console.log(`✅ Access granted for user role: ${(user as any)?.role} to ${requiredRole}`);
     return <Component />;
   };
 
