@@ -764,12 +764,14 @@ export default function CurrentAccountPage() {
   // PDF için Türkçe karakter dönüşüm fonksiyonu
   const convertTurkishChars = (text: string) => {
     return text
-      .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
-      .replace(/ü/g, 'u').replace(/Ü/g, 'U')
-      .replace(/ş/g, 's').replace(/Ş/g, 'S')
-      .replace(/ı/g, 'i').replace(/I/g, 'I')
-      .replace(/ö/g, 'o').replace(/Ö/g, 'O')
-      .replace(/ç/g, 'c').replace(/Ç/g, 'C');
+      .replace(/ğ/g, 'g').replace(/Ğ/g, 'g')
+      .replace(/ü/g, 'u').replace(/Ü/g, 'u')
+      .replace(/ş/g, 's').replace(/Ş/g, 's')
+      .replace(/ı/g, 'i').replace(/İ/g, 'i').replace(/I/g, 'i')
+      .replace(/ö/g, 'o').replace(/Ö/g, 'o')
+      .replace(/ç/g, 'c').replace(/Ç/g, 'c')
+      .toLowerCase()
+      .replace(/\b\w/g, letter => letter.toUpperCase()); // İlk harfleri büyük yap
   };
 
   // Müşteri cari hesap durumlarını hesapla
