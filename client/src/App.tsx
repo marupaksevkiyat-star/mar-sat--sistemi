@@ -93,35 +93,18 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/orders" component={Orders} />
       <Route path="/customers" component={Customers} />
-      <Route path="/sales">
-        <ProtectedRoute component={Sales} requiredRole="sales" />
-      </Route>
-      <Route path="/appointments">
-        <ProtectedRoute component={Appointments} requiredRole="sales" />
-      </Route>
-      <Route path="/production">
-        <ProtectedRoute component={Production} requiredRole="production" />
-      </Route>
-      <Route path="/shipping">
-        <ProtectedRoute component={Shipping} requiredRole="shipping" />
-      </Route>
+      <Route path="/sales" component={Sales} />
+      <Route path="/appointments" component={Appointments} />
+      <Route path="/production" component={Production} />
+      <Route path="/shipping" component={Shipping} />
       <Route path="/sales-reports">
         <ProtectedRoute component={SalesReports} requiredRole="admin" />
       </Route>
-      <Route path="/invoices">
-        <ProtectedRoute component={Invoices} requiredRole="accounting" />
-      </Route>
+      <Route path="/invoices" component={Invoices} />
       <Route path="/invoices/:id">
-        {(params) => (
-          <ProtectedRoute 
-            component={() => <InvoiceDetail invoiceId={params.id} />} 
-            requiredRole="accounting" 
-          />
-        )}
+        {(params) => <InvoiceDetail invoiceId={params.id} />}
       </Route>
-      <Route path="/current-account">
-        <ProtectedRoute component={CurrentAccount} requiredRole="accounting" />
-      </Route>
+      <Route path="/current-account" component={CurrentAccount} />
       <Route path="/mail-settings">
         <ProtectedRoute component={MailSettings} requiredRole="admin" />
       </Route>
