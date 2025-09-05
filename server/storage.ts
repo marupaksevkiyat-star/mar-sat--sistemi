@@ -11,6 +11,7 @@ import {
   mailTemplates,
   payments,
   accountTransactions,
+  deliverySlips,
   type User,
   type UpsertUser,
   type InsertCustomer,
@@ -900,6 +901,49 @@ export class DatabaseStorage implements IStorage {
         eq(payments.status, "pending"),
         sql`${payments.dueDate} < ${today}`
       ));
+  }
+
+  // Delivery Slip işlemleri
+  async updateDeliverySlipSignature(orderId: string, signatureData: {
+    customerSignature?: string;
+    recipientName?: string;
+  }): Promise<void> {
+    console.log(`🔄 Updating delivery slip signature for order: ${orderId}`);
+    
+    // Bu siparişe ait irsaliyeleri bul
+    const existingSlips = await db
+      .select()
+      .from(deliverySlips)
+      .where(eq(deliverySlips.orderId, orderId));
+    
+    if (existingSlips.length === 0) {
+      console.log(`⚠️ No delivery slips found for order: ${orderId}`);
+      return;
+    }
+    
+    // Tüm irsaliyeleri güncelle (genelde tek tane olur ama güvenlik için)
+    for (const slip of existingSlips) {
+      const updateData: any = {
+        updatedAt: new Date(),
+        status: 'delivered',
+        deliveredAt: new Date(),
+      };
+      
+      if (signatureData.customerSignature) {
+        updateData.customerSignature = signatureData.customerSignature;
+      }
+      
+      if (signatureData.recipientName) {
+        updateData.recipientName = signatureData.recipientName;
+      }
+      
+      await db
+        .update(deliverySlips)
+        .set(updateData)
+        .where(eq(deliverySlips.id, slip.id));
+      
+      console.log(`✅ Updated delivery slip ${slip.deliverySlipNumber} for order: ${orderId}`);
+    }
   }
 }
 

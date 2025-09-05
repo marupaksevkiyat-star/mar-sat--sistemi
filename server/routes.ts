@@ -677,17 +677,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/orders/:id/status', isAuthenticated, async (req, res) => {
     try {
-      const { status, ...updates } = req.body;
+      const { status, deliveryRecipient, deliverySignature, ...updates } = req.body;
       const order = await storage.updateOrderStatus(req.params.id, status, updates);
       
-      // Eğer sipariş "delivered" durumuna geçtiyse, müşteriye mail gönder
+      // Eğer sipariş "delivered" durumuna geçtiyse
       if (status === 'delivered') {
+        console.log(`📦 Order delivered: ${req.params.id}`);
+        
+        // Müşteri imzasını irsaliyeye kaydet
+        if (deliverySignature || deliveryRecipient) {
+          console.log(`✍️ Saving delivery signature and recipient for order: ${req.params.id}`);
+          try {
+            await storage.updateDeliverySlipSignature(req.params.id, {
+              customerSignature: deliverySignature,
+              recipientName: deliveryRecipient,
+            });
+            console.log(`✅ Delivery signature saved successfully for order: ${req.params.id}`);
+          } catch (signatureError) {
+            console.error(`❌ Failed to save delivery signature for order ${req.params.id}:`, signatureError instanceof Error ? signatureError.message : 'Unknown error');
+            // İmza kaydedilemese bile sipariş durumu güncellensin
+          }
+        }
+        
+        // Müşteriye mail gönder
         console.log(`📧 Sending delivery notification for order: ${req.params.id}`);
         try {
           await sendDeliveryNotification(req.params.id);
           console.log(`✅ Delivery notification sent successfully for order: ${req.params.id}`);
         } catch (mailError) {
-          console.error(`❌ Failed to send delivery notification for order ${req.params.id}:`, mailError);
+          console.error(`❌ Failed to send delivery notification for order ${req.params.id}:`, mailError instanceof Error ? mailError.message : 'Unknown error');
           // Mail gönderimi başarısız olsa bile sipariş durumu güncellensin
         }
       }
