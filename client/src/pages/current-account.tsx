@@ -761,6 +761,17 @@ export default function CurrentAccountPage() {
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
 
+  // PDF için Türkçe karakter dönüşüm fonksiyonu
+  const convertTurkishChars = (text: string) => {
+    return text
+      .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
+      .replace(/ü/g, 'u').replace(/Ü/g, 'U')
+      .replace(/ş/g, 's').replace(/Ş/g, 'S')
+      .replace(/ı/g, 'i').replace(/I/g, 'I')
+      .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+      .replace(/ç/g, 'c').replace(/Ç/g, 'C');
+  };
+
   // Müşteri cari hesap durumlarını hesapla
   const getCustomerAccountStatus = (companyName: string, customerData: any) => {
     const customerId = customerData.customer?.id;
@@ -847,10 +858,10 @@ export default function CurrentAccountPage() {
       
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(20);
-      pdf.text('MARUPAK', pageWidth / 2, 12, { align: 'center' });
+      pdf.text(convertTurkishChars('MARUPAK'), pageWidth / 2, 12, { align: 'center' });
       
       pdf.setFontSize(14);
-      pdf.text('HESAP EKSTRESİ', pageWidth / 2, 22, { align: 'center' });
+      pdf.text(convertTurkishChars('HESAP EKSTRESİ'), pageWidth / 2, 22, { align: 'center' });
       
       // Reset text color
       pdf.setTextColor(0, 0, 0);
@@ -863,17 +874,17 @@ export default function CurrentAccountPage() {
       pdf.rect(15, yPos, pageWidth - 30, 25, 'S');
       
       pdf.setFontSize(12);
-      pdf.text('MUSTERI BILGILERI', 20, yPos + 8);
+      pdf.text(convertTurkishChars('MÜŞTERİ BİLGİLERİ'), 20, yPos + 8);
       pdf.setFontSize(11);
-      pdf.text(`Firma Adı: ${companyName}`, 20, yPos + 16);
-      pdf.text(`Ekstre Tarihi: ${formatDate(new Date().toISOString())}`, 120, yPos + 16);
-      pdf.text(`Dönem: ${accountStatementDateRange.startDate} / ${accountStatementDateRange.endDate}`, 20, yPos + 22);
+      pdf.text(convertTurkishChars(`Firma Adı: ${companyName}`), 20, yPos + 16);
+      pdf.text(convertTurkishChars(`Ekstre Tarihi: ${formatDate(new Date().toISOString())}`), 120, yPos + 16);
+      pdf.text(convertTurkishChars(`Dönem: ${accountStatementDateRange.startDate} / ${accountStatementDateRange.endDate}`), 20, yPos + 22);
       
       yPos += 40;
       
       // Özet bilgiler tablosu
       pdf.setFontSize(12);
-      pdf.text('FINANSAL OZET', 20, yPos);
+      pdf.text(convertTurkishChars('FİNANSAL ÖZET'), 20, yPos);
       yPos += 10;
       
       // Tablo başlıkları
@@ -882,9 +893,9 @@ export default function CurrentAccountPage() {
       
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(10);
-      pdf.text('TOPLAM BORC', 20, yPos + 7);
-      pdf.text('TOPLAM ODEME', 80, yPos + 7);
-      pdf.text('KALAN BAKIYE', 140, yPos + 7);
+      pdf.text(convertTurkishChars('TOPLAM BORÇ'), 20, yPos + 7);
+      pdf.text(convertTurkishChars('TOPLAM ÖDEME'), 80, yPos + 7);
+      pdf.text(convertTurkishChars('KALAN BAKİYE'), 140, yPos + 7);
       
       yPos += 10;
       
@@ -915,7 +926,7 @@ export default function CurrentAccountPage() {
       
       // Birleşik tablo
       pdf.setFontSize(12);
-      pdf.text('ISLEM DETAYLARI', 20, yPos);
+      pdf.text(convertTurkishChars('İŞLEM DETAYLARI'), 20, yPos);
       yPos += 15;
       
       // Tablo başlıkları
@@ -924,11 +935,11 @@ export default function CurrentAccountPage() {
       
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(10);
-      pdf.text('TARIH', 20, yPos + 7);
-      pdf.text('ACIKLAMA', 70, yPos + 7);
-      pdf.text('BORC', 130, yPos + 7);
-      pdf.text('ALACAK', 155, yPos + 7);
-      pdf.text('KALAN', 180, yPos + 7);
+      pdf.text(convertTurkishChars('TARİH'), 20, yPos + 7);
+      pdf.text(convertTurkishChars('AÇIKLAMA'), 70, yPos + 7);
+      pdf.text(convertTurkishChars('BORÇ'), 130, yPos + 7);
+      pdf.text(convertTurkishChars('ALACAK'), 155, yPos + 7);
+      pdf.text(convertTurkishChars('KALAN'), 180, yPos + 7);
       
       yPos += 10;
       
@@ -970,8 +981,8 @@ export default function CurrentAccountPage() {
         pdf.rect(15, yPos, pageWidth - 30, 8, 'F');
         
         pdf.setFontSize(9);
-        pdf.text(formatDate(transaction.date), 20, yPos + 6);
-        pdf.text(transaction.description, 70, yPos + 6);
+        pdf.text(convertTurkishChars(formatDate(transaction.date)), 20, yPos + 6);
+        pdf.text(convertTurkishChars(transaction.description), 70, yPos + 6);
         
         if (transaction.type === 'invoice') {
           // Borç (fatura)
@@ -1009,8 +1020,8 @@ export default function CurrentAccountPage() {
       
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(8);
-      pdf.text('MARUPAK Satis ve Uretim Yonetim Sistemi', pageWidth / 2, footerY + 10, { align: 'center' });
-      pdf.text(`Olusturma Tarihi: ${formatDate(new Date().toISOString())}`, pageWidth / 2, footerY + 15, { align: 'center' });
+      pdf.text(convertTurkishChars('MARUPAK Satış ve Üretim Yönetim Sistemi'), pageWidth / 2, footerY + 10, { align: 'center' });
+      pdf.text(convertTurkishChars(`Oluşturma Tarihi: ${formatDate(new Date().toISOString())}`), pageWidth / 2, footerY + 15, { align: 'center' });
       
       pdf.save(`hesap-ekstresi-${companyName}-${accountStatementDateRange.startDate}-${accountStatementDateRange.endDate}.pdf`);
       
