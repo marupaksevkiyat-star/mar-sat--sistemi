@@ -121,7 +121,7 @@ function Router() {
           <Route path="/permissions">
             <ProtectedRoute component={Permissions} requiredRole="admin" />
           </Route>
-          <Route component={NotFound} />
+          <Route path="*" component={NotFound} />
         </>
       )}
     </Switch>
