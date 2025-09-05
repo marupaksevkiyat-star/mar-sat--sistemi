@@ -30,6 +30,15 @@ interface Customer {
   createdAt?: string;
 }
 
+interface CustomerHistory {
+  appointments: any[];
+  orders: any[];
+  visits: any[];
+  totalAppointments: number;
+  totalOrders: number;
+  totalVisits: number;
+}
+
 export default function Customers() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
@@ -47,7 +56,7 @@ export default function Customers() {
   });
 
   // Müşteri geçmişi verileri
-  const { data: customerHistory } = useQuery({
+  const { data: customerHistory } = useQuery<CustomerHistory>({
     queryKey: ['/api/customer-history', selectedCustomerHistory?.id],
     enabled: !!selectedCustomerHistory,
   });
