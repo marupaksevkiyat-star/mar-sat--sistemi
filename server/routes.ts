@@ -1709,6 +1709,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Faturalanan siparişlerin irsaliyelerini senkronize et
+  app.post('/api/orders/sync-invoiced-deliveries', isAuthenticated, async (req, res) => {
+    try {
+      console.log('🔄 Faturalanan siparişlerin irsaliyelerini senkronize ediliyor...');
+      
+      // Faturalanan ama irsaliyeleri delivered olmayan siparişleri bul
+      const invoicedOrders = await db
+        .select({
+          orderId: orders.id,
+          orderNumber: orders.orderNumber,
+        })
+        .from(orders)
+        .innerJoin(invoiceItems, eq(invoiceItems.orderId, orders.id))
+        .where(eq(orders.status, 'delivered'))
+        .groupBy(orders.id, orders.orderNumber);
+      
+      let updatedCount = 0;
+      
+      for (const order of invoicedOrders) {
+        // Bu siparişe ait shipping durumundaki irsaliyeleri bul
+        const shippingSlips = await db
+          .select()
+          .from(deliverySlips)
+          .where(
+            and(
+              eq(deliverySlips.orderId, order.orderId),
+              eq(deliverySlips.status, 'shipping')
+            )
+          );
+        
+        // Bu irsaliyeleri delivered durumuna getir
+        for (const slip of shippingSlips) {
+          await db
+            .update(deliverySlips)
+            .set({
+              status: 'delivered',
+              deliveredAt: new Date(),
+              recipientName: 'Sistem senkronizasyonu',
+              notes: 'Faturalanan sipariş - otomatik teslim edildi',
+              updatedAt: new Date(),
+            })
+            .where(eq(deliverySlips.id, slip.id));
+          
+          updatedCount++;
+          console.log(`✅ İrsaliye güncellendi: ${slip.deliverySlipNumber} -> delivered`);
+        }
+      }
+      
+      console.log(`🎉 Toplam ${updatedCount} irsaliye senkronize edildi`);
+      res.json({ 
+        message: `${updatedCount} irsaliye başarıyla senkronize edildi`,
+        updatedCount 
+      });
+    } catch (error) {
+      console.error("Error syncing invoiced deliveries:", error);
+      res.status(500).json({ message: "Failed to sync invoiced deliveries" });
+    }
+  });
+
   // CARİ HESAP API'LERİ
 
   // Müşteri ödemelerini getir
