@@ -1,0 +1,52 @@
+2025-09-06T00:02:43.538876907Z     port: 443
+2025-09-06T00:02:43.538879087Z   },
+2025-09-06T00:02:43.538881777Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.57.176:443'
+2025-09-06T00:02:43.538883927Z }
+2025-09-06T00:02:43.539602348Z 12:02:43 AM [express] GET /api/customers 500 in 5ms :: {"message":"Failed to fetch customers"}
+2025-09-06T00:02:51.53539184Z Error creating customer: ErrorEvent {
+2025-09-06T00:02:51.535423591Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T00:02:51.535428451Z     _events: [Object: null prototype] {
+2025-09-06T00:02:51.535433211Z       error: [Function],
+2025-09-06T00:02:51.535437532Z       message: [Function],
+2025-09-06T00:02:51.535456083Z       close: [Function],
+2025-09-06T00:02:51.535459103Z       open: [Function]
+2025-09-06T00:02:51.535461663Z     },
+2025-09-06T00:02:51.535464333Z     _eventsCount: 4,
+2025-09-06T00:02:51.535467123Z     _maxListeners: undefined,
+2025-09-06T00:02:51.535469763Z     _binaryType: 'arraybuffer',
+2025-09-06T00:02:51.535472263Z     _closeCode: 1006,
+2025-09-06T00:02:51.535474733Z     _closeFrameReceived: false,
+2025-09-06T00:02:51.535477464Z     _closeFrameSent: false,
+2025-09-06T00:02:51.535479873Z     _closeMessage: <Buffer >,
+2025-09-06T00:02:51.535482414Z     _closeTimer: null,
+2025-09-06T00:02:51.535484764Z     _errorEmitted: true,
+2025-09-06T00:02:51.535487554Z     _extensions: {},
+2025-09-06T00:02:51.535490014Z     _paused: false,
+2025-09-06T00:02:51.535492544Z     _protocol: '',
+2025-09-06T00:02:51.535495134Z     _readyState: 3,
+2025-09-06T00:02:51.535497764Z     _receiver: null,
+2025-09-06T00:02:51.535500254Z     _sender: null,
+2025-09-06T00:02:51.535502894Z     _socket: null,
+2025-09-06T00:02:51.535505485Z     _bufferedAmount: 0,
+2025-09-06T00:02:51.535508185Z     _isServer: false,
+2025-09-06T00:02:51.535510675Z     _redirects: 0,
+2025-09-06T00:02:51.535513115Z     _autoPong: true,
+2025-09-06T00:02:51.535515705Z     _url: 'wss://dpg-d2tnf4buibrs73evd9dg-a/v2',
+2025-09-06T00:02:51.535518465Z     _req: null,
+2025-09-06T00:02:51.535521085Z     [Symbol(shapeMode)]: false,
+2025-09-06T00:02:51.535523786Z     [Symbol(kCapture)]: false
+2025-09-06T00:02:51.535526406Z   },
+2025-09-06T00:02:51.535529116Z   [Symbol(kType)]: 'error',
+2025-09-06T00:02:51.535531876Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.57.176:443
+2025-09-06T00:02:51.535534606Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-06T00:02:51.535537026Z     errno: -111,
+2025-09-06T00:02:51.535539496Z     code: 'ECONNREFUSED',
+2025-09-06T00:02:51.535542196Z     syscall: 'connect',
+2025-09-06T00:02:51.535544766Z     address: '10.202.57.176',
+2025-09-06T00:02:51.535547336Z     port: 443
+2025-09-06T00:02:51.535549947Z   },
+2025-09-06T00:02:51.535553287Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.57.176:443'
+2025-09-06T00:02:51.535555667Z }
+2025-09-06T00:02:51.536457266Z 12:02:51 AM [express] POST /api/customers 400 in 7ms :: {"message":"Failed to create customer"}
+2025-09-06T00:03:51.175885681Z ==> Detected service running on port 10000
+2025-09-06T00:03:51.5346863Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
