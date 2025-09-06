@@ -1,0 +1,58 @@
+2025-09-06T01:34:13.023864629Z ==> Deploying...
+2025-09-06T01:34:33.179252073Z ==> Running 'npm run start'
+2025-09-06T01:34:34.181397103Z 
+2025-09-06T01:34:34.181433065Z > rest-express@1.0.0 start
+2025-09-06T01:34:34.181442695Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:34:34.181445835Z 
+2025-09-06T01:34:41.072064532Z 🔧 Setting up database...
+2025-09-06T01:34:45.683143106Z No config path provided, using default 'drizzle.config.ts'
+2025-09-06T01:34:45.68342193Z Reading config file '/opt/render/project/src/drizzle.config.ts'
+2025-09-06T01:34:52.578140478Z Using 'pg' driver for database querying
+2025-09-06T01:34:55.082694518Z [⣷] Pulling schema from database...
+2025-09-06T01:34:55.179457085Z error: SSL/TLS required
+2025-09-06T01:34:55.179481416Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:34:55.179486486Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:34:55.179493097Z     at async Object.query (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:66575:26)
+2025-09-06T01:34:55.179503207Z     at async fromDatabase2 (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:18700:25) {
+2025-09-06T01:34:55.179509048Z   length: 37,
+2025-09-06T01:34:55.179514898Z   severity: 'FATAL',
+2025-09-06T01:34:55.179521238Z   code: '28000',
+2025-09-06T01:34:55.179525039Z   detail: undefined,
+2025-09-06T01:34:55.179528589Z   hint: undefined,
+2025-09-06T01:34:55.179531989Z   position: undefined,
+2025-09-06T01:34:55.179536719Z   internalPosition: undefined,
+2025-09-06T01:34:55.179540179Z   internalQuery: undefined,
+2025-09-06T01:34:55.179543649Z   where: undefined,
+2025-09-06T01:34:55.179547Z   schema: undefined,
+2025-09-06T01:34:55.17955039Z   table: undefined,
+2025-09-06T01:34:55.1795538Z   column: undefined,
+2025-09-06T01:34:55.17955717Z   dataType: undefined,
+2025-09-06T01:34:55.17956053Z   constraint: undefined,
+2025-09-06T01:34:55.1795639Z   file: undefined,
+2025-09-06T01:34:55.179567261Z   line: undefined,
+2025-09-06T01:34:55.179570661Z   routine: undefined
+2025-09-06T01:34:55.179575601Z }
+2025-09-06T01:34:55.583660053Z ✅ Database schema pushed successfully!
+2025-09-06T01:34:55.583826901Z 🔧 Adding test data...
+2025-09-06T01:35:15.266668543Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:35:15.824322589Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:36:19.150160743Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:36:19.49080598Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:36:27.960961573Z error: SSL/TLS required
+2025-09-06T01:36:27.960986353Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:36:27.960992133Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:36:27.960996773Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:36:27.961001304Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:177:19)
+2025-09-06T01:36:27.961005764Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:36:32.787905753Z error: SSL/TLS required
+2025-09-06T01:36:32.787928364Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:36:32.787933324Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:36:32.787938324Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:36:32.787942434Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:177:19)
+2025-09-06T01:36:32.787946224Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:36:35.454846869Z error: SSL/TLS required
+2025-09-06T01:36:35.45487398Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:36:35.45488141Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:36:35.45488777Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:36:35.454912641Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:177:19)
+2025-09-06T01:36:35.454918671Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
