@@ -1,0 +1,50 @@
+2025-09-06T01:49:00.883503173Z Node.js v22.16.0
+2025-09-06T01:49:14.081219539Z ==> Deploying...
+2025-09-06T01:49:33.18155157Z ==> Running 'npm run start'
+2025-09-06T01:49:34.280877826Z 
+2025-09-06T01:49:34.280902546Z > rest-express@1.0.0 start
+2025-09-06T01:49:34.280908546Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:49:34.280911256Z 
+2025-09-06T01:49:41.083888187Z 🔧 Setting up database...
+2025-09-06T01:49:51.09330792Z file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1384
+2025-09-06T01:49:51.093335701Z  connect",o),this._clients=this._clients.filter(u=>u!==t),s&&(o.message="Connect\
+2025-09-06T01:49:51.093340041Z                                                                        ^
+2025-09-06T01:49:51.093343001Z 
+2025-09-06T01:49:51.093345591Z TypeError: Cannot set property message of #<ErrorEvent> which has only a getter
+2025-09-06T01:49:51.093352411Z     at An._connectionCallback (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1384:72)
+2025-09-06T01:49:51.093356621Z     at An._handleErrorWhileConnecting (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1290:38)
+2025-09-06T01:49:51.093359681Z     at An._handleErrorEvent (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1291:33)
+2025-09-06T01:49:51.093363082Z     at fn.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:49:51.093366022Z     at v.reportStreamError (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1201:46)
+2025-09-06T01:49:51.093368822Z     at v.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:49:51.093372142Z     at WebSocket.<anonymous> (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:986:42)
+2025-09-06T01:49:51.093374912Z     at callListener (/opt/render/project/src/node_modules/ws/lib/event-target.js:290:14)
+2025-09-06T01:49:51.093377562Z     at WebSocket.onError (/opt/render/project/src/node_modules/ws/lib/event-target.js:230:9)
+2025-09-06T01:49:51.093380772Z     at WebSocket.emit (node:events:518:28)
+2025-09-06T01:49:51.093383262Z 
+2025-09-06T01:49:51.093385992Z Node.js v22.16.0
+2025-09-06T01:49:56.192175525Z ==> Exited with status 1
+2025-09-06T01:49:56.337253539Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+2025-09-06T01:50:00.868695498Z ==> Running 'npm run start'
+2025-09-06T01:50:01.781315929Z 
+2025-09-06T01:50:01.7813677Z > rest-express@1.0.0 start
+2025-09-06T01:50:01.78137463Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:50:01.78137743Z 
+2025-09-06T01:50:08.460338797Z 🔧 Setting up database...
+2025-09-06T01:50:18.468179079Z file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1384
+2025-09-06T01:50:18.468209329Z  connect",o),this._clients=this._clients.filter(u=>u!==t),s&&(o.message="Connect\
+2025-09-06T01:50:18.46821798Z                                                                        ^
+2025-09-06T01:50:18.46822248Z 
+2025-09-06T01:50:18.46822649Z TypeError: Cannot set property message of #<ErrorEvent> which has only a getter
+2025-09-06T01:50:18.46823146Z     at An._connectionCallback (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1384:72)
+2025-09-06T01:50:18.46823855Z     at An._handleErrorWhileConnecting (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1290:38)
+2025-09-06T01:50:18.46824245Z     at An._handleErrorEvent (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1291:33)
+2025-09-06T01:50:18.468248161Z     at fn.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:50:18.468252581Z     at v.reportStreamError (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1201:46)
+2025-09-06T01:50:18.468256981Z     at v.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:50:18.468260851Z     at WebSocket.<anonymous> (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:986:42)
+2025-09-06T01:50:18.468265001Z     at callListener (/opt/render/project/src/node_modules/ws/lib/event-target.js:290:14)
+2025-09-06T01:50:18.468269201Z     at WebSocket.onError (/opt/render/project/src/node_modules/ws/lib/event-target.js:230:9)
+2025-09-06T01:50:18.468275011Z     at WebSocket.emit (node:events:518:28)
+2025-09-06T01:50:18.468278731Z 
+2025-09-06T01:50:18.468282731Z Node.js v22.16.0
