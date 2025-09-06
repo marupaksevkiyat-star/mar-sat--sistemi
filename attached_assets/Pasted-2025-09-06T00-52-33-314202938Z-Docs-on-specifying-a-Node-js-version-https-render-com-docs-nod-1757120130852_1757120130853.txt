@@ -1,0 +1,89 @@
+2025-09-06T00:52:33.314202938Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-09-06T00:52:35.115576309Z ==> Running build command 'npm install --production=false && npm run build'...
+2025-09-06T00:52:43.242191145Z 
+2025-09-06T00:52:43.242216407Z added 539 packages, and audited 540 packages in 8s
+2025-09-06T00:52:43.242252469Z 
+2025-09-06T00:52:43.24226769Z 70 packages are looking for funding
+2025-09-06T00:52:43.242284401Z   run `npm fund` for details
+2025-09-06T00:52:43.265674994Z 
+2025-09-06T00:52:43.265687115Z 11 vulnerabilities (3 low, 8 moderate)
+2025-09-06T00:52:43.265690815Z 
+2025-09-06T00:52:43.265695145Z To address issues that do not require attention, run:
+2025-09-06T00:52:43.265698755Z   npm audit fix
+2025-09-06T00:52:43.265702225Z 
+2025-09-06T00:52:43.265705716Z To address all issues (including breaking changes), run:
+2025-09-06T00:52:43.265709576Z   npm audit fix --force
+2025-09-06T00:52:43.265712886Z 
+2025-09-06T00:52:43.265718336Z Run `npm audit` for details.
+2025-09-06T00:52:43.43692102Z 
+2025-09-06T00:52:43.436946031Z > rest-express@1.0.0 build
+2025-09-06T00:52:43.436952791Z > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+2025-09-06T00:52:43.436958662Z 
+2025-09-06T00:52:43.613219558Z vite v5.4.19 building for production...
+2025-09-06T00:52:43.659524116Z transforming...
+2025-09-06T00:52:43.885058162Z Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+2025-09-06T00:52:43.885074823Z   npx update-browserslist-db@latest
+2025-09-06T00:52:43.885079063Z   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2025-09-06T00:52:49.250199411Z ✓ 2259 modules transformed.
+2025-09-06T00:52:49.524448495Z rendering chunks...
+2025-09-06T00:52:49.867043382Z computing gzip size...
+2025-09-06T00:52:49.897203637Z ../dist/public/index.html                                          2.25 kB │ gzip:   0.91 kB
+2025-09-06T00:52:49.897235339Z ../dist/public/assets/MARUPAK_LOGO_1757030221412-DlQta4u5.png     80.59 kB
+2025-09-06T00:52:49.897369967Z ../dist/public/assets/index-B8NcCs4s.css                          76.72 kB │ gzip:  13.10 kB
+2025-09-06T00:52:49.897500324Z ../dist/public/assets/purify.es-BFmuJLeH.js                       21.93 kB │ gzip:   8.62 kB
+2025-09-06T00:52:49.897537046Z ../dist/public/assets/index.es-gWZ34Ako.js                       150.53 kB │ gzip:  51.48 kB
+2025-09-06T00:52:49.897546427Z ../dist/public/assets/html2canvas.esm-CBrSDip1.js                201.42 kB │ gzip:  48.03 kB
+2025-09-06T00:52:49.89759507Z ../dist/public/assets/index-8VjKs_HX.js                        1,246.01 kB │ gzip: 358.32 kB
+2025-09-06T00:52:49.897666854Z 
+2025-09-06T00:52:49.897672144Z (!) Some chunks are larger than 500 kB after minification. Consider:
+2025-09-06T00:52:49.897676424Z - Using dynamic import() to code-split the application
+2025-09-06T00:52:49.897680634Z - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+2025-09-06T00:52:49.897700276Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+2025-09-06T00:52:49.898005153Z ✓ built in 6.26s
+2025-09-06T00:52:50.015134649Z 
+2025-09-06T00:52:50.01515628Z   dist/index.js  118.0kb
+2025-09-06T00:52:50.01515884Z 
+2025-09-06T00:52:50.01516075Z ⚡ Done in 10ms
+2025-09-06T00:52:54.417451073Z ==> Uploading build...
+2025-09-06T00:53:03.945365632Z ==> Uploaded in 6.2s. Compression took 3.4s
+2025-09-06T00:53:03.980056949Z ==> Build successful 🎉
+2025-09-06T00:53:06.749943926Z ==> Deploying...
+2025-09-06T00:53:25.981763542Z ==> Running 'npm run start'
+2025-09-06T00:53:26.988914483Z 
+2025-09-06T00:53:26.988941414Z > rest-express@1.0.0 start
+2025-09-06T00:53:26.988946874Z > NODE_ENV=production node dist/index.js
+2025-09-06T00:53:26.988949364Z 
+2025-09-06T00:53:33.885841054Z 🔧 Setting up database...
+2025-09-06T00:53:38.883097547Z No config path provided, using default 'drizzle.config.ts'
+2025-09-06T00:53:38.883434734Z Reading config file '/opt/render/project/src/drizzle.config.ts'
+2025-09-06T00:53:45.477963241Z Using 'pg' driver for database querying
+2025-09-06T00:53:48.381803208Z [⣷] Pulling schema from database...
+2025-09-06T00:53:48.481796942Z error: SSL/TLS required
+2025-09-06T00:53:48.481820832Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T00:53:48.481824082Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T00:53:48.481826673Z     at async Object.query (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:66575:26)
+2025-09-06T00:53:48.481830422Z     at async fromDatabase2 (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:18700:25) {
+2025-09-06T00:53:48.481832983Z   length: 37,
+2025-09-06T00:53:48.481835513Z   severity: 'FATAL',
+2025-09-06T00:53:48.481838273Z   code: '28000',
+2025-09-06T00:53:48.481841033Z   detail: undefined,
+2025-09-06T00:53:48.481843493Z   hint: undefined,
+2025-09-06T00:53:48.481846033Z   position: undefined,
+2025-09-06T00:53:48.481848903Z   internalPosition: undefined,
+2025-09-06T00:53:48.481851373Z   internalQuery: undefined,
+2025-09-06T00:53:48.481853733Z   where: undefined,
+2025-09-06T00:53:48.481856073Z   schema: undefined,
+2025-09-06T00:53:48.481858593Z   table: undefined,
+2025-09-06T00:53:48.481860953Z   column: undefined,
+2025-09-06T00:53:48.481863313Z   dataType: undefined,
+2025-09-06T00:53:48.481865353Z   constraint: undefined,
+2025-09-06T00:53:48.481867283Z   file: undefined,
+2025-09-06T00:53:48.481869173Z   line: undefined,
+2025-09-06T00:53:48.481871103Z   routine: undefined
+2025-09-06T00:53:48.481873023Z }
+2025-09-06T00:53:48.993521256Z ✅ Database schema pushed successfully!
+2025-09-06T00:53:48.9936969Z 🔧 Adding test data...
+2025-09-06T00:54:09.125002933Z ==> No open ports detected, continuing to scan...
+2025-09-06T00:54:09.46367616Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T00:55:11.960680904Z ==> No open ports detected, continuing to scan...
+2025-09-06T00:55:12.346145334Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
