@@ -1,14 +1,37 @@
 import { storage } from "./storage";
 import type { OrderWithDetails, MailTemplate } from "@shared/schema";
-import { MailService } from '@sendgrid/mail';
+import nodemailer from 'nodemailer';
 
-// SendGrid setup
-const mailService = new MailService();
-if (process.env.SENDGRID_API_KEY) {
-  mailService.setApiKey(process.env.SENDGRID_API_KEY);
+// Mail ayarlarını veritabanından al
+async function getMailSettings() {
+  try {
+    const smtpSettings = await storage.getMailSetting('smtp_settings');
+    if (smtpSettings?.settingValue) {
+      return JSON.parse(smtpSettings.settingValue);
+    }
+  } catch (error) {
+    console.log('Mail settings not found in database, using environment variables');
+  }
+  
+  // Fallback: Environment variables kullan
+  return {
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD
+    }
+  };
 }
 
-// SendGrid ile mail gönderme fonksiyonu
+// SMTP transporter oluştur
+const createMailTransporter = async () => {
+  const settings = await getMailSettings();
+  return nodemailer.createTransporter(settings);
+};
+
+// Mail gönderme fonksiyonu (Panel ayarları veya env variables kullanır)
 export async function sendEmailWithSendGrid(params: {
   to: string;
   subject: string;
@@ -16,22 +39,29 @@ export async function sendEmailWithSendGrid(params: {
   text: string;
 }): Promise<boolean> {
   try {
-    if (!process.env.SENDGRID_API_KEY) {
-      console.log('⚠️ SENDGRID_API_KEY not found - email not sent');
+    const transporter = await createMailTransporter();
+    const settings = await getMailSettings();
+    
+    // Gönderen email adresini belirle
+    const fromEmail = settings.auth?.user || process.env.GMAIL_USER || 'noreply@company.com';
+    
+    if (!settings.auth?.user && !process.env.GMAIL_USER) {
+      console.log('⚠️ No email credentials found in panel or environment variables');
       return false;
     }
 
-    await mailService.send({
+    await transporter.sendMail({
+      from: `"Satış Sistemi" <${fromEmail}>`,
       to: params.to,
-      from: 'noreply@company.com', // Verified sender email
       subject: params.subject,
       text: params.text,
       html: params.html,
     });
     
+    console.log('✅ Email sent successfully via SMTP');
     return true;
   } catch (error) {
-    console.error('SendGrid email error:', error);
+    console.error('SMTP email error:', error);
     return false;
   }
 }
