@@ -65,9 +65,26 @@ app.use((req, res, next) => {
       console.log('🔧 Skipping schema push in production - assuming tables exist');
       console.log('📝 Note: Run drizzle-kit push manually if schema changes needed');
       
-      // PRODUCTION FIX: Skip test data insertion - may cause WebSocket issues
-      console.log('🔧 Skipping test data insertion in production');
-      console.log('📝 Note: Test data should already exist or be added manually');
+      // PRODUCTION FIX: Add essential users for foreign key constraints
+      try {
+        const { db } = await import('./db');
+        const { users } = await import('../shared/schema');
+        
+        console.log('🔧 Adding essential users...');
+        
+        // Essential users for system to work (foreign key requirements)
+        await db.insert(users).values([
+          { id: 'admin', email: 'admin@system.com', firstName: 'Admin', lastName: 'User', role: 'admin' },
+          { id: 'sales1', email: 'sales@company.com', firstName: 'Satış', lastName: 'Personeli', role: 'sales' },
+          { id: 'production1', email: 'production@company.com', firstName: 'Üretim', lastName: 'Personeli', role: 'production' },
+          { id: 'shipping1', email: 'shipping@company.com', firstName: 'Kargo', lastName: 'Personeli', role: 'shipping' }
+        ]).onConflictDoNothing();
+        
+        console.log('✅ Essential users added successfully!');
+      } catch (userError: any) {
+        console.log('⚠️ User creation error:', userError.message, '- continuing...');
+      }
+      
       console.log('✅ Database setup completed!');
     }
   } catch (error: any) {
