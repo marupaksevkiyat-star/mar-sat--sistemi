@@ -1,0 +1,50 @@
+2025-09-06T01:42:33.500475879Z     at v.reportStreamError (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1201:46)
+2025-09-06T01:42:33.500480429Z     at v.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:42:33.500484699Z     at WebSocket.<anonymous> (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:986:42)
+2025-09-06T01:42:33.500489239Z     at callListener (/opt/render/project/src/node_modules/ws/lib/event-target.js:290:14)
+2025-09-06T01:42:33.5004935Z     at WebSocket.onError (/opt/render/project/src/node_modules/ws/lib/event-target.js:230:9)
+2025-09-06T01:42:33.5004983Z     at WebSocket.emit (node:events:518:28)
+2025-09-06T01:42:33.50050896Z 
+2025-09-06T01:42:33.500513571Z Node.js v22.16.0
+2025-09-06T01:43:26.924587516Z error: relation "IDX_session_expire" already exists
+2025-09-06T01:43:26.924620817Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:43:26.924625677Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:43:26.924630327Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:43:26.924635207Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:186:9)
+2025-09-06T01:43:26.924658378Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:43:45.204116104Z error: relation "IDX_session_expire" already exists
+2025-09-06T01:43:45.204171245Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:43:45.204177415Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:43:45.204182845Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:43:45.204188265Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:186:9)
+2025-09-06T01:43:45.204208086Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:43:47.310916611Z error: relation "IDX_session_expire" already exists
+2025-09-06T01:43:47.310948961Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:43:47.310954401Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:43:47.310959561Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:43:47.310964621Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:186:9)
+2025-09-06T01:43:47.310968672Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:44:01.106465549Z error: relation "IDX_session_expire" already exists
+2025-09-06T01:44:01.1065003Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:44:01.10650559Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:44:01.10651019Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:44:01.106514621Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:186:9)
+2025-09-06T01:44:01.106518311Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:44:10.923467707Z error: relation "IDX_session_expire" already exists
+2025-09-06T01:44:10.923497187Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:44:10.923502787Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:44:10.923507728Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:44:10.923512788Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:186:9)
+2025-09-06T01:44:10.923516998Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:44:12.361006742Z error: relation "IDX_session_expire" already exists
+2025-09-06T01:44:12.361034813Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:44:12.361040643Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:44:12.361045773Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:44:12.361050603Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:186:9)
+2025-09-06T01:44:12.361055173Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:44:24.88930871Z error: relation "IDX_session_expire" already exists
+2025-09-06T01:44:24.889330931Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:44:24.889335711Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:44:24.889339531Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:44:24.889342981Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:186:9)
+2025-09-06T01:44:24.889345821Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
