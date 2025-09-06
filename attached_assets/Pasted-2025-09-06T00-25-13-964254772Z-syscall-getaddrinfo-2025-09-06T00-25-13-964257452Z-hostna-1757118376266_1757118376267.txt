@@ -1,0 +1,138 @@
+2025-09-06T00:25:13.964254772Z     syscall: 'getaddrinfo',
+2025-09-06T00:25:13.964257452Z     hostname: 'dpg-d2tnf4buibrs73evd9dg-a.render-internal.com'
+2025-09-06T00:25:13.964260342Z   },
+2025-09-06T00:25:13.964263132Z   [Symbol(kMessage)]: 'getaddrinfo ENOTFOUND dpg-d2tnf4buibrs73evd9dg-a.render-internal.com'
+2025-09-06T00:25:13.964265862Z }
+2025-09-06T00:25:13.965810745Z 12:25:13 AM [express] GET /api/appointments/today/2025-09-06 500 in 13ms :: {"message":"Failed to fet…
+2025-09-06T00:25:13.966665939Z Error fetching customers: ErrorEvent {
+2025-09-06T00:25:13.966673179Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T00:25:13.966676129Z     _events: [Object: null prototype] {
+2025-09-06T00:25:13.96669985Z       error: [Function],
+2025-09-06T00:25:13.966702501Z       message: [Function],
+2025-09-06T00:25:13.966704841Z       close: [Function],
+2025-09-06T00:25:13.966707091Z       open: [Function]
+2025-09-06T00:25:13.966709391Z     },
+2025-09-06T00:25:13.966711931Z     _eventsCount: 4,
+2025-09-06T00:25:13.966714401Z     _maxListeners: undefined,
+2025-09-06T00:25:13.966717201Z     _binaryType: 'arraybuffer',
+2025-09-06T00:25:13.966719651Z     _closeCode: 1006,
+2025-09-06T00:25:13.966722161Z     _closeFrameReceived: false,
+2025-09-06T00:25:13.966724681Z     _closeFrameSent: false,
+2025-09-06T00:25:13.966726962Z     _closeMessage: <Buffer >,
+2025-09-06T00:25:13.966729362Z     _closeTimer: null,
+2025-09-06T00:25:13.966731892Z     _errorEmitted: true,
+2025-09-06T00:25:13.966734472Z     _extensions: {},
+2025-09-06T00:25:13.966736862Z     _paused: false,
+2025-09-06T00:25:13.966739062Z     _protocol: '',
+2025-09-06T00:25:13.966741472Z     _readyState: 3,
+2025-09-06T00:25:13.966744072Z     _receiver: null,
+2025-09-06T00:25:13.966746912Z     _sender: null,
+2025-09-06T00:25:13.966759313Z     _socket: null,
+2025-09-06T00:25:13.966762033Z     _bufferedAmount: 0,
+2025-09-06T00:25:13.966764553Z     _isServer: false,
+2025-09-06T00:25:13.966767233Z     _redirects: 0,
+2025-09-06T00:25:13.966769953Z     _autoPong: true,
+2025-09-06T00:25:13.966773323Z     _url: 'wss://dpg-d2tnf4buibrs73evd9dg-a.render-internal.com/v2',
+2025-09-06T00:25:13.966776073Z     _req: null,
+2025-09-06T00:25:13.966778624Z     [Symbol(shapeMode)]: false,
+2025-09-06T00:25:13.966780914Z     [Symbol(kCapture)]: false
+2025-09-06T00:25:13.966783524Z   },
+2025-09-06T00:25:13.966786234Z   [Symbol(kType)]: 'error',
+2025-09-06T00:25:13.966789414Z   [Symbol(kError)]: Error: getaddrinfo ENOTFOUND dpg-d2tnf4buibrs73evd9dg-a.render-internal.com
+2025-09-06T00:25:13.966792104Z       at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+2025-09-06T00:25:13.966794464Z     errno: -3008,
+2025-09-06T00:25:13.966797104Z     code: 'ENOTFOUND',
+2025-09-06T00:25:13.966799804Z     syscall: 'getaddrinfo',
+2025-09-06T00:25:13.966802425Z     hostname: 'dpg-d2tnf4buibrs73evd9dg-a.render-internal.com'
+2025-09-06T00:25:13.966805205Z   },
+2025-09-06T00:25:13.966808215Z   [Symbol(kMessage)]: 'getaddrinfo ENOTFOUND dpg-d2tnf4buibrs73evd9dg-a.render-internal.com'
+2025-09-06T00:25:13.966810905Z }
+2025-09-06T00:25:14.035895748Z 12:25:14 AM [express] GET /api/customers 500 in 76ms :: {"message":"Failed to fetch customers"}
+2025-09-06T00:25:23.46486854Z Error creating customer: ErrorEvent {
+2025-09-06T00:25:23.464891611Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T00:25:23.464896941Z     _events: [Object: null prototype] {
+2025-09-06T00:25:23.464902291Z       error: [Function],
+2025-09-06T00:25:23.464906882Z       message: [Function],
+2025-09-06T00:25:23.464911472Z       close: [Function],
+2025-09-06T00:25:23.464915462Z       open: [Function]
+2025-09-06T00:25:23.464919762Z     },
+2025-09-06T00:25:23.464924022Z     _eventsCount: 4,
+2025-09-06T00:25:23.464926802Z     _maxListeners: undefined,
+2025-09-06T00:25:23.464929532Z     _binaryType: 'arraybuffer',
+2025-09-06T00:25:23.464932303Z     _closeCode: 1006,
+2025-09-06T00:25:23.464935103Z     _closeFrameReceived: false,
+2025-09-06T00:25:23.464937873Z     _closeFrameSent: false,
+2025-09-06T00:25:23.464940613Z     _closeMessage: <Buffer >,
+2025-09-06T00:25:23.464943363Z     _closeTimer: null,
+2025-09-06T00:25:23.464946153Z     _errorEmitted: true,
+2025-09-06T00:25:23.464948923Z     _extensions: {},
+2025-09-06T00:25:23.464951733Z     _paused: false,
+2025-09-06T00:25:23.464954973Z     _protocol: '',
+2025-09-06T00:25:23.464957873Z     _readyState: 3,
+2025-09-06T00:25:23.464960664Z     _receiver: null,
+2025-09-06T00:25:23.464963384Z     _sender: null,
+2025-09-06T00:25:23.464966134Z     _socket: null,
+2025-09-06T00:25:23.464968854Z     _bufferedAmount: 0,
+2025-09-06T00:25:23.464971634Z     _isServer: false,
+2025-09-06T00:25:23.464974364Z     _redirects: 0,
+2025-09-06T00:25:23.464977094Z     _autoPong: true,
+2025-09-06T00:25:23.464980434Z     _url: 'wss://dpg-d2tnf4buibrs73evd9dg-a.render-internal.com/v2',
+2025-09-06T00:25:23.464983275Z     _req: null,
+2025-09-06T00:25:23.464986045Z     [Symbol(shapeMode)]: false,
+2025-09-06T00:25:23.464988785Z     [Symbol(kCapture)]: false
+2025-09-06T00:25:23.464991555Z   },
+2025-09-06T00:25:23.464994405Z   [Symbol(kType)]: 'error',
+2025-09-06T00:25:23.464997785Z   [Symbol(kError)]: Error: getaddrinfo ENOTFOUND dpg-d2tnf4buibrs73evd9dg-a.render-internal.com
+2025-09-06T00:25:23.465000635Z       at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+2025-09-06T00:25:23.465013096Z     errno: -3008,
+2025-09-06T00:25:23.465014966Z     code: 'ENOTFOUND',
+2025-09-06T00:25:23.465016646Z     syscall: 'getaddrinfo',
+2025-09-06T00:25:23.465018966Z     hostname: 'dpg-d2tnf4buibrs73evd9dg-a.render-internal.com'
+2025-09-06T00:25:23.465020636Z   },
+2025-09-06T00:25:23.465022906Z   [Symbol(kMessage)]: 'getaddrinfo ENOTFOUND dpg-d2tnf4buibrs73evd9dg-a.render-internal.com'
+2025-09-06T00:25:23.465025056Z }
+2025-09-06T00:25:23.465775477Z 12:25:23 AM [express] POST /api/customers 400 in 7ms :: {"message":"Failed to create customer"}
+2025-09-06T00:25:24.979415687Z Error creating customer: ErrorEvent {
+2025-09-06T00:25:24.979445588Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T00:25:24.979449279Z     _events: [Object: null prototype] {
+2025-09-06T00:25:24.979452559Z       error: [Function],
+2025-09-06T00:25:24.979455099Z       message: [Function],
+2025-09-06T00:25:24.979457689Z       close: [Function],
+2025-09-06T00:25:24.979460259Z       open: [Function]
+2025-09-06T00:25:24.979463119Z     },
+2025-09-06T00:25:24.979466159Z     _eventsCount: 4,
+2025-09-06T00:25:24.979468519Z     _maxListeners: undefined,
+2025-09-06T00:25:24.979470269Z     _binaryType: 'arraybuffer',
+2025-09-06T00:25:24.979472009Z     _closeCode: 1006,
+2025-09-06T00:25:24.97947366Z     _closeFrameReceived: false,
+2025-09-06T00:25:24.97947558Z     _closeFrameSent: false,
+2025-09-06T00:25:24.97947722Z     _closeMessage: <Buffer >,
+2025-09-06T00:25:24.97947885Z     _closeTimer: null,
+2025-09-06T00:25:24.97948054Z     _errorEmitted: true,
+2025-09-06T00:25:24.97948219Z     _extensions: {},
+2025-09-06T00:25:24.9794839Z     _paused: false,
+2025-09-06T00:25:24.9794856Z     _protocol: '',
+2025-09-06T00:25:24.97948725Z     _readyState: 3,
+2025-09-06T00:25:24.97948888Z     _receiver: null,
+2025-09-06T00:25:24.97949051Z     _sender: null,
+2025-09-06T00:25:24.97949214Z     _socket: null,
+2025-09-06T00:25:24.97949375Z     _bufferedAmount: 0,
+2025-09-06T00:25:24.97949542Z     _isServer: false,
+2025-09-06T00:25:24.97949706Z     _redirects: 0,
+2025-09-06T00:25:24.979498881Z     _autoPong: true,
+2025-09-06T00:25:24.97950117Z     _url: 'wss://dpg-d2tnf4buibrs73evd9dg-a.render-internal.com/v2',
+2025-09-06T00:25:24.979502891Z     _req: null,
+2025-09-06T00:25:24.979504621Z     [Symbol(shapeMode)]: false,
+2025-09-06T00:25:24.979506321Z     [Symbol(kCapture)]: false
+2025-09-06T00:25:24.979508001Z   },
+2025-09-06T00:25:24.979509761Z   [Symbol(kType)]: 'error',
+2025-09-06T00:25:24.979512271Z   [Symbol(kError)]: Error: getaddrinfo ENOTFOUND dpg-d2tnf4buibrs73evd9dg-a.render-internal.com
+2025-09-06T00:25:24.979514021Z       at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+2025-09-06T00:25:24.979515711Z     errno: -3008,
+2025-09-06T00:25:24.979517381Z     code: 'ENOTFOUND',
+2025-09-06T00:25:24.979519031Z     syscall: 'getaddrinfo',
+2025-09-06T00:25:24.979521151Z     hostname: 'dpg-d2tnf4buibrs73evd9dg-a.render-internal.com'
+2025-09-06T00:25:24.979522802Z   },
+2025-09-06T00:25:24.979524502Z   [Symbol(kMessage)]: 'getaddrinfo ENOTFOUND dpg-d2tnf4buibrs73evd9dg-a.render-internal.com'
+2025-09-06T00:25:24.979526191Z }
+2025-09-06T00:25:24.980200999Z 12:25:24 AM [express] POST /api/customers 400 in 4ms :: {"message":"Failed to create customer"}
