@@ -38,16 +38,17 @@ const isAuthenticated = (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // RENDER FIX: Memory store with stable session for single instance
+  // Production-ready session configuration
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'demo-secret',
-    resave: true, // RENDER FIX: resave true for single instance
+    secret: process.env.SESSION_SECRET || 'satis-uretim-secret-fallback',
+    resave: false,
     saveUninitialized: false,
     rolling: true, // Keep session alive with activity
+    name: 'connect.sid', // Standard session name
     cookie: {
-      secure: false, // RENDER FIX: proxy issue ile secure cookies çalışmıyor
+      secure: false, // Set to false for Render proxy compatibility
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: 8 * 60 * 60 * 1000, // 8 hours
       sameSite: 'lax'
     }
   }));

@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import { sql } from "drizzle-orm";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -37,34 +38,58 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Database setup - otomatik tablo oluşturma
+  // Database setup - production ready
   try {
     if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
       console.log('🔧 Setting up database...');
       
-      // Drizzle kit push ile tabloları oluştur
+      // Test database connection first
+      try {
+        const { db } = await import('./db');
+        await db.execute(sql`SELECT 1`);
+        console.log('✅ Database connection verified!');
+      } catch (connectError: any) {
+        console.log('⚠️ Database connection test failed:', connectError.message);
+      }
+      
+      // Try schema push with error handling
       const { spawn } = await import('child_process');
       
-      await new Promise((resolve, reject) => {
+      await new Promise((resolve) => {
         const pushProcess = spawn('npx', ['drizzle-kit', 'push', '--force'], {
           stdio: 'inherit',
           env: { ...process.env }
         });
         
+        let hasCompleted = false;
+        
+        const completeOnce = () => {
+          if (!hasCompleted) {
+            hasCompleted = true;
+            resolve(true);
+          }
+        };
+        
         pushProcess.on('close', (code) => {
           if (code === 0) {
             console.log('✅ Database schema pushed successfully!');
-            resolve(true);
           } else {
-            console.log('⚠️ Schema push failed, continuing...');
-            resolve(true); // Continue even if fails
+            console.log('⚠️ Schema push failed, but continuing...');
           }
+          completeOnce();
         });
         
         pushProcess.on('error', (err) => {
-          console.log('⚠️ Schema push error:', err.message);
-          resolve(true); // Continue even if fails
+          console.log('⚠️ Schema push error:', err.message, 'but continuing...');
+          completeOnce();
         });
+        
+        // Timeout after 30 seconds
+        setTimeout(() => {
+          console.log('⏱️ Schema push timeout, continuing...');
+          pushProcess.kill();
+          completeOnce();
+        }, 30000);
       });
       
       // Test verisi ekle
