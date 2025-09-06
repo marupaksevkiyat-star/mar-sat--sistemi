@@ -1,0 +1,183 @@
+2025-09-06T01:54:40.661415659Z error: relation "IDX_session_expire" already exists
+2025-09-06T01:54:40.661446279Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:54:40.661452529Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:54:40.661463189Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:54:40.66146888Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:186:9)
+2025-09-06T01:54:40.66147322Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:54:51.450510302Z ==> Running 'npm run start'
+2025-09-06T01:54:52.452943507Z 
+2025-09-06T01:54:52.452966347Z > rest-express@1.0.0 start
+2025-09-06T01:54:52.452973117Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:54:52.452975397Z 
+2025-09-06T01:54:59.243379908Z 🔧 Setting up database...
+2025-09-06T01:55:04.24570011Z ⚠️ Database connection test failed: Connection timeout - continuing without initial test...
+2025-09-06T01:55:04.245730901Z 🔧 Skipping schema push in production - assuming tables exist
+2025-09-06T01:55:04.245750391Z 📝 Note: Run drizzle-kit push manually if schema changes needed
+2025-09-06T01:55:04.245762281Z 🔧 Skipping test data insertion in production
+2025-09-06T01:55:04.245897714Z 📝 Note: Test data should already exist or be added manually
+2025-09-06T01:55:04.245966405Z ✅ Database setup completed!
+2025-09-06T01:55:04.247886982Z Warning: connect.session() MemoryStore is not
+2025-09-06T01:55:04.247926603Z designed for a production environment, as it will leak
+2025-09-06T01:55:04.247934383Z memory, and will not scale past a single process.
+2025-09-06T01:55:04.349021642Z 1:55:04 AM [express] serving on port 10000
+2025-09-06T01:55:09.251620751Z node:internal/event_target:1101
+2025-09-06T01:55:09.251652052Z   process.nextTick(() => { throw err; });
+2025-09-06T01:55:09.251657302Z                            ^
+2025-09-06T01:55:09.251661002Z 
+2025-09-06T01:55:09.251665652Z TypeError: Cannot set property message of #<_ErrorEvent> which has only a getter
+2025-09-06T01:55:09.251671623Z     at An._connectionCallback (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1384:72)
+2025-09-06T01:55:09.251679043Z     at An._handleErrorWhileConnecting (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1290:38)
+2025-09-06T01:55:09.251683583Z     at An._handleErrorEvent (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1291:33)
+2025-09-06T01:55:09.251689503Z     at fn.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:55:09.251693543Z     at v.reportStreamError (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1201:46)
+2025-09-06T01:55:09.251697873Z     at v.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:55:09.251702383Z     at WebSocket.<anonymous> (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:986:42)
+2025-09-06T01:55:09.251706513Z     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+2025-09-06T01:55:09.251710853Z     at WebSocket.dispatchEvent (node:internal/event_target:762:26)
+2025-09-06T01:55:09.251715203Z     at fireEvent (node:internal/deps/undici/undici:11663:14)
+2025-09-06T01:55:09.251719043Z 
+2025-09-06T01:55:09.251722884Z Node.js v22.16.0
+2025-09-06T01:55:11.037536217Z ==> Exited with status 1
+2025-09-06T01:55:11.18717985Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+2025-09-06T01:55:16.1886358Z ==> Running 'npm run start'
+2025-09-06T01:55:17.196796955Z 
+2025-09-06T01:55:17.196812625Z > rest-express@1.0.0 start
+2025-09-06T01:55:17.196817175Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:55:17.196819525Z 
+2025-09-06T01:55:24.389496313Z 🔧 Setting up database...
+2025-09-06T01:55:29.391694144Z ⚠️ Database connection test failed: Connection timeout - continuing without initial test...
+2025-09-06T01:55:29.391729885Z 🔧 Skipping schema push in production - assuming tables exist
+2025-09-06T01:55:29.391743245Z 📝 Note: Run drizzle-kit push manually if schema changes needed
+2025-09-06T01:55:29.391805926Z 🔧 Skipping test data insertion in production
+2025-09-06T01:55:29.391872228Z 📝 Note: Test data should already exist or be added manually
+2025-09-06T01:55:29.391894018Z ✅ Database setup completed!
+2025-09-06T01:55:29.393338226Z Warning: connect.session() MemoryStore is not
+2025-09-06T01:55:29.393349126Z designed for a production environment, as it will leak
+2025-09-06T01:55:29.393354156Z memory, and will not scale past a single process.
+2025-09-06T01:55:29.479025038Z 1:55:29 AM [express] serving on port 10000
+2025-09-06T01:55:34.484129145Z node:internal/event_target:1101
+2025-09-06T01:55:34.484164826Z   process.nextTick(() => { throw err; });
+2025-09-06T01:55:34.484171736Z                            ^
+2025-09-06T01:55:34.484176636Z 
+2025-09-06T01:55:34.484182436Z TypeError: Cannot set property message of #<_ErrorEvent> which has only a getter
+2025-09-06T01:55:34.484188686Z     at An._connectionCallback (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1384:72)
+2025-09-06T01:55:34.484195486Z     at An._handleErrorWhileConnecting (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1290:38)
+2025-09-06T01:55:34.484200726Z     at An._handleErrorEvent (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1291:33)
+2025-09-06T01:55:34.484206987Z     at fn.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:55:34.484212527Z     at v.reportStreamError (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1201:46)
+2025-09-06T01:55:34.484216507Z     at v.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:55:34.484219927Z     at WebSocket.<anonymous> (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:986:42)
+2025-09-06T01:55:34.484223457Z     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+2025-09-06T01:55:34.484226917Z     at WebSocket.dispatchEvent (node:internal/event_target:762:26)
+2025-09-06T01:55:34.484230967Z     at fireEvent (node:internal/deps/undici/undici:11663:14)
+2025-09-06T01:55:34.484235177Z 
+2025-09-06T01:55:34.484240957Z Node.js v22.16.0
+2025-09-06T01:55:55.752774584Z ==> Deploying...
+2025-09-06T01:56:18.427439465Z ==> Running 'npm run start'
+2025-09-06T01:56:19.433616966Z 
+2025-09-06T01:56:19.433638916Z > rest-express@1.0.0 start
+2025-09-06T01:56:19.433643286Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:56:19.433645766Z 
+2025-09-06T01:56:26.439143197Z 🔧 Setting up database...
+2025-09-06T01:56:31.441701822Z ⚠️ Database connection test failed: Connection timeout - continuing without initial test...
+2025-09-06T01:56:31.441758684Z 🔧 Skipping schema push in production - assuming tables exist
+2025-09-06T01:56:31.441809135Z 📝 Note: Run drizzle-kit push manually if schema changes needed
+2025-09-06T01:56:31.441896527Z 🔧 Skipping test data insertion in production
+2025-09-06T01:56:31.441949549Z 📝 Note: Test data should already exist or be added manually
+2025-09-06T01:56:31.44199247Z ✅ Database setup completed!
+2025-09-06T01:56:31.443495117Z Warning: connect.session() MemoryStore is not
+2025-09-06T01:56:31.443505047Z designed for a production environment, as it will leak
+2025-09-06T01:56:31.443508297Z memory, and will not scale past a single process.
+2025-09-06T01:56:31.527598013Z 1:56:31 AM [express] serving on port 10000
+2025-09-06T01:56:36.431517631Z ==> Your service is live 🎉
+2025-09-06T01:56:36.61628529Z ==> 
+2025-09-06T01:56:36.773359702Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:56:36.927485024Z ==> 
+2025-09-06T01:56:37.088341706Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-06T01:56:37.242245698Z ==> 
+2025-09-06T01:56:37.395967451Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:56:36.536461425Z node:internal/event_target:1101
+2025-09-06T01:56:36.536485796Z   process.nextTick(() => { throw err; });
+2025-09-06T01:56:36.536490206Z                            ^
+2025-09-06T01:56:36.536494136Z 
+2025-09-06T01:56:36.536498377Z TypeError: Cannot set property message of #<_ErrorEvent> which has only a getter
+2025-09-06T01:56:36.536502837Z     at An._connectionCallback (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1384:72)
+2025-09-06T01:56:36.536508187Z     at An._handleErrorWhileConnecting (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1290:38)
+2025-09-06T01:56:36.536512257Z     at An._handleErrorEvent (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1291:33)
+2025-09-06T01:56:36.536516387Z     at fn.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:56:36.536520347Z     at v.reportStreamError (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1201:46)
+2025-09-06T01:56:36.536524277Z     at v.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:56:36.536528387Z     at WebSocket.<anonymous> (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:986:42)
+2025-09-06T01:56:36.536532047Z     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+2025-09-06T01:56:36.536536237Z     at WebSocket.dispatchEvent (node:internal/event_target:762:26)
+2025-09-06T01:56:36.536540778Z     at fireEvent (node:internal/deps/undici/undici:11663:14)
+2025-09-06T01:56:36.536555728Z 
+2025-09-06T01:56:36.536567478Z Node.js v22.16.0
+2025-09-06T01:56:42.584427318Z ==> Running 'npm run start'
+2025-09-06T01:56:43.482723499Z 
+2025-09-06T01:56:43.48273909Z > rest-express@1.0.0 start
+2025-09-06T01:56:43.48274275Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:56:43.4827444Z 
+2025-09-06T01:56:50.178879168Z 🔧 Setting up database...
+2025-09-06T01:56:55.182048268Z ⚠️ Database connection test failed: Connection timeout - continuing without initial test...
+2025-09-06T01:56:55.182108319Z 🔧 Skipping schema push in production - assuming tables exist
+2025-09-06T01:56:55.182168821Z 📝 Note: Run drizzle-kit push manually if schema changes needed
+2025-09-06T01:56:55.182222942Z 🔧 Skipping test data insertion in production
+2025-09-06T01:56:55.182281424Z 📝 Note: Test data should already exist or be added manually
+2025-09-06T01:56:55.182287634Z ✅ Database setup completed!
+2025-09-06T01:56:55.1837361Z Warning: connect.session() MemoryStore is not
+2025-09-06T01:56:55.183752101Z designed for a production environment, as it will leak
+2025-09-06T01:56:55.18375733Z memory, and will not scale past a single process.
+2025-09-06T01:56:55.282050891Z 1:56:55 AM [express] serving on port 10000
+2025-09-06T01:56:57.493709559Z 1:56:57 AM [express] GET /api/auth/user 401 in 2ms :: {"message":"Unauthorized"}
+2025-09-06T01:57:00.188729575Z node:internal/event_target:1101
+2025-09-06T01:57:00.188752875Z   process.nextTick(() => { throw err; });
+2025-09-06T01:57:00.188757556Z                            ^
+2025-09-06T01:57:00.188761306Z 
+2025-09-06T01:57:00.188766236Z TypeError: Cannot set property message of #<_ErrorEvent> which has only a getter
+2025-09-06T01:57:00.188771386Z     at An._connectionCallback (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1384:72)
+2025-09-06T01:57:00.188777676Z     at An._handleErrorWhileConnecting (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1290:38)
+2025-09-06T01:57:00.188781756Z     at An._handleErrorEvent (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1291:33)
+2025-09-06T01:57:00.188786686Z     at fn.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:57:00.188792046Z     at v.reportStreamError (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1201:46)
+2025-09-06T01:57:00.188796406Z     at v.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:57:00.188800817Z     at WebSocket.<anonymous> (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:986:42)
+2025-09-06T01:57:00.188804877Z     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+2025-09-06T01:57:00.188809367Z     at WebSocket.dispatchEvent (node:internal/event_target:762:26)
+2025-09-06T01:57:00.188814417Z     at fireEvent (node:internal/deps/undici/undici:11663:14)
+2025-09-06T01:57:00.188818437Z 
+2025-09-06T01:57:00.188822147Z Node.js v22.16.0
+2025-09-06T01:57:21.465439548Z ==> Running 'npm run start'
+2025-09-06T01:57:22.478862459Z 
+2025-09-06T01:57:22.478888769Z > rest-express@1.0.0 start
+2025-09-06T01:57:22.47889388Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:57:22.4788964Z 
+2025-09-06T01:57:29.76931227Z 🔧 Setting up database...
+2025-09-06T01:57:34.77135358Z ⚠️ Database connection test failed: Connection timeout - continuing without initial test...
+2025-09-06T01:57:34.771420041Z 🔧 Skipping schema push in production - assuming tables exist
+2025-09-06T01:57:34.771475223Z 📝 Note: Run drizzle-kit push manually if schema changes needed
+2025-09-06T01:57:34.771557905Z 🔧 Skipping test data insertion in production
+2025-09-06T01:57:34.771607386Z 📝 Note: Test data should already exist or be added manually
+2025-09-06T01:57:34.771613846Z ✅ Database setup completed!
+2025-09-06T01:57:34.773083723Z Warning: connect.session() MemoryStore is not
+2025-09-06T01:57:34.773100063Z designed for a production environment, as it will leak
+2025-09-06T01:57:34.773103043Z memory, and will not scale past a single process.
+2025-09-06T01:57:34.949196263Z 1:57:34 AM [express] serving on port 10000
+2025-09-06T01:57:36.897853745Z 1:57:36 AM [express] GET /api/auth/user 401 in 2ms :: {"message":"Unauthorized"}
+2025-09-06T01:57:39.89094252Z node:internal/event_target:1101
+2025-09-06T01:57:39.89095937Z   process.nextTick(() => { throw err; });
+2025-09-06T01:57:39.89096396Z                            ^
+2025-09-06T01:57:39.890967891Z 
+2025-09-06T01:57:39.890972971Z TypeError: Cannot set property message of #<_ErrorEvent> which has only a getter
+2025-09-06T01:57:39.890977701Z     at An._connectionCallback (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1384:72)
+2025-09-06T01:57:39.890983271Z     at An._handleErrorWhileConnecting (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1290:38)
+2025-09-06T01:57:39.890987341Z     at An._handleErrorEvent (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1291:33)
+2025-09-06T01:57:39.890991791Z     at fn.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:57:39.890996051Z     at v.reportStreamError (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1201:46)
+2025-09-06T01:57:39.891000031Z     at v.emit (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-09-06T01:57:39.891004011Z     at WebSocket.<anonymous> (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:986:42)
+2025-09-06T01:57:39.891008201Z     at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)
+2025-09-06T01:57:39.891012501Z     at WebSocket.dispatchEvent (node:internal/event_target:762:26)
+2025-09-06T01:57:39.891017142Z     at fireEvent (node:internal/deps/undici/undici:11663:14)
+2025-09-06T01:57:39.891021162Z 
+2025-09-06T01:57:39.891025082Z Node.js v22.16.0

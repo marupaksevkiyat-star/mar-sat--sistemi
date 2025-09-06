@@ -1,19 +1,6 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
-
-// PRODUCTION FIX: WebSocket configuration with fallback
-if (process.env.NODE_ENV === 'production') {
-  // Disable WebSocket in production if causing issues
-  neonConfig.webSocketConstructor = undefined;
-  neonConfig.useSecureWebSocket = false;
-  neonConfig.pipelineTLS = false;
-  neonConfig.pipelineConnect = false;
-} else {
-  // Development mode with WebSocket
-  neonConfig.webSocketConstructor = ws;
-}
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -21,15 +8,18 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Production-ready connection with SSL support
-const connectionString = process.env.DATABASE_URL!;
+// PRODUCTION FIX: Use standard PostgreSQL driver instead of Neon serverless
+// This eliminates WebSocket connection issues completely
 const poolConfig = {
-  connectionString,
+  connectionString: process.env.DATABASE_URL!,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
+  statement_timeout: 10000,
+  query_timeout: 10000,
 };
 
+console.log('🔧 Using standard PostgreSQL driver for stable connection');
 export const pool = new Pool(poolConfig);
-export const db = drizzle({ client: pool, schema });
+export const db = drizzle(pool, { schema });
