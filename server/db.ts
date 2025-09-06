@@ -3,7 +3,17 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
 
-neonConfig.webSocketConstructor = ws;
+// PRODUCTION FIX: WebSocket configuration with fallback
+if (process.env.NODE_ENV === 'production') {
+  // Disable WebSocket in production if causing issues
+  neonConfig.webSocketConstructor = undefined;
+  neonConfig.useSecureWebSocket = false;
+  neonConfig.pipelineTLS = false;
+  neonConfig.pipelineConnect = false;
+} else {
+  // Development mode with WebSocket
+  neonConfig.webSocketConstructor = ws;
+}
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
