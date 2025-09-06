@@ -38,17 +38,18 @@ const isAuthenticated = (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Production-ready session configuration
+  // RENDER PRODUCTION FIX: Memory store - single instance deployment için ideal
+  // PostgreSQL session store SSL ve index sorunları yaşıyor
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'satis-uretim-secret-fallback',
-    resave: false,
+    secret: process.env.SESSION_SECRET || 'satis-uretim-secret-fallback-key',
+    resave: true, // Memory store için true olmalı
     saveUninitialized: false,
-    rolling: true, // Keep session alive with activity
-    name: 'connect.sid', // Standard session name
+    rolling: true, // Activity ile session'ı canlı tut
+    name: 'sessionid', // Farklı session name
     cookie: {
-      secure: false, // Set to false for Render proxy compatibility
+      secure: false, // Render proxy için false
       httpOnly: true,
-      maxAge: 8 * 60 * 60 * 1000, // 8 hours
+      maxAge: 4 * 60 * 60 * 1000, // 4 saat (daha kısa)
       sameSite: 'lax'
     }
   }));
