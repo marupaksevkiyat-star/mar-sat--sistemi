@@ -1,6 +1,6 @@
 import { storage } from "./storage";
 import type { OrderWithDetails, MailTemplate } from "@shared/schema";
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 // Mail ayarlarını veritabanından al
 async function getMailSettings() {
@@ -28,6 +28,13 @@ async function getMailSettings() {
 // SMTP transporter oluştur
 const createMailTransporter = async () => {
   const settings = await getMailSettings();
+  
+  // Nodemailer import hatası varsa demo mode
+  if (typeof nodemailer.createTransporter !== 'function') {
+    console.log('⚠️ Nodemailer not properly imported - using demo mode');
+    return null;
+  }
+  
   return nodemailer.createTransporter(settings);
 };
 
@@ -45,12 +52,13 @@ export async function sendEmailWithSendGrid(params: {
     // Gönderen email adresini belirle
     const fromEmail = settings.auth?.user || process.env.GMAIL_USER || 'noreply@company.com';
     
-    if (!settings.auth?.user && !process.env.GMAIL_USER) {
-      console.log('⚠️ No email credentials found - switching to demo mode');
+    // Eğer transporter oluşturulamazsa veya credentials yoksa demo mode
+    if (!transporter || (!settings.auth?.user && !process.env.GMAIL_USER)) {
+      console.log('⚠️ No email configuration found - switching to demo mode');
       console.log('📧 DEMO MODE - EMAIL CONTENT:');
       console.log('To:', params.to);
       console.log('Subject:', params.subject);
-      console.log('Text:', params.text);
+      console.log('Text:', params.text.substring(0, 200) + '...');
       console.log('---');
       return true; // Demo modunda başarılı say
     }
