@@ -80,16 +80,24 @@ export async function sendDeliveryNotification(orderId: string): Promise<boolean
       customerName: order.customer.contactPerson || order.customer.companyName
     };
 
-    // Log the email (gerçek mail server olmadığı için console'a yazdır)
-    console.log('📧 DELIVERY NOTIFICATION EMAIL:');
-    console.log('To:', emailData.to);
-    console.log('Subject:', emailData.subject);
-    console.log('Customer:', emailData.customerName);
-    console.log('Order:', order.orderNumber);
-    console.log('---');
+    // SendGrid ile gerçek mail gönder
+    const emailSent = await sendEmailWithSendGrid({
+      to: emailData.to,
+      subject: emailData.subject,
+      html: emailData.htmlContent,
+      text: emailData.textContent
+    });
 
-    // Gerçek projesinde burada SMTP server ile mail gönderilir
-    // Şimdilik mailto: link ile kullanıcı kendi mail uygulamasından gönderebilir
+    if (emailSent) {
+      console.log('✅ DELIVERY EMAIL SENT:');
+      console.log('To:', emailData.to);
+      console.log('Subject:', emailData.subject);
+      console.log('Customer:', emailData.customerName);
+      console.log('Order:', order.orderNumber);
+      console.log('---');
+    } else {
+      console.error('❌ Failed to send delivery email for order:', order.orderNumber);
+    }
     
     return true;
   } catch (error) {
