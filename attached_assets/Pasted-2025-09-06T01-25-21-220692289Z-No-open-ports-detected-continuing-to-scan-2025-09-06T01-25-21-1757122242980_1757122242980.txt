@@ -1,0 +1,73 @@
+2025-09-06T01:25:21.220692289Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:25:21.576868824Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:26:24.123096897Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:26:24.469775728Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:27:18.512627069Z ==> Your service is live 🎉
+2025-09-06T01:27:18.670439914Z ==> 
+2025-09-06T01:27:18.82619667Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:27:18.979692525Z ==> 
+2025-09-06T01:27:19.134870571Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-06T01:27:19.288455786Z ==> 
+2025-09-06T01:27:19.441352502Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:27:15.62623059Z ⚠️ Test data error: connect ETIMEDOUT 3.65.142.85:443
+2025-09-06T01:27:15.627957371Z Warning: connect.session() MemoryStore is not
+2025-09-06T01:27:15.627979302Z designed for a production environment, as it will leak
+2025-09-06T01:27:15.627984892Z memory, and will not scale past a single process.
+2025-09-06T01:27:15.724044023Z 1:27:15 AM [express] serving on port 10000
+2025-09-06T01:27:58.61036987Z ==> Deploying...
+2025-09-06T01:28:20.724526037Z ==> Running 'npm run start'
+2025-09-06T01:28:21.827312776Z 
+2025-09-06T01:28:21.827340747Z > rest-express@1.0.0 start
+2025-09-06T01:28:21.827347287Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:28:21.827349687Z 
+2025-09-06T01:28:30.014875638Z 🔧 Setting up database...
+2025-09-06T01:28:35.024700717Z No config path provided, using default 'drizzle.config.ts'
+2025-09-06T01:28:35.025313251Z Reading config file '/opt/render/project/src/drizzle.config.ts'
+2025-09-06T01:28:42.516204402Z Using 'pg' driver for database querying
+2025-09-06T01:28:45.71558245Z [⣷] Pulling schema from database...
+2025-09-06T01:28:45.824927396Z error: SSL/TLS required
+2025-09-06T01:28:45.824944827Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:28:45.824949867Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:28:45.824953937Z     at async Object.query (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:66575:26)
+2025-09-06T01:28:45.824958837Z     at async fromDatabase2 (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:18700:25) {
+2025-09-06T01:28:45.824962887Z   length: 37,
+2025-09-06T01:28:45.824966847Z   severity: 'FATAL',
+2025-09-06T01:28:45.824970957Z   code: '28000',
+2025-09-06T01:28:45.824975288Z   detail: undefined,
+2025-09-06T01:28:45.824979108Z   hint: undefined,
+2025-09-06T01:28:45.826486532Z   position: undefined,
+2025-09-06T01:28:45.826499152Z   internalPosition: undefined,
+2025-09-06T01:28:45.826505753Z   internalQuery: undefined,
+2025-09-06T01:28:45.826510473Z   where: undefined,
+2025-09-06T01:28:45.826514263Z   schema: undefined,
+2025-09-06T01:28:45.826517933Z   table: undefined,
+2025-09-06T01:28:45.826521593Z   column: undefined,
+2025-09-06T01:28:45.826525113Z   dataType: undefined,
+2025-09-06T01:28:45.826529143Z   constraint: undefined,
+2025-09-06T01:28:45.826533043Z   file: undefined,
+2025-09-06T01:28:45.826537563Z   line: undefined,
+2025-09-06T01:28:45.826541693Z   routine: undefined
+2025-09-06T01:28:45.826546013Z }
+2025-09-06T01:28:46.420373096Z ✅ Database schema pushed successfully!
+2025-09-06T01:28:46.420398706Z 🔧 Adding test data...
+2025-09-06T01:29:05.393662576Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:29:05.739647696Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:29:38.463089692Z 1:29:38 AM [express] GET /api/auth/user 401 in 2ms :: {"message":"Unauthorized"}
+2025-09-06T01:29:40.495049968Z Login attempt: username="admin", password="1234"
+2025-09-06T01:29:40.495162641Z Found user credential for "admin": Yes
+2025-09-06T01:29:40.496899921Z Available users: [
+2025-09-06T01:29:40.496910892Z   'admin',  'ahmet',
+2025-09-06T01:29:40.496915562Z   'ayse',   'mehmet',
+2025-09-06T01:29:40.496919792Z   'zeynep', 'ali',
+2025-09-06T01:29:40.496923922Z   'elif',   'fatma',
+2025-09-06T01:29:40.496927612Z   'murat'
+2025-09-06T01:29:40.496931702Z ]
+2025-09-06T01:29:40.496936282Z Login successful for user: admin
+2025-09-06T01:29:40.498659523Z 1:29:40 AM [express] POST /api/login 200 in 4ms :: {"success":true}
+2025-09-06T01:29:40.883869303Z 1:29:40 AM [express] GET /api/auth/user 200 in 2ms :: {"id":"admin","firstName":"Admin","lastName":"…
+2025-09-06T01:29:40.980859568Z 📊 Dashboard stats request - User: admin, Role: admin, Can see all data: true
+2025-09-06T01:29:41.06033026Z 📅 Getting upcoming appointments (next 7 days) for user: admin
+2025-09-06T01:29:55.793120552Z 1:29:55 AM [express] GET /api/visits/2025-09-06 200 in 3ms
+2025-09-06T01:29:55.797042192Z 🕐 Date filter applied: 2025-09-06T00:00:00.000Z to 2025-09-06T23:59:59.999Z
+2025-09-06T01:30:08.25776308Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:30:08.631849609Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
