@@ -1,0 +1,94 @@
+2025-09-06T01:14:12.47793503Z 1:14:12 AM [express] GET /api/orders 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:14:14.819577657Z ==> Your service is live 🎉
+2025-09-06T01:14:15.005256005Z ==> 
+2025-09-06T01:14:15.163440488Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:14:15.319017342Z ==> 
+2025-09-06T01:14:15.479449795Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-06T01:14:15.63452516Z ==> 
+2025-09-06T01:14:15.789854714Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:14:38.85531938Z   'elif',   'fatma',
+2025-09-06T01:14:38.85532403Z   'murat'
+2025-09-06T01:14:38.855328561Z ]
+2025-09-06T01:14:38.855334401Z Login successful for user: admin
+2025-09-06T01:14:38.856128497Z 1:14:38 AM [express] POST /api/login 200 in 1ms :: {"success":true}
+2025-09-06T01:14:39.409686166Z 1:14:39 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:16:27.456764057Z Login attempt: username="admin", password="1234"
+2025-09-06T01:16:27.456797328Z Found user credential for "admin": Yes
+2025-09-06T01:16:27.45692621Z Available users: [
+2025-09-06T01:16:27.45693774Z   'admin',  'ahmet',
+2025-09-06T01:16:27.456942171Z   'ayse',   'mehmet',
+2025-09-06T01:16:27.456945931Z   'zeynep', 'ali',
+2025-09-06T01:16:27.456949601Z   'elif',   'fatma',
+2025-09-06T01:16:27.456953251Z   'murat'
+2025-09-06T01:16:27.456957361Z ]
+2025-09-06T01:16:27.456962081Z Login successful for user: admin
+2025-09-06T01:16:27.45793296Z 1:16:27 AM [express] POST /api/login 200 in 1ms :: {"success":true}
+2025-09-06T01:16:28.143892565Z 1:16:28 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:16:37.715792152Z Login attempt: username="elif", password="1234"
+2025-09-06T01:16:37.715821443Z Found user credential for "elif": Yes
+2025-09-06T01:16:37.716011577Z Available users: [
+2025-09-06T01:16:37.716018927Z   'admin',  'ahmet',
+2025-09-06T01:16:37.716023547Z   'ayse',   'mehmet',
+2025-09-06T01:16:37.716026737Z   'zeynep', 'ali',
+2025-09-06T01:16:37.716040367Z   'elif',   'fatma',
+2025-09-06T01:16:37.716042267Z   'murat'
+2025-09-06T01:16:37.716043967Z ]
+2025-09-06T01:16:37.716046407Z Login successful for user: elif
+2025-09-06T01:16:37.716827803Z 1:16:37 AM [express] POST /api/login 200 in 1ms :: {"success":true}
+2025-09-06T01:16:38.452439641Z 1:16:38 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:16:47.243853588Z Login attempt: username="admin", password="1234"
+2025-09-06T01:16:47.244079552Z Found user credential for "admin": Yes
+2025-09-06T01:16:47.244189575Z Available users: [
+2025-09-06T01:16:47.244196035Z   'admin',  'ahmet',
+2025-09-06T01:16:47.244198875Z   'ayse',   'mehmet',
+2025-09-06T01:16:47.244201675Z   'zeynep', 'ali',
+2025-09-06T01:16:47.244204325Z   'elif',   'fatma',
+2025-09-06T01:16:47.244258136Z   'murat'
+2025-09-06T01:16:47.244263556Z ]
+2025-09-06T01:16:47.244267986Z Login successful for user: admin
+2025-09-06T01:16:47.245271336Z 1:16:47 AM [express] POST /api/login 200 in 1ms :: {"success":true}
+2025-09-06T01:16:47.60364286Z 1:16:47 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:11.578492884Z 1:17:11 AM [express] GET /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:11.583911543Z 1:17:11 AM [express] GET /api/appointments 401 in 0ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:16.433474895Z 1:17:16 AM [express] GET /api/appointments/today/2025-09-06 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:16.441999837Z 1:17:16 AM [express] GET /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:16.445300414Z 1:17:16 AM [express] GET /api/visits/2025-09-06 200 in 2ms
+2025-09-06T01:17:22.075799882Z 1:17:22 AM [express] POST /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:22.997675071Z 1:17:22 AM [express] POST /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:23.28693724Z 1:17:23 AM [express] POST /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:23.478484516Z 1:17:23 AM [express] POST /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:26.792949293Z 1:17:26 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:29.265328392Z Login attempt: username="admin", password="1234"
+2025-09-06T01:17:29.265357522Z Found user credential for "admin": Yes
+2025-09-06T01:17:29.266010906Z Available users: [
+2025-09-06T01:17:29.266022426Z   'admin',  'ahmet',
+2025-09-06T01:17:29.266027226Z   'ayse',   'mehmet',
+2025-09-06T01:17:29.266031566Z   'zeynep', 'ali',
+2025-09-06T01:17:29.266035846Z   'elif',   'fatma',
+2025-09-06T01:17:29.266040196Z   'murat'
+2025-09-06T01:17:29.266044606Z ]
+2025-09-06T01:17:29.266049606Z Login successful for user: admin
+2025-09-06T01:17:29.266470705Z 1:17:29 AM [express] POST /api/login 200 in 1ms :: {"success":true}
+2025-09-06T01:17:29.643977975Z 1:17:29 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:11.578492884Z 1:17:11 AM [express] GET /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:11.583911543Z 1:17:11 AM [express] GET /api/appointments 401 in 0ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:16.433474895Z 1:17:16 AM [express] GET /api/appointments/today/2025-09-06 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:16.441999837Z 1:17:16 AM [express] GET /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:16.445300414Z 1:17:16 AM [express] GET /api/visits/2025-09-06 200 in 2ms
+2025-09-06T01:17:22.075799882Z 1:17:22 AM [express] POST /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:22.997675071Z 1:17:22 AM [express] POST /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:23.28693724Z 1:17:23 AM [express] POST /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:23.478484516Z 1:17:23 AM [express] POST /api/customers 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:26.792949293Z 1:17:26 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:17:29.265328392Z Login attempt: username="admin", password="1234"
+2025-09-06T01:17:29.265357522Z Found user credential for "admin": Yes
+2025-09-06T01:17:29.266010906Z Available users: [
+2025-09-06T01:17:29.266022426Z   'admin',  'ahmet',
+2025-09-06T01:17:29.266027226Z   'ayse',   'mehmet',
+2025-09-06T01:17:29.266031566Z   'zeynep', 'ali',
+2025-09-06T01:17:29.266035846Z   'elif',   'fatma',
+2025-09-06T01:17:29.266040196Z   'murat'
+2025-09-06T01:17:29.266044606Z ]
+2025-09-06T01:17:29.266049606Z Login successful for user: admin
+2025-09-06T01:17:29.266470705Z 1:17:29 AM [express] POST /api/login 200 in 1ms :: {"success":true}
+2025-09-06T01:17:29.643977975Z 1:17:29 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
