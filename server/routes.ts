@@ -20,6 +20,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import { sendDeliveryNotification } from "./mailService";
 
 // Extend the session interface to include user
@@ -38,8 +39,15 @@ const isAuthenticated = (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session setup
+  // PostgreSQL session store setup
+  const pgSession = connectPgSimple(session);
+  
   app.use(session({
+    store: new pgSession({
+      conString: process.env.DATABASE_URL,
+      tableName: 'session',
+      createTableIfMissing: true
+    }),
     secret: process.env.SESSION_SECRET || 'demo-secret',
     resave: false,
     saveUninitialized: false,

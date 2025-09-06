@@ -1,0 +1,62 @@
+2025-09-06T01:20:56.346338991Z 
+2025-09-06T01:20:56.346376882Z > rest-express@1.0.0 start
+2025-09-06T01:20:56.346383652Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:20:56.346387143Z 
+2025-09-06T01:21:03.040723235Z 🔧 Setting up database...
+2025-09-06T01:21:07.939589745Z No config path provided, using default 'drizzle.config.ts'
+2025-09-06T01:21:07.93981466Z Reading config file '/opt/render/project/src/drizzle.config.ts'
+2025-09-06T01:21:14.949061482Z Using 'pg' driver for database querying
+2025-09-06T01:21:17.952091388Z [⣷] Pulling schema from database...
+2025-09-06T01:21:18.053011202Z error: SSL/TLS required
+2025-09-06T01:21:18.053034622Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:21:18.053038572Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:21:18.053042132Z     at async Object.query (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:66575:26)
+2025-09-06T01:21:18.053046463Z     at async fromDatabase2 (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:18700:25) {
+2025-09-06T01:21:18.053049443Z   length: 37,
+2025-09-06T01:21:18.053052283Z   severity: 'FATAL',
+2025-09-06T01:21:18.053055023Z   code: '28000',
+2025-09-06T01:21:18.053057843Z   detail: undefined,
+2025-09-06T01:21:18.053060573Z   hint: undefined,
+2025-09-06T01:21:18.053063353Z   position: undefined,
+2025-09-06T01:21:18.053070123Z   internalPosition: undefined,
+2025-09-06T01:21:18.053074653Z   internalQuery: undefined,
+2025-09-06T01:21:18.053079133Z   where: undefined,
+2025-09-06T01:21:18.053083803Z   schema: undefined,
+2025-09-06T01:21:18.053088223Z   table: undefined,
+2025-09-06T01:21:18.053092473Z   column: undefined,
+2025-09-06T01:21:18.053096464Z   dataType: undefined,
+2025-09-06T01:21:18.053100174Z   constraint: undefined,
+2025-09-06T01:21:18.053104364Z   file: undefined,
+2025-09-06T01:21:18.053109154Z   line: undefined,
+2025-09-06T01:21:18.053113594Z   routine: undefined
+2025-09-06T01:21:18.053116364Z }
+2025-09-06T01:21:18.550333503Z ✅ Database schema pushed successfully!
+2025-09-06T01:21:18.550537578Z 🔧 Adding test data...
+2025-09-06T01:21:36.732580772Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:21:37.108858042Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:22:39.543979222Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:22:39.878987137Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:23:02.4554431Z Login attempt: username="admin", password="1234"
+2025-09-06T01:23:02.455536672Z Found user credential for "admin": Yes
+2025-09-06T01:23:02.455575273Z Available users: [
+2025-09-06T01:23:02.455582093Z   'admin',  'ahmet',
+2025-09-06T01:23:02.455585723Z   'ayse',   'mehmet',
+2025-09-06T01:23:02.455588493Z   'zeynep', 'ali',
+2025-09-06T01:23:02.455591413Z   'elif',   'fatma',
+2025-09-06T01:23:02.455594243Z   'murat'
+2025-09-06T01:23:02.455596973Z ]
+2025-09-06T01:23:02.455625594Z Login successful for user: admin
+2025-09-06T01:23:02.456644524Z 1:23:02 AM [express] POST /api/login 200 in 2ms :: {"success":true}
+2025-09-06T01:23:02.960320469Z 1:23:02 AM [express] GET /api/auth/user 401 in 0ms :: {"message":"Unauthorized"}
+2025-09-06T01:23:35.457074218Z ==> Your service is live 🎉
+2025-09-06T01:23:35.65172239Z ==> 
+2025-09-06T01:23:35.808687506Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:23:35.967245191Z ==> 
+2025-09-06T01:23:36.127230836Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-06T01:23:36.303109559Z ==> 
+2025-09-06T01:23:36.462289755Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:23:33.206848511Z ⚠️ Test data error: connect ETIMEDOUT 3.65.142.85:443
+2025-09-06T01:23:33.20855318Z Warning: connect.session() MemoryStore is not
+2025-09-06T01:23:33.208591411Z designed for a production environment, as it will leak
+2025-09-06T01:23:33.208596851Z memory, and will not scale past a single process.
+2025-09-06T01:23:33.345059749Z 1:23:33 AM [express] serving on port 10000
