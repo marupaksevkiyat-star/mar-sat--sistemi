@@ -40,9 +40,14 @@ const isAuthenticated = (req: any, res: any, next: any) => {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Session setup
   app.use(session({
-    secret: 'demo-secret',
+    secret: process.env.SESSION_SECRET || 'demo-secret',
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
   }));
 
   // Simple login route
