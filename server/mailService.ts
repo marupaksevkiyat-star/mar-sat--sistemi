@@ -1,5 +1,40 @@
 import { storage } from "./storage";
 import type { OrderWithDetails, MailTemplate } from "@shared/schema";
+import { MailService } from '@sendgrid/mail';
+
+// SendGrid setup
+const mailService = new MailService();
+if (process.env.SENDGRID_API_KEY) {
+  mailService.setApiKey(process.env.SENDGRID_API_KEY);
+}
+
+// SendGrid ile mail gönderme fonksiyonu
+export async function sendEmailWithSendGrid(params: {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+}): Promise<boolean> {
+  try {
+    if (!process.env.SENDGRID_API_KEY) {
+      console.log('⚠️ SENDGRID_API_KEY not found - email not sent');
+      return false;
+    }
+
+    await mailService.send({
+      to: params.to,
+      from: 'noreply@company.com', // Verified sender email
+      subject: params.subject,
+      text: params.text,
+      html: params.html,
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('SendGrid email error:', error);
+    return false;
+  }
+}
 
 // Mail template variables'ları replace etmek için fonksiyon
 export function renderTemplate(template: MailTemplate, order: OrderWithDetails): { subject: string; htmlContent: string; textContent: string } {
