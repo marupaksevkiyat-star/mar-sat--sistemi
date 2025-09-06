@@ -665,7 +665,7 @@ export default function InvoicesPage() {
                           <td className="border border-gray-400 p-2 text-center">{item.quantity}</td>
                           <td className="border border-gray-400 p-2 text-center">{item.unit}</td>
                           <td className="border border-gray-400 p-2 text-right">{formatCurrency(item.unitPrice)}</td>
-                          <td className="border border-gray-400 p-2 text-right">{formatCurrency(item.totalPrice)}</td>
+                          <td className="border border-gray-400 p-2 text-right">{formatCurrency(item.quantity * item.unitPrice)}</td>
                         </tr>
                       ))
                     }
@@ -675,9 +675,31 @@ export default function InvoicesPage() {
 
               {/* TOPLAM HESAPLAMALAR */}
               {(() => {
+                // DÜZELTME: Ürün bazında miktar × birim fiyat hesabı yap
                 const subtotal = customerAccountDetails?.pendingInvoices
                   ?.filter((invoice: any) => selectedInvoices.includes(invoice.orderId))
-                  ?.reduce((sum: number, invoice: any) => sum + parseFloat(invoice.totalAmount), 0) || 0;
+                  ?.flatMap((invoice: any) => invoice.items || [])
+                  ?.reduce((acc: any[], item: any) => {
+                    // Aynı ürünleri grupla
+                    const existing = acc.find(x => x.productId === item.productId);
+                    if (existing) {
+                      existing.quantity += item.quantity;
+                      existing.totalPrice += parseFloat(item.totalPrice);
+                    } else {
+                      acc.push({
+                        productId: item.productId,
+                        quantity: item.quantity,
+                        unitPrice: parseFloat(item.unitPrice),
+                        totalPrice: parseFloat(item.totalPrice)
+                      });
+                    }
+                    return acc;
+                  }, [])
+                  ?.reduce((sum: number, item: any) => {
+                    // Her ürün için miktar × birim fiyat hesabı yap
+                    return sum + (item.quantity * item.unitPrice);
+                  }, 0) || 0;
+                  
                 const kdvAmount = subtotal * (selectedVatRate / 100);
                 const total = subtotal + kdvAmount;
 
