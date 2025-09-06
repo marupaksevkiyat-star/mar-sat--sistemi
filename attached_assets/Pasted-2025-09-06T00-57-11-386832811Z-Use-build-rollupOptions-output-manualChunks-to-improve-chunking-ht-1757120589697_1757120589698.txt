@@ -1,0 +1,65 @@
+2025-09-06T00:57:11.386832811Z - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+2025-09-06T00:57:11.386860464Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+2025-09-06T00:57:11.38704315Z ✓ built in 6.26s
+2025-09-06T00:57:11.467326368Z 
+2025-09-06T00:57:11.467352041Z   dist/index.js  118.0kb
+2025-09-06T00:57:11.467355811Z 
+2025-09-06T00:57:11.467359621Z ⚡ Done in 9ms
+2025-09-06T00:57:12.23794453Z ==> Uploading build...
+2025-09-06T00:57:22.180017691Z ==> Uploaded in 6.7s. Compression took 3.2s
+2025-09-06T00:57:22.213823992Z ==> Build successful 🎉
+2025-09-06T00:57:26.555349184Z ==> Deploying...
+2025-09-06T00:57:47.827372284Z 
+2025-09-06T00:57:47.827393025Z > rest-express@1.0.0 start
+2025-09-06T00:57:47.827397005Z > NODE_ENV=production node dist/index.js
+2025-09-06T00:57:47.827399125Z 
+2025-09-06T00:57:54.829319297Z 🔧 Setting up database...
+2025-09-06T00:57:59.525292638Z No config path provided, using default 'drizzle.config.ts'
+2025-09-06T00:57:59.525563772Z Reading config file '/opt/render/project/src/drizzle.config.ts'
+2025-09-06T00:58:05.618741168Z Using 'pg' driver for database querying
+2025-09-06T00:58:09.018745834Z [⣷] Pulling schema from database...
+2025-09-06T00:58:09.033907387Z error: SSL/TLS required
+2025-09-06T00:58:09.033927548Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T00:58:09.033932738Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T00:58:09.033936608Z     at async Object.query (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:66575:26)
+2025-09-06T00:58:09.033941718Z     at async fromDatabase2 (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:18700:25) {
+2025-09-06T00:58:09.033945388Z   length: 37,
+2025-09-06T00:58:09.033948978Z   severity: 'FATAL',
+2025-09-06T00:58:09.033968629Z   code: '28000',
+2025-09-06T00:58:09.033974029Z   detail: undefined,
+2025-09-06T00:58:09.033977949Z   hint: undefined,
+2025-09-06T00:58:09.033981539Z   position: undefined,
+2025-09-06T00:58:09.033985609Z   internalPosition: undefined,
+2025-09-06T00:58:09.033989149Z   internalQuery: undefined,
+2025-09-06T00:58:09.033992819Z   where: undefined,
+2025-09-06T00:58:09.033996509Z   schema: undefined,
+2025-09-06T00:58:09.033999979Z   table: undefined,
+2025-09-06T00:58:09.034003379Z   column: undefined,
+2025-09-06T00:58:09.034006999Z   dataType: undefined,
+2025-09-06T00:58:09.034010619Z   constraint: undefined,
+2025-09-06T00:58:09.03401464Z   file: undefined,
+2025-09-06T00:58:09.03401826Z   line: undefined,
+2025-09-06T00:58:09.03402196Z   routine: undefined
+2025-09-06T00:58:09.03402556Z }
+2025-09-06T00:58:09.524493256Z ✅ Database schema pushed successfully!
+2025-09-06T00:58:09.52469539Z 🔧 Adding test data...
+2025-09-06T00:58:28.944160589Z ==> No open ports detected, continuing to scan...
+2025-09-06T00:58:29.294518556Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T00:59:31.709675122Z ==> No open ports detected, continuing to scan...
+2025-09-06T00:59:32.04248868Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:00:27.61334006Z ==> Your service is live 🎉
+2025-09-06T01:00:27.802694543Z ==> 
+2025-09-06T01:00:27.95911785Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:00:28.117069236Z ==> 
+2025-09-06T01:00:28.270680172Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-06T01:00:28.426094539Z ==> 
+2025-09-06T01:00:28.63878893Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:00:24.144637481Z ⚠️ Test data error: connect ETIMEDOUT 3.65.142.85:443
+2025-09-06T01:00:24.147306901Z Warning: connect.session() MemoryStore is not
+2025-09-06T01:00:24.147344851Z designed for a production environment, as it will leak
+2025-09-06T01:00:24.147349511Z memory, and will not scale past a single process.
+2025-09-06T01:00:24.33204636Z 1:00:24 AM [express] serving on port 10000
+2025-09-06T01:00:33.521769916Z 1:00:33 AM [express] GET /api/appointments/today/2025-09-06 401 in 3ms :: {"message":"Unauthorized"}
+2025-09-06T01:00:33.523855005Z 1:00:33 AM [express] GET /api/customers 401 in 0ms :: {"message":"Unauthorized"}
+2025-09-06T01:00:33.526890892Z 1:00:33 AM [express] GET /api/visits/2025-09-06 200 in 3ms
+2025-09-06T01:00:46.29637856Z 1:00:46 AM [express] POST /api/customers 401 in 2ms :: {"message":"Unauthorized"}
