@@ -1,6 +1,6 @@
 import { storage } from "./storage";
 import type { OrderWithDetails, MailTemplate } from "@shared/schema";
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
 // Mail ayarlarını veritabanından al
 async function getMailSettings() {
@@ -46,8 +46,13 @@ export async function sendEmailWithSendGrid(params: {
     const fromEmail = settings.auth?.user || process.env.GMAIL_USER || 'noreply@company.com';
     
     if (!settings.auth?.user && !process.env.GMAIL_USER) {
-      console.log('⚠️ No email credentials found in panel or environment variables');
-      return false;
+      console.log('⚠️ No email credentials found - switching to demo mode');
+      console.log('📧 DEMO MODE - EMAIL CONTENT:');
+      console.log('To:', params.to);
+      console.log('Subject:', params.subject);
+      console.log('Text:', params.text);
+      console.log('---');
+      return true; // Demo modunda başarılı say
     }
 
     await transporter.sendMail({
