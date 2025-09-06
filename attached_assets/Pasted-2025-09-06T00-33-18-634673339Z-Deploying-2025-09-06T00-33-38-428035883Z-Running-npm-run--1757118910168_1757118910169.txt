@@ -1,0 +1,260 @@
+2025-09-06T00:33:18.634673339Z ==> Deploying...
+2025-09-06T00:33:38.428035883Z ==> Running 'npm run start'
+2025-09-06T00:33:39.426130093Z 
+2025-09-06T00:33:39.426164014Z > rest-express@1.0.0 start
+2025-09-06T00:33:39.426169954Z > NODE_ENV=production node dist/index.js
+2025-09-06T00:33:39.426171824Z 
+2025-09-06T00:33:46.126126112Z 🔧 Setting up database...
+2025-09-06T00:33:50.626308601Z No config path provided, using default 'drizzle.config.ts'
+2025-09-06T00:33:50.626586186Z Reading config file '/opt/render/project/src/drizzle.config.ts'
+2025-09-06T00:33:57.03171086Z Using 'pg' driver for database querying
+2025-09-06T00:33:59.821601037Z [⣷] Pulling schema from database...
+2025-09-06T00:33:59.859839466Z [⣯] Pulling schema from database...
+2025-09-06T00:33:59.98822899Z [⣟] Pulling schema from database...
+2025-09-06T00:34:00.11581731Z [⡿] Pulling schema from database...
+2025-09-06T00:34:00.243832367Z [⢿] Pulling schema from database...
+2025-09-06T00:34:00.372083389Z [⣻] Pulling schema from database...
+2025-09-06T00:34:00.500602036Z [⣽] Pulling schema from database...
+2025-09-06T00:34:00.6295209Z [⣷] Pulling schema from database...
+2025-09-06T00:34:00.757462876Z [⣯] Pulling schema from database...
+2025-09-06T00:34:00.885052876Z [⣟] Pulling schema from database...
+2025-09-06T00:34:01.013235897Z [⡿] Pulling schema from database...
+2025-09-06T00:34:01.140643533Z [⢿] Pulling schema from database...
+2025-09-06T00:34:01.269577147Z [⣻] Pulling schema from database...
+2025-09-06T00:34:01.398574163Z [⣽] Pulling schema from database...
+2025-09-06T00:34:01.526045901Z [⣷] Pulling schema from database...
+2025-09-06T00:34:01.654371124Z [⣯] Pulling schema from database...
+2025-09-06T00:34:01.782497473Z [⣟] Pulling schema from database...
+2025-09-06T00:34:01.909818568Z [⡿] Pulling schema from database...
+2025-09-06T00:34:02.037794054Z [⢿] Pulling schema from database...
+2025-09-06T00:34:02.16572484Z [⣻] Pulling schema from database...
+2025-09-06T00:34:02.293770388Z [⣽] Pulling schema from database...
+2025-09-06T00:34:02.421981719Z [⣷] Pulling schema from database...
+2025-09-06T00:34:02.550372184Z [⣯] Pulling schema from database...
+2025-09-06T00:34:02.677888742Z [⣟] Pulling schema from database...
+2025-09-06T00:34:02.806203825Z [⡿] Pulling schema from database...
+2025-09-06T00:34:02.933881626Z [⢿] Pulling schema from database...
+2025-09-06T00:34:03.062028086Z [⣻] Pulling schema from database...
+2025-09-06T00:34:03.190244437Z [⣽] Pulling schema from database...
+2025-09-06T00:34:03.318185573Z [⣷] Pulling schema from database...
+2025-09-06T00:34:03.446550147Z [⣯] Pulling schema from database...
+2025-09-06T00:34:03.57380476Z [⣟] Pulling schema from database...
+2025-09-06T00:34:03.702033332Z [⡿] Pulling schema from database...
+2025-09-06T00:34:03.830525318Z [⢿] Pulling schema from database...
+2025-09-06T00:34:03.957756081Z [⣻] Pulling schema from database...
+2025-09-06T00:34:04.085793689Z [⣽] Pulling schema from database...
+2025-09-06T00:34:04.220031843Z [⣷] Pulling schema from database...
+2025-09-06T00:34:04.348345017Z [⣯] Pulling schema from database...
+2025-09-06T00:34:04.476203871Z [⣟] Pulling schema from database...
+2025-09-06T00:34:04.603886652Z [⡿] Pulling schema from database...
+2025-09-06T00:34:04.633437798Z [✓] Pulling schema from database...
+2025-09-06T00:34:04.925781316Z [i] No changes detected
+2025-09-06T00:34:05.521773734Z ✅ Database schema pushed successfully!
+2025-09-06T00:34:05.521944677Z 🔧 Adding test data...
+2025-09-06T00:34:05.725004366Z ⚠️ Test data error: connect ECONNREFUSED 10.202.57.176:443
+2025-09-06T00:34:05.726515264Z Warning: connect.session() MemoryStore is not
+2025-09-06T00:34:05.726526144Z designed for a production environment, as it will leak
+2025-09-06T00:34:05.726529804Z memory, and will not scale past a single process.
+2025-09-06T00:34:05.91985178Z 12:34:05 AM [express] serving on port 10000
+2025-09-06T00:34:09.444854172Z ==> Your service is live 🎉
+2025-09-06T00:34:09.604096738Z ==> 
+2025-09-06T00:34:09.757403494Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T00:34:09.91091692Z ==> 
+2025-09-06T00:34:10.063445507Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-06T00:34:10.228007432Z ==> 
+2025-09-06T00:34:10.381749328Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T00:34:21.362793212Z 12:34:21 AM [express] GET /api/auth/user 401 in 3ms :: {"message":"Unauthorized"}
+2025-09-06T00:34:24.751213795Z Login attempt: username="admin", password="1234"
+2025-09-06T00:34:24.751256626Z Found user credential for "admin": Yes
+2025-09-06T00:34:24.752852146Z Available users: [
+2025-09-06T00:34:24.752859676Z   'admin',  'ahmet',
+2025-09-06T00:34:24.752862266Z   'ayse',   'mehmet',
+2025-09-06T00:34:24.752864486Z   'zeynep', 'ali',
+2025-09-06T00:34:24.752866546Z   'elif',   'fatma',
+2025-09-06T00:34:24.752868776Z   'murat'
+2025-09-06T00:34:24.752874466Z ]
+2025-09-06T00:34:24.752885427Z Login successful for user: admin
+2025-09-06T00:34:24.754350194Z 12:34:24 AM [express] POST /api/login 200 in 3ms :: {"success":true}
+2025-09-06T00:34:25.129964568Z 12:34:25 AM [express] GET /api/auth/user 200 in 1ms :: {"id":"admin","firstName":"Admin","lastName":"…
+2025-09-06T00:34:25.297163432Z 🕐 Date filter applied: 2025-09-06T00:00:00.000Z to 2025-09-06T23:59:59.999Z
+2025-09-06T00:34:25.305607591Z Error fetching today's appointments: ErrorEvent {
+2025-09-06T00:34:25.305641652Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T00:34:25.305646422Z     _events: [Object: null prototype] {
+2025-09-06T00:34:25.305650222Z       error: [Function],
+2025-09-06T00:34:25.305653132Z       message: [Function],
+2025-09-06T00:34:25.305656092Z       close: [Function],
+2025-09-06T00:34:25.305659022Z       open: [Function]
+2025-09-06T00:34:25.305661892Z     },
+2025-09-06T00:34:25.305664882Z     _eventsCount: 4,
+2025-09-06T00:34:25.305667652Z     _maxListeners: undefined,
+2025-09-06T00:34:25.305670192Z     _binaryType: 'arraybuffer',
+2025-09-06T00:34:25.305673192Z     _closeCode: 1006,
+2025-09-06T00:34:25.305676172Z     _closeFrameReceived: false,
+2025-09-06T00:34:25.305679202Z     _closeFrameSent: false,
+2025-09-06T00:34:25.305681903Z     _closeMessage: <Buffer >,
+2025-09-06T00:34:25.305684423Z     _closeTimer: null,
+2025-09-06T00:34:25.305687203Z     _errorEmitted: true,
+2025-09-06T00:34:25.305689983Z     _extensions: {},
+2025-09-06T00:34:25.305692553Z     _paused: false,
+2025-09-06T00:34:25.305695443Z     _protocol: '',
+2025-09-06T00:34:25.305698123Z     _readyState: 3,
+2025-09-06T00:34:25.305700913Z     _receiver: null,
+2025-09-06T00:34:25.305703473Z     _sender: null,
+2025-09-06T00:34:25.305706213Z     _socket: null,
+2025-09-06T00:34:25.305712403Z     _bufferedAmount: 0,
+2025-09-06T00:34:25.305715473Z     _isServer: false,
+2025-09-06T00:34:25.305718363Z     _redirects: 0,
+2025-09-06T00:34:25.305721203Z     _autoPong: true,
+2025-09-06T00:34:25.305724153Z     _url: 'wss://10.202.57.176/v2',
+2025-09-06T00:34:25.305726813Z     _req: null,
+2025-09-06T00:34:25.305729733Z     [Symbol(shapeMode)]: false,
+2025-09-06T00:34:25.305732483Z     [Symbol(kCapture)]: false
+2025-09-06T00:34:25.305735204Z   },
+2025-09-06T00:34:25.305738053Z   [Symbol(kType)]: 'error',
+2025-09-06T00:34:25.305741444Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.57.176:443
+2025-09-06T00:34:25.305762834Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-06T00:34:25.305766264Z     errno: -111,
+2025-09-06T00:34:25.305768864Z     code: 'ECONNREFUSED',
+2025-09-06T00:34:25.305771404Z     syscall: 'connect',
+2025-09-06T00:34:25.305774094Z     address: '10.202.57.176',
+2025-09-06T00:34:25.305776954Z     port: 443
+2025-09-06T00:34:25.305779704Z   },
+2025-09-06T00:34:25.305782364Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.57.176:443'
+2025-09-06T00:34:25.305785124Z }
+2025-09-06T00:34:25.306527398Z 12:34:25 AM [express] GET /api/appointments/today/2025-09-06 500 in 12ms :: {"message":"Failed to fet…
+2025-09-06T00:34:25.321852787Z Error fetching customers: ErrorEvent {
+2025-09-06T00:34:25.321866837Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T00:34:25.321870247Z     _events: [Object: null prototype] {
+2025-09-06T00:34:25.321874087Z       error: [Function],
+2025-09-06T00:34:25.321876917Z       message: [Function],
+2025-09-06T00:34:25.321879877Z       close: [Function],
+2025-09-06T00:34:25.321882717Z       open: [Function]
+2025-09-06T00:34:25.321885447Z     },
+2025-09-06T00:34:25.321887957Z     _eventsCount: 4,
+2025-09-06T00:34:25.321890577Z     _maxListeners: undefined,
+2025-09-06T00:34:25.321893447Z     _binaryType: 'arraybuffer',
+2025-09-06T00:34:25.321896268Z     _closeCode: 1006,
+2025-09-06T00:34:25.321899617Z     _closeFrameReceived: false,
+2025-09-06T00:34:25.321902668Z     _closeFrameSent: false,
+2025-09-06T00:34:25.321905998Z     _closeMessage: <Buffer >,
+2025-09-06T00:34:25.321908728Z     _closeTimer: null,
+2025-09-06T00:34:25.321911288Z     _errorEmitted: true,
+2025-09-06T00:34:25.321914078Z     _extensions: {},
+2025-09-06T00:34:25.321916928Z     _paused: false,
+2025-09-06T00:34:25.321919698Z     _protocol: '',
+2025-09-06T00:34:25.321922438Z     _readyState: 3,
+2025-09-06T00:34:25.321925188Z     _receiver: null,
+2025-09-06T00:34:25.321927898Z     _sender: null,
+2025-09-06T00:34:25.321941728Z     _socket: null,
+2025-09-06T00:34:25.321944738Z     _bufferedAmount: 0,
+2025-09-06T00:34:25.321947398Z     _isServer: false,
+2025-09-06T00:34:25.321950129Z     _redirects: 0,
+2025-09-06T00:34:25.321952689Z     _autoPong: true,
+2025-09-06T00:34:25.321955518Z     _url: 'wss://10.202.57.176/v2',
+2025-09-06T00:34:25.321958269Z     _req: null,
+2025-09-06T00:34:25.321961059Z     [Symbol(shapeMode)]: false,
+2025-09-06T00:34:25.321963839Z     [Symbol(kCapture)]: false
+2025-09-06T00:34:25.321966369Z   },
+2025-09-06T00:34:25.321969289Z   [Symbol(kType)]: 'error',
+2025-09-06T00:34:25.321972679Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.57.176:443
+2025-09-06T00:34:25.321975719Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-06T00:34:25.321978399Z     errno: -111,
+2025-09-06T00:34:25.321981409Z     code: 'ECONNREFUSED',
+2025-09-06T00:34:25.321984419Z     syscall: 'connect',
+2025-09-06T00:34:25.321987199Z     address: '10.202.57.176',
+2025-09-06T00:34:25.321990069Z     port: 443
+2025-09-06T00:34:25.321992999Z   },
+2025-09-06T00:34:25.321995919Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.57.176:443'
+2025-09-06T00:34:25.321998789Z }
+2025-09-06T00:34:25.323043869Z 12:34:25 AM [express] GET /api/customers 500 in 16ms :: {"message":"Failed to fetch customers"}
+2025-09-06T00:34:25.324568838Z 12:34:25 AM [express] GET /api/visits/2025-09-06 200 in 4ms
+2025-09-06T00:34:39.591226411Z Error creating customer: ErrorEvent {
+2025-09-06T00:34:39.591253711Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T00:34:39.591258642Z     _events: [Object: null prototype] {
+2025-09-06T00:34:39.591274762Z       error: [Function],
+2025-09-06T00:34:39.591276742Z       message: [Function],
+2025-09-06T00:34:39.591278732Z       close: [Function],
+2025-09-06T00:34:39.591280932Z       open: [Function]
+2025-09-06T00:34:39.591283272Z     },
+2025-09-06T00:34:39.591286072Z     _eventsCount: 4,
+2025-09-06T00:34:39.591288912Z     _maxListeners: undefined,
+2025-09-06T00:34:39.591291582Z     _binaryType: 'arraybuffer',
+2025-09-06T00:34:39.591294202Z     _closeCode: 1006,
+2025-09-06T00:34:39.591297332Z     _closeFrameReceived: false,
+2025-09-06T00:34:39.591300012Z     _closeFrameSent: false,
+2025-09-06T00:34:39.591302982Z     _closeMessage: <Buffer >,
+2025-09-06T00:34:39.591305842Z     _closeTimer: null,
+2025-09-06T00:34:39.591308532Z     _errorEmitted: true,
+2025-09-06T00:34:39.591311592Z     _extensions: {},
+2025-09-06T00:34:39.591313303Z     _paused: false,
+2025-09-06T00:34:39.591314992Z     _protocol: '',
+2025-09-06T00:34:39.591316743Z     _readyState: 3,
+2025-09-06T00:34:39.591318383Z     _receiver: null,
+2025-09-06T00:34:39.591320053Z     _sender: null,
+2025-09-06T00:34:39.591321763Z     _socket: null,
+2025-09-06T00:34:39.591323453Z     _bufferedAmount: 0,
+2025-09-06T00:34:39.591325073Z     _isServer: false,
+2025-09-06T00:34:39.591326733Z     _redirects: 0,
+2025-09-06T00:34:39.591328433Z     _autoPong: true,
+2025-09-06T00:34:39.591330213Z     _url: 'wss://10.202.57.176/v2',
+2025-09-06T00:34:39.591331943Z     _req: null,
+2025-09-06T00:34:39.591333703Z     [Symbol(shapeMode)]: false,
+2025-09-06T00:34:39.591335403Z     [Symbol(kCapture)]: false
+2025-09-06T00:34:39.591337443Z   },
+2025-09-06T00:34:39.591339183Z   [Symbol(kType)]: 'error',
+2025-09-06T00:34:39.591341653Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.57.176:443
+2025-09-06T00:34:39.591343383Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-06T00:34:39.591345033Z     errno: -111,
+2025-09-06T00:34:39.591346733Z     code: 'ECONNREFUSED',
+2025-09-06T00:34:39.591348443Z     syscall: 'connect',
+2025-09-06T00:34:39.591350653Z     address: '10.202.57.176',
+2025-09-06T00:34:39.591353623Z     port: 443
+2025-09-06T00:34:39.591356473Z   },
+2025-09-06T00:34:39.591362384Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.57.176:443'
+2025-09-06T00:34:39.591365044Z }
+2025-09-06T00:34:39.591983555Z 12:34:39 AM [express] POST /api/customers 400 in 4ms :: {"message":"Failed to create customer"}
+2025-09-06T00:34:41.010236277Z Error creating customer: ErrorEvent {
+2025-09-06T00:34:41.010267208Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T00:34:41.010270828Z     _events: [Object: null prototype] {
+2025-09-06T00:34:41.010274518Z       error: [Function],
+2025-09-06T00:34:41.010277288Z       message: [Function],
+2025-09-06T00:34:41.010280298Z       close: [Function],
+2025-09-06T00:34:41.010283208Z       open: [Function]
+2025-09-06T00:34:41.010286318Z     },
+2025-09-06T00:34:41.010289648Z     _eventsCount: 4,
+2025-09-06T00:34:41.010292478Z     _maxListeners: undefined,
+2025-09-06T00:34:41.010295658Z     _binaryType: 'arraybuffer',
+2025-09-06T00:34:41.010298638Z     _closeCode: 1006,
+2025-09-06T00:34:41.010301629Z     _closeFrameReceived: false,
+2025-09-06T00:34:41.010304269Z     _closeFrameSent: false,
+2025-09-06T00:34:41.010307269Z     _closeMessage: <Buffer >,
+2025-09-06T00:34:41.010309979Z     _closeTimer: null,
+2025-09-06T00:34:41.010312739Z     _errorEmitted: true,
+2025-09-06T00:34:41.010316299Z     _extensions: {},
+2025-09-06T00:34:41.010318939Z     _paused: false,
+2025-09-06T00:34:41.010336779Z     _protocol: '',
+2025-09-06T00:34:41.010339549Z     _readyState: 3,
+2025-09-06T00:34:41.010342289Z     _receiver: null,
+2025-09-06T00:34:41.010345199Z     _sender: null,
+2025-09-06T00:34:41.010347459Z     _socket: null,
+2025-09-06T00:34:41.010349639Z     _bufferedAmount: 0,
+2025-09-06T00:34:41.01035179Z     _isServer: false,
+2025-09-06T00:34:41.0103541Z     _redirects: 0,
+2025-09-06T00:34:41.01035659Z     _autoPong: true,
+2025-09-06T00:34:41.01035911Z     _url: 'wss://10.202.57.176/v2',
+2025-09-06T00:34:41.01036198Z     _req: null,
+2025-09-06T00:34:41.01036482Z     [Symbol(shapeMode)]: false,
+2025-09-06T00:34:41.01036743Z     [Symbol(kCapture)]: false
+2025-09-06T00:34:41.01037001Z   },
+2025-09-06T00:34:41.01037266Z   [Symbol(kType)]: 'error',
+2025-09-06T00:34:41.01037567Z   [Symbol(kError)]: Error: connect ECONNREFUSED 10.202.57.176:443
+2025-09-06T00:34:41.01037815Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-06T00:34:41.010398651Z     errno: -111,
+2025-09-06T00:34:41.010405231Z     code: 'ECONNREFUSED',
+2025-09-06T00:34:41.010408221Z     syscall: 'connect',
+2025-09-06T00:34:41.010410831Z     address: '10.202.57.176',
+2025-09-06T00:34:41.010413341Z     port: 443
+2025-09-06T00:34:41.010415971Z   },
+2025-09-06T00:34:41.010419431Z   [Symbol(kMessage)]: 'connect ECONNREFUSED 10.202.57.176:443'
+2025-09-06T00:34:41.010422231Z }
+2025-09-06T00:34:41.01091141Z 12:34:41 AM [express] POST /api/customers 400 in 3ms :: {"message":"Failed to create customer"}
