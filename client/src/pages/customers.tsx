@@ -43,6 +43,7 @@ export default function Customers() {
   // Müşteri verileri
   const { data: customers = [], isLoading: customersLoading } = useQuery({
     queryKey: ['/api/customers'],
+    queryFn: () => fetch('/api/customers', { credentials: 'include' }).then(res => res.json()),
     enabled: isAuthenticated,
   });
 
@@ -51,6 +52,7 @@ export default function Customers() {
   // Müşteri geçmişi query
   const { data: customerHistory } = useQuery({
     queryKey: [`/api/customers/${selectedCustomerHistory?.id}/history`],
+    queryFn: () => fetch(`/api/customers/${selectedCustomerHistory?.id}/history`, { credentials: 'include' }).then(res => res.json()),
     enabled: !!selectedCustomerHistory,
     retry: false,
   });
@@ -60,6 +62,7 @@ export default function Customers() {
     mutationFn: async (customerId: string) => {
       const response = await fetch(`/api/customers/${customerId}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
       
       if (!response.ok) {
@@ -89,8 +92,9 @@ export default function Customers() {
   const updateCustomerMutation = useMutation({
     mutationFn: async (data: { id: string } & Partial<Customer>) => {
       const response = await fetch(`/api/customers/${data.id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(data),
       });
       
@@ -124,6 +128,7 @@ export default function Customers() {
     mutationFn: async (customerId: string) => {
       const response = await fetch(`/api/customers/${customerId}/deactivate`, {
         method: 'PATCH',
+        credentials: 'include',
       });
       
       if (!response.ok) {
