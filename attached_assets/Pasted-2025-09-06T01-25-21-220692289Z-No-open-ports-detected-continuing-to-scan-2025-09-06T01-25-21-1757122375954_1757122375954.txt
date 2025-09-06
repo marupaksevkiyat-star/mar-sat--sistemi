@@ -1,0 +1,262 @@
+2025-09-06T01:25:21.220692289Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:25:21.576868824Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:26:24.123096897Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:26:24.469775728Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:27:18.512627069Z ==> Your service is live 🎉
+2025-09-06T01:27:18.670439914Z ==> 
+2025-09-06T01:27:18.82619667Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:27:18.979692525Z ==> 
+2025-09-06T01:27:19.134870571Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-06T01:27:19.288455786Z ==> 
+2025-09-06T01:27:19.441352502Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:27:15.62623059Z ⚠️ Test data error: connect ETIMEDOUT 3.65.142.85:443
+2025-09-06T01:27:15.627957371Z Warning: connect.session() MemoryStore is not
+2025-09-06T01:27:15.627979302Z designed for a production environment, as it will leak
+2025-09-06T01:27:15.627984892Z memory, and will not scale past a single process.
+2025-09-06T01:27:15.724044023Z 1:27:15 AM [express] serving on port 10000
+2025-09-06T01:27:58.61036987Z ==> Deploying...
+2025-09-06T01:28:20.724526037Z ==> Running 'npm run start'
+2025-09-06T01:28:21.827312776Z 
+2025-09-06T01:28:21.827340747Z > rest-express@1.0.0 start
+2025-09-06T01:28:21.827347287Z > NODE_ENV=production node dist/index.js
+2025-09-06T01:28:21.827349687Z 
+2025-09-06T01:28:30.014875638Z 🔧 Setting up database...
+2025-09-06T01:28:35.024700717Z No config path provided, using default 'drizzle.config.ts'
+2025-09-06T01:28:35.025313251Z Reading config file '/opt/render/project/src/drizzle.config.ts'
+2025-09-06T01:28:42.516204402Z Using 'pg' driver for database querying
+2025-09-06T01:28:45.71558245Z [⣷] Pulling schema from database...
+2025-09-06T01:28:45.824927396Z error: SSL/TLS required
+2025-09-06T01:28:45.824944827Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:28:45.824949867Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:28:45.824953937Z     at async Object.query (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:66575:26)
+2025-09-06T01:28:45.824958837Z     at async fromDatabase2 (/opt/render/project/src/node_modules/drizzle-kit/bin.cjs:18700:25) {
+2025-09-06T01:28:45.824962887Z   length: 37,
+2025-09-06T01:28:45.824966847Z   severity: 'FATAL',
+2025-09-06T01:28:45.824970957Z   code: '28000',
+2025-09-06T01:28:45.824975288Z   detail: undefined,
+2025-09-06T01:28:45.824979108Z   hint: undefined,
+2025-09-06T01:28:45.826486532Z   position: undefined,
+2025-09-06T01:28:45.826499152Z   internalPosition: undefined,
+2025-09-06T01:28:45.826505753Z   internalQuery: undefined,
+2025-09-06T01:28:45.826510473Z   where: undefined,
+2025-09-06T01:28:45.826514263Z   schema: undefined,
+2025-09-06T01:28:45.826517933Z   table: undefined,
+2025-09-06T01:28:45.826521593Z   column: undefined,
+2025-09-06T01:28:45.826525113Z   dataType: undefined,
+2025-09-06T01:28:45.826529143Z   constraint: undefined,
+2025-09-06T01:28:45.826533043Z   file: undefined,
+2025-09-06T01:28:45.826537563Z   line: undefined,
+2025-09-06T01:28:45.826541693Z   routine: undefined
+2025-09-06T01:28:45.826546013Z }
+2025-09-06T01:28:46.420373096Z ✅ Database schema pushed successfully!
+2025-09-06T01:28:46.420398706Z 🔧 Adding test data...
+2025-09-06T01:29:05.393662576Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:29:05.739647696Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:29:38.463089692Z 1:29:38 AM [express] GET /api/auth/user 401 in 2ms :: {"message":"Unauthorized"}
+2025-09-06T01:29:40.495049968Z Login attempt: username="admin", password="1234"
+2025-09-06T01:29:40.495162641Z Found user credential for "admin": Yes
+2025-09-06T01:29:40.496899921Z Available users: [
+2025-09-06T01:29:40.496910892Z   'admin',  'ahmet',
+2025-09-06T01:29:40.496915562Z   'ayse',   'mehmet',
+2025-09-06T01:29:40.496919792Z   'zeynep', 'ali',
+2025-09-06T01:29:40.496923922Z   'elif',   'fatma',
+2025-09-06T01:29:40.496927612Z   'murat'
+2025-09-06T01:29:40.496931702Z ]
+2025-09-06T01:29:40.496936282Z Login successful for user: admin
+2025-09-06T01:29:40.498659523Z 1:29:40 AM [express] POST /api/login 200 in 4ms :: {"success":true}
+2025-09-06T01:29:40.883869303Z 1:29:40 AM [express] GET /api/auth/user 200 in 2ms :: {"id":"admin","firstName":"Admin","lastName":"…
+2025-09-06T01:29:40.980859568Z 📊 Dashboard stats request - User: admin, Role: admin, Can see all data: true
+2025-09-06T01:29:41.06033026Z 📅 Getting upcoming appointments (next 7 days) for user: admin
+2025-09-06T01:29:55.793120552Z 1:29:55 AM [express] GET /api/visits/2025-09-06 200 in 3ms
+2025-09-06T01:29:55.797042192Z 🕐 Date filter applied: 2025-09-06T00:00:00.000Z to 2025-09-06T23:59:59.999Z
+2025-09-06T01:30:08.25776308Z ==> No open ports detected, continuing to scan...
+2025-09-06T01:30:08.631849609Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-06T01:30:59.668967216Z ⚠️ Test data error: connect ETIMEDOUT 3.65.142.85:443
+2025-09-06T01:30:59.91298367Z 1:30:59 AM [express] serving on port 10000
+2025-09-06T01:31:09.477107624Z ==> Your service is live 🎉
+2025-09-06T01:31:09.672318033Z ==> 
+2025-09-06T01:31:09.834490719Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:31:09.990701466Z ==> 
+2025-09-06T01:31:10.146861893Z ==> Available at your primary URL https://satis-uretim-app.onrender.com
+2025-09-06T01:31:10.30205872Z ==> 
+2025-09-06T01:31:10.459761857Z ==> ///////////////////////////////////////////////////////////
+2025-09-06T01:31:35.923425162Z 1:31:35 AM [express] POST /api/customers 500 in 89ms :: {"message":"SSL/TLS required"}
+2025-09-06T01:31:35.924455546Z error: SSL/TLS required
+2025-09-06T01:31:35.924472246Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:31:35.924477676Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:31:35.924482846Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:31:35.924487776Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:177:19)
+2025-09-06T01:31:35.924492006Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:31:37.873847926Z 1:31:37 AM [express] POST /api/customers 500 in 1ms :: {"message":"SSL/TLS required"}
+2025-09-06T01:31:37.87403319Z error: SSL/TLS required
+2025-09-06T01:31:37.874042851Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:31:37.874047891Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:31:37.874052531Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:31:37.874074311Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:177:19)
+2025-09-06T01:31:37.874077082Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:31:38.890605246Z 1:31:38 AM [express] POST /api/customers 500 in 1ms :: {"message":"SSL/TLS required"}
+2025-09-06T01:31:38.8907985Z error: SSL/TLS required
+2025-09-06T01:31:38.890808811Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:31:38.890812761Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:31:38.890815971Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:31:38.890819031Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:177:19)
+2025-09-06T01:31:38.890821741Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:31:39.538349796Z error: SSL/TLS required
+2025-09-06T01:31:39.538363176Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:31:39.538366376Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:31:39.538368806Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:31:39.538371076Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:177:19)
+2025-09-06T01:31:39.538372836Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:31:39.538380406Z 1:31:39 AM [express] POST /api/customers 500 in 1ms :: {"message":"SSL/TLS required"}
+2025-09-06T01:31:54.152926578Z Error fetching dashboard stats: ErrorEvent {
+2025-09-06T01:31:54.152963589Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T01:31:54.152970379Z     _events: [Object: null prototype] {
+2025-09-06T01:31:54.152977079Z       error: [Function],
+2025-09-06T01:31:54.152981819Z       message: [Function],
+2025-09-06T01:31:54.152987679Z       close: [Function],
+2025-09-06T01:31:54.152993119Z       open: [Function]
+2025-09-06T01:31:54.15299878Z     },
+2025-09-06T01:31:54.153004469Z     _eventsCount: 4,
+2025-09-06T01:31:54.15300976Z     _maxListeners: undefined,
+2025-09-06T01:31:54.15301567Z     _binaryType: 'arraybuffer',
+2025-09-06T01:31:54.15302115Z     _closeCode: 1006,
+2025-09-06T01:31:54.15302632Z     _closeFrameReceived: false,
+2025-09-06T01:31:54.15303152Z     _closeFrameSent: false,
+2025-09-06T01:31:54.15303673Z     _closeMessage: <Buffer >,
+2025-09-06T01:31:54.15304212Z     _closeTimer: null,
+2025-09-06T01:31:54.15304752Z     _errorEmitted: true,
+2025-09-06T01:31:54.15305136Z     _extensions: {},
+2025-09-06T01:31:54.153054861Z     _paused: false,
+2025-09-06T01:31:54.153058501Z     _protocol: '',
+2025-09-06T01:31:54.153062041Z     _readyState: 3,
+2025-09-06T01:31:54.153065801Z     _receiver: null,
+2025-09-06T01:31:54.153069471Z     _sender: null,
+2025-09-06T01:31:54.153073031Z     _socket: null,
+2025-09-06T01:31:54.153078091Z     _bufferedAmount: 0,
+2025-09-06T01:31:54.153084141Z     _isServer: false,
+2025-09-06T01:31:54.153089791Z     _redirects: 0,
+2025-09-06T01:31:54.153095331Z     _autoPong: true,
+2025-09-06T01:31:54.153103611Z     _url: 'wss://dpg-d2tnf4buibrs73evd9dg-a.frankfurt-postgres.render.com/v2',
+2025-09-06T01:31:54.153109311Z     _req: null,
+2025-09-06T01:31:54.153115502Z     [Symbol(shapeMode)]: false,
+2025-09-06T01:31:54.153119342Z     [Symbol(kCapture)]: false
+2025-09-06T01:31:54.153122922Z   },
+2025-09-06T01:31:54.153126582Z   [Symbol(kType)]: 'error',
+2025-09-06T01:31:54.153130412Z   [Symbol(kError)]: Error: connect ETIMEDOUT 3.65.142.85:443
+2025-09-06T01:31:54.153134022Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-06T01:31:54.153137572Z     errno: -110,
+2025-09-06T01:31:54.153141162Z     code: 'ETIMEDOUT',
+2025-09-06T01:31:54.153147102Z     syscall: 'connect',
+2025-09-06T01:31:54.153152722Z     address: '3.65.142.85',
+2025-09-06T01:31:54.153158512Z     port: 443
+2025-09-06T01:31:54.153163662Z   },
+2025-09-06T01:31:54.153169623Z   [Symbol(kMessage)]: 'connect ETIMEDOUT 3.65.142.85:443'
+2025-09-06T01:31:54.153175812Z }
+2025-09-06T01:31:54.154061828Z Error fetching recent orders: ErrorEvent {
+2025-09-06T01:31:54.154086299Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T01:31:54.154091439Z     _events: [Object: null prototype] {
+2025-09-06T01:31:54.154096659Z       error: [Function],
+2025-09-06T01:31:54.154100509Z       message: [Function],
+2025-09-06T01:31:54.154104569Z       close: [Function],
+2025-09-06T01:31:54.154108449Z       open: [Function]
+2025-09-06T01:31:54.154112559Z     },
+2025-09-06T01:31:54.154116719Z     _eventsCount: 4,
+2025-09-06T01:31:54.15412074Z     _maxListeners: undefined,
+2025-09-06T01:31:54.154124809Z     _binaryType: 'arraybuffer',
+2025-09-06T01:31:54.15412876Z     _closeCode: 1006,
+2025-09-06T01:31:54.15413269Z     _closeFrameReceived: false,
+2025-09-06T01:31:54.15414727Z     _closeFrameSent: false,
+2025-09-06T01:31:54.15414996Z     _closeMessage: <Buffer >,
+2025-09-06T01:31:54.1541526Z     _closeTimer: null,
+2025-09-06T01:31:54.15415549Z     _errorEmitted: true,
+2025-09-06T01:31:54.15415826Z     _extensions: {},
+2025-09-06T01:31:54.15416101Z     _paused: false,
+2025-09-06T01:31:54.15416375Z     _protocol: '',
+2025-09-06T01:31:54.1541667Z     _readyState: 3,
+2025-09-06T01:31:54.15416944Z     _receiver: null,
+2025-09-06T01:31:54.15417208Z     _sender: null,
+2025-09-06T01:31:54.154174981Z     _socket: null,
+2025-09-06T01:31:54.154177861Z     _bufferedAmount: 0,
+2025-09-06T01:31:54.154180561Z     _isServer: false,
+2025-09-06T01:31:54.15418357Z     _redirects: 0,
+2025-09-06T01:31:54.154186371Z     _autoPong: true,
+2025-09-06T01:31:54.154189671Z     _url: 'wss://dpg-d2tnf4buibrs73evd9dg-a.frankfurt-postgres.render.com/v2',
+2025-09-06T01:31:54.154192411Z     _req: null,
+2025-09-06T01:31:54.154195201Z     [Symbol(shapeMode)]: false,
+2025-09-06T01:31:54.154197521Z     [Symbol(kCapture)]: false
+2025-09-06T01:31:54.154200061Z   },
+2025-09-06T01:31:54.154202621Z   [Symbol(kType)]: 'error',
+2025-09-06T01:31:54.154206001Z   [Symbol(kError)]: Error: connect ETIMEDOUT 3.65.142.85:443
+2025-09-06T01:31:54.154210921Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-06T01:31:54.154213631Z     errno: -110,
+2025-09-06T01:31:54.154216281Z     code: 'ETIMEDOUT',
+2025-09-06T01:31:54.154218891Z     syscall: 'connect',
+2025-09-06T01:31:54.154221581Z     address: '3.65.142.85',
+2025-09-06T01:31:54.154224371Z     port: 443
+2025-09-06T01:31:54.154226961Z   },
+2025-09-06T01:31:54.154229881Z   [Symbol(kMessage)]: 'connect ETIMEDOUT 3.65.142.85:443'
+2025-09-06T01:31:54.154232531Z }
+2025-09-06T01:31:54.155126678Z Error fetching today's appointments: ErrorEvent {
+2025-09-06T01:31:54.155141408Z   [Symbol(kTarget)]: WebSocket {
+2025-09-06T01:31:54.155145598Z     _events: [Object: null prototype] {
+2025-09-06T01:31:54.155148968Z       error: [Function],
+2025-09-06T01:31:54.155151938Z       message: [Function],
+2025-09-06T01:31:54.155155128Z       close: [Function],
+2025-09-06T01:31:54.155157918Z       open: [Function]
+2025-09-06T01:31:54.155177838Z     },
+2025-09-06T01:31:54.155181358Z     _eventsCount: 4,
+2025-09-06T01:31:54.155184188Z     _maxListeners: undefined,
+2025-09-06T01:31:54.155187219Z     _binaryType: 'arraybuffer',
+2025-09-06T01:31:54.155190188Z     _closeCode: 1006,
+2025-09-06T01:31:54.155193109Z     _closeFrameReceived: false,
+2025-09-06T01:31:54.155196149Z     _closeFrameSent: false,
+2025-09-06T01:31:54.155199099Z     _closeMessage: <Buffer >,
+2025-09-06T01:31:54.155202109Z     _closeTimer: null,
+2025-09-06T01:31:54.155205029Z     _errorEmitted: true,
+2025-09-06T01:31:54.155207919Z     _extensions: {},
+2025-09-06T01:31:54.155210969Z     _paused: false,
+2025-09-06T01:31:54.155213709Z     _protocol: '',
+2025-09-06T01:31:54.155216579Z     _readyState: 3,
+2025-09-06T01:31:54.155219899Z     _receiver: null,
+2025-09-06T01:31:54.155222889Z     _sender: null,
+2025-09-06T01:31:54.155225699Z     _socket: null,
+2025-09-06T01:31:54.155228719Z     _bufferedAmount: 0,
+2025-09-06T01:31:54.155231689Z     _isServer: false,
+2025-09-06T01:31:54.155234689Z     _redirects: 0,
+2025-09-06T01:31:54.155237609Z     _autoPong: true,
+2025-09-06T01:31:54.155240789Z     _url: 'wss://dpg-d2tnf4buibrs73evd9dg-a.frankfurt-postgres.render.com/v2',
+2025-09-06T01:31:54.155243809Z     _req: null,
+2025-09-06T01:31:54.15526672Z     [Symbol(shapeMode)]: false,
+2025-09-06T01:31:54.15527009Z     [Symbol(kCapture)]: false
+2025-09-06T01:31:54.15527297Z   },
+2025-09-06T01:31:54.15527563Z   [Symbol(kType)]: 'error',
+2025-09-06T01:31:54.15527865Z   [Symbol(kError)]: Error: connect ETIMEDOUT 3.65.142.85:443
+2025-09-06T01:31:54.15528145Z       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1636:16) {
+2025-09-06T01:31:54.15528413Z     errno: -110,
+2025-09-06T01:31:54.1552871Z     code: 'ETIMEDOUT',
+2025-09-06T01:31:54.1552899Z     syscall: 'connect',
+2025-09-06T01:31:54.15529312Z     address: '3.65.142.85',
+2025-09-06T01:31:54.15529597Z     port: 443
+2025-09-06T01:31:54.155298601Z   },
+2025-09-06T01:31:54.155301481Z   [Symbol(kMessage)]: 'connect ETIMEDOUT 3.65.142.85:443'
+2025-09-06T01:31:54.155304321Z }
+2025-09-06T01:31:51.166096247Z error: SSL/TLS required
+2025-09-06T01:31:51.166122658Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:31:51.166126158Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:31:51.166129888Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:31:51.166133138Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:177:19)
+2025-09-06T01:31:51.166136438Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:31:51.253989532Z error: SSL/TLS required
+2025-09-06T01:31:51.254020693Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:31:51.254025313Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:31:51.254028443Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:31:51.254031723Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:177:19)
+2025-09-06T01:31:51.254034083Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:32:36.672717537Z error: SSL/TLS required
+2025-09-06T01:32:36.672747127Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2025-09-06T01:32:36.672751878Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-06T01:32:36.672756908Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:322:21)
+2025-09-06T01:32:36.672761618Z     at async PGStore._rawEnsureSessionStoreTable (/opt/render/project/src/node_modules/connect-pg-simple/index.js:177:19)
+2025-09-06T01:32:36.672778318Z     at async PGStore._asyncQuery (/opt/render/project/src/node_modules/connect-pg-simple/index.js:315:7)
+2025-09-06T01:32:37.755102431Z 1:32:37 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+2025-09-06T01:32:39.067041807Z 1:32:39 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}

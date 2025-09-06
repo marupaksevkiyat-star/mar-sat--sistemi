@@ -44,7 +44,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.use(session({
     store: new pgSession({
-      conString: process.env.DATABASE_URL,
+      conString: process.env.DATABASE_URL + '?sslmode=require',
       tableName: 'session',
       createTableIfMissing: true
     }),
